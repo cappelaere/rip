@@ -9,19 +9,21 @@ You may need to download and install node > 0.6.x
 http://nodejs.org/#download
 
 ### Download rip
-git clone https://github.com/cappelaere/rip.git
-cd rip
+> git clone https://github.com/cappelaere/rip.git
+
+> cd rip
 
 ### install all required node-modules
-npm install
+> npm install
 
 ### Download Redis
 You will also need a local instance of a Redis Database
 http://redis.io/
-download the code, install and start the database locally
+
+Download the code, install and start the database locally
 
 ### Start RIP
-node server.js
+> node server.js
 
 ### Browse
 and point your browser to http://localhost:3000 
