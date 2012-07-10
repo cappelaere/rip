@@ -1,0 +1,14 @@
+{
+    "root_service":                 "rip",
+    "realm":                        "/rip",
+    "server_url":                   "http://rip.jit.su",
+	
+	"debug":						true,
+		
+	"twitter_consumer_key": 		"jTYVo469eAe6csK9zJ2ig",
+	"twitter_consumer_secret":		"lOAzkJ4eBk5dQJqJG7dcIc5aBhCdU7jC3HhMLRCJoJE",
+	"twitter_oauth_token":			"416661318-w5zaBhfQLbxhd7ML55IwmnCoIkjJAXj4Cehq4aQW",
+	"twitter_oauth_secret": 		"7kPguVUoRkDzEyT9M1fSsjZg9MDfR2olpoZzwyEhsY",
+
+	"pubsubhubbub_url":				"http://geobliki.superfeedr.com"
+}

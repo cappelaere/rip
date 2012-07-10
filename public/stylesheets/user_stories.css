@@ -1,0 +1,55 @@
+
+
+#role:before {
+	font-weight: bold;
+	content: "As ";
+}	
+
+#want:before {
+	font-weight: bold;	
+	content: "I want to ";
+}
+
+#benefit:before {
+	font-weight: bold;	
+	content: "So that I ";
+}
+
+#given:before {
+	font-weight: bold;	
+	content: "Given ";
+	
+}
+
+#when:before {
+	font-weight: bold;	
+	content: "When ";
+	
+}
+
+#then:before {
+	font-weight: bold;
+	content: "Then ";
+		
+}
+
+#and:before {
+	font-weight: bold;	
+	content: "  And ";
+	
+}
+
+#rationale:before {
+	content: "  Rationale: ";
+	
+}
+
+#rationale {
+	background-color: lightgray;
+	margin: 1em;
+	font-style: italic;	
+}
+
+#back.before {
+	content: "<a href='/stories";
+}

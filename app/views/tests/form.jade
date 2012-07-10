@@ -1,0 +1,34 @@
+h2 Test RESTful Service
+
+form(method='post',action='/tests')
+	p
+	table
+		tr
+			td
+				label Enter URL: &nbsp;
+				input(type='text', id='inp', name='params[url]', value='http://radarsat.geobliki.com', size="40") &nbsp;
+		
+			td
+				label Options: &nbsp;
+				select(id='select_url', name='select_url' )
+					option(value="http://radarsat.geobliki.com", selected ) http://radarsat.geobliki.com
+					option(value="http://eo-virtual-archive4.esa.int/search/html") http://eo-virtual-archive4.esa.int/search/html
+					option(value="http://geogratis.gc.ca/api/en") http://geogratis.gc.ca/api/en
+	p
+	With Selected Preferences:	
+	p
+	input(  type='checkbox', name='params[OpenSearch]', checked)
+	Label Check OpenSearch
+	p
+	input(  type='checkbox', name='params[GoogleDiscoveryAPI]', checked) 
+	Label Check Google Discovery API
+	p
+	input(type="submit", value="Submit")
+
+	script(src='/javascripts/jquery-1.5.min.js')
+	script(type='text/javascript')
+		var selectoption = document.getElementById("select_url")
+		selectoption.onchange=function(){
+			var opt = this.options[this.selectedIndex].value
+			$('#inp').val(opt)
+		}

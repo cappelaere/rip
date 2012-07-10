@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <title>Mocha Run</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="/stylesheets/mocha.css" />
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<script src='/javascripts/showhide.js'></script>
+	<script src='/javascripts/jquery-1.5.min.js'></script>
+	
+	<script type="text/javascript">
+	  function init_sio() {
+		var socket = io.connect('<%= server_url %>');
+		
+	  	socket.on('rstats', function (data) {
+		    var stats = JSON.parse(data);
+	
+		    var percent = stats.tests / stats.total * 100 | 0;
+	
+			var progress = "progress: <em>"+percent+"</em>";
+			var passes 	 = "passes: <em>"+stats.passes+"</em>";
+			var failures = "failures: <em>"+stats.failures+"</em>";
+			var duration = "duration: <em>"+stats.duration+"</em>ms";
+		
+			$('#stats-passes').html(passes);
+			$('#stats-failures').html(failures);
+			$('#stats-duration').html(duration);
+		
+			//window.location.reload(true);
+		});
+		
+		socket.on('rsuite', function (data, fn) {
+
+			$('#start-report').append(data);
+			if(fn) {
+				fn('ok');
+			} else {
+				console.log("fn missing");
+			}
+		});
+		
+		socket.on('connected', function() {
+			socket.emit('startTest', '<%= JSON.stringify(params) %>');
+		});
+	};
+	</script>
+	
+  </head>
+
+  <body onload = "init_sio()">
+		<div id="mocha"> 
+			<ul id="stats">
+				<li id="stats-passes"   class="passes"></li>
+				<li id="stats-failures" class="failures"></li>
+				<li id="stats-duration" class="duration"></li>
+			</ul>
+		</div>
+		
+		<h2><b>Testing: <%= url %> </b></h2>
+
+	    <div id="mocha"> 
+			<ul id='report'>
+				<div id='start-report'></div>
+			</ul>
+		</div>
+  </body>
+</html>

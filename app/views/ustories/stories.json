@@ -1,0 +1,60 @@
+{
+    "End_Point": {
+        "is valid and available":  {
+            "link": { "href": "/EndPoint/ValidEndPoint"}
+      }
+    },
+    "Landing_Page": {
+        "uses HTML5": {
+            "link": { "href": "/LandingPage/HTML5"}
+      },
+        "has links to Discovery Documents in Head": {
+            "link": { "href": "/LandingPage/DiscoveryDoc"}          
+      }
+    },
+    "OpenSearch_Document": {
+        "is accessible": {
+            "link": { "href": "/OpenSearch/DiscoveryDoc"}                      
+        }
+    },
+    "API_Discovery_Document": {
+        "is accessible": {
+            "link": { "href": "/API/DiscoveryDoc"}                      
+        },
+        "contains API metadata": {
+            "link": { "href": "/API/MetaData"}                      
+        }      
+    },
+    "Uniform_Interface": {
+        "uses limited http verbs": {
+            "link": { "href": "/UniformInterface/Verbs"}                      
+        },
+        "follows idempotence rules": {
+            "link": { "href": "/UniformInterface/Idempotence"}                      
+        }       
+    },
+    "Content_Negotiation": {
+        "uses Accept and Content-Type headers": {},
+        "allows representation suffixes html|json|txt|xml": {},
+		"supports custom mime-type": {}
+    },
+	"Atom Feeds": {
+		"extends ATOM": {},
+		"uses proper custom format":{},
+		"connects to one or more aggregators": {}
+	},
+    "HATEOAS": {
+        "uses links in resources": {},
+        "defines links relations": {}
+    },
+    "Caching": {
+        "uses caching frontend": {},
+        "uses ETAGS": {}
+    },
+    "Security": {
+        "defines security protocol": {}
+	},
+    "CORS": {
+        "supports cross-origin resource sharing": {}
+	}
+}

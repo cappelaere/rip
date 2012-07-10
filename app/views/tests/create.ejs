@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <title>Mocha Run</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="/stylesheets/mocha.css" />
+
+    <script src="/javascripts/mocha.js"></script>
+    <script src="/javascripts/chai.js"></script>
+
+    <script>mocha.setup('bdd')</script>
+    <script>expect = chai.expect</script>
+
+    <script src="/tests/Array.js"></script>
+    <!--
+	<script src="/tests/Discovery.js"></script>
+    <script src="/tests/OpenSearch.js"></script>
+    <script src="/tests/UniformInterface.js"></script>
+	-->
+
+</head>
+
+  <body>
+	<b>Testing: <%= url %> </b>
+    <div id="mocha"> </div>
+
+
+   <script>
+	 global.url = '<%= url %>';
+      mocha
+		.run();
+    </script>
+
+  </body>
+</html>
