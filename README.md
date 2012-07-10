@@ -2,6 +2,30 @@
 
 RIP is a RESTful Interface Tester
 
+## Requirements & Installation
+
+RIP is a node.js application.
+You may need to download and install node > 0.6.x
+http://nodejs.org/#download
+
+### Download rip
+git clone https://github.com/cappelaere/rip.git
+cd rip
+
+### install all required node-modules
+npm install
+
+### Download Redis
+You will also need a local instance of a Redis Database
+http://redis.io/
+download the code, install and start the database locally
+
+### Start RIP
+node server.js
+
+### Browse
+and point your browser to http://localhost:3000 
+
 ## Examples
 
 Go to tests.  Select or enter a web service end point for testing
