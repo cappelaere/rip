@@ -3,10 +3,11 @@
     <title>Mocha Run</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="/stylesheets/mocha.css" />
-	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script src='/javascripts/showhide.js'></script>
 	<script src='/javascripts/jquery-1.5.min.js'></script>
-	
+
+<!--  remove socket.io for now	
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script type="text/javascript">
 	  function init_sio() {
 		var socket = io.connect('<%= server_url %>');
@@ -43,9 +44,12 @@
 		});
 	};
 	</script>
-	
-  </head>
+-->
 
+  </head>
+	
+  <body>
+<!-- used for socket.io
   <body onload = "init_sio()">
 		<div id="mocha"> 
 			<ul id="stats">
@@ -62,5 +66,12 @@
 				<div id='start-report'></div>
 			</ul>
 		</div>
+-->
+	<h2><b>Testing: <%= url %> </b></h2>
+	<div id="mocha"> 
+		<ul id='report'>
+		<%- results %>
+		</ul>
+	</div>
   </body>
 </html>

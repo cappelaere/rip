@@ -35,21 +35,27 @@ var express 		= require('express'),
 	global.server_url 	= server_url;
 
 	var db, sessionStore;
+	var rtg, passwd;
 	
 	// configuring the database access & session store
 	//
 	if( app.settings.env == 'production') {
-		console.log("Now connecting to nodejitsu redis...")
+
+		console.log("* Connecting to nodejitsu redis...")
 	
 		// jitsu databases create redis rip2
 		// jitsu databases list
 		var conn_url 		= 'redis://nodejitsu:ff6691395536b4d5636a81627530830d@drum.redistogo.com:9774/';
-		var rtg 			= url.parse(conn_url);
-		var passwd 			= rtg.auth.split(':')[1];
+		rtg 				= url.parse(conn_url);
+		passwd 				= rtg.auth.split(':')[1];
 		
 		db				    = redis.createClient(rtg.port, rtg.hostname);
 		//console.log("redis port:"+rtg.port+" hostname:"+rtg.hostname+" passwd:"+passwd);
 		db.auth(passwd);
+		db.debugMode 	= true; 
+		db.on("error", function (err) {
+		    console.log("Production Redis Database Error " + err);
+		});
 
 		var str = JSON.stringify(new Date());
 		console.log("Trying to start at: "+str);
@@ -67,16 +73,13 @@ var express 		= require('express'),
 		sessionStore 	= new RedisStore(options);
 		
 	} else {
-		console.log("Connecting to localhost redis...");
+		console.log("* Connecting to localhost redis...");
 		db			 = redis.createClient();
-		sessionStore = new RedisStore();		
+		db.on("error", function (err) {
+		    console.log("Local Redis Database Error " + err);
+		});
+		sessionStore = new RedisStore();	
 	}
-
-	db.debugMode 	= true; 
-	db.on("error", function (err) {
-	    console.log("Redis Database Error " + err);
-	});
-
 	
 app.root 			= process.cwd();
 app.db				= db;
@@ -227,6 +230,9 @@ if (!module.parent) {
 	app.listen(port);
 	console.log('RIP started on port:'+port);
 	
+	//===============================================================================
+	if( false ) { // remove socket.io for now... does not work properly everywhere...
+	
 	// Attach socket.io
 	app.sio = sio.listen(app);
 
@@ -251,20 +257,56 @@ if (!module.parent) {
 	
 	// Configure it
 	app.sio.configure('production', function() {
+		if( true ) {
+			console.log("++ Socket.io production settings... RedisStore at:"+rtg.hostname+":"+rtg.port);
+		
+			var sioredis = require('socket.io/node_modules/redis');
+			var pub = sioredis.createClient(rtg.port, rtg.hostname);
+			pub.on("error", function (err) { console.log("Socket.io pub Redis Database Error " + err); });
+			pub.auth(passwd, function() { console.log("pub auth")});
+		
+			var sub = sioredis.createClient(rtg.port, rtg.hostname);
+			sub.on("error", function (err) { console.log("Socket.io sub Redis Database Error " + err);});
+			sub.auth(passwd, function() { console.log("sub auth")});
+		
+			var cli = sioredis.createClient(rtg.port, rtg.hostname);
+			cli.on("error", function (err) {  console.log("Socket.io cli Redis Database Error " + err);	});
+			cli.auth(passwd, function() { console.log("cli auth")});
+		
+			console.log("Creating socket.io store...");
+			var SIORedisStore = require('socket.io/lib/stores/redis');
+			app.sio.set('store', new SIORedisStore({
+				redisPub: 		pub,
+				redisSub: 		sub,
+				redisClient: 	cli
+			}));
+		} else {
+			console.log("Socket.io production settings... MemoryStore");
+			var SocketIOMemoryStore = require('socket.io/lib/stores/memory');
+			app.sio.set('store', new SocketIOMemoryStore());
+	    }
 		app.sio.enable('browser client minification');  // send minified client
 		app.sio.enable('browser client etag');          // apply etag caching logic based on version number
 		app.sio.enable('browser client gzip');          // gzip the file
 		app.sio.set('log level', 1);                    // reduce logging
 		app.sio.set('transports', [                     // enable all transports (optional if you want flashsocket)
-		    'websocket'
-		  , 'flashsocket'
-		  , 'htmlfile'
+//		    'websocket'
+//		  , 'flashsocket'
+//		  , 'htmlfile'
 		  , 'xhr-polling'
-		  , 'jsonp-polling'
+//		  , 'jsonp-polling'
 		]);
+		app.sio.set("polling duration", 10);
 	})
 
 	app.sio.configure('development', function() {
+		console.log("Socket.io development settings");
+		
 		app.sio.set('log level', 1);
 	})	
+	
+	} // end of socketio removal
+	// ==========================================
+	 
+	console.log("RIP Server ready...")
 }

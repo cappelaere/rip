@@ -39,7 +39,8 @@ Select optional test and submit.
 Pat Cappelaere	Vightel			pat@cappelaere.com
 Peter Rushforth GeoConnections	Peter.Rushforth@NRCan-RNCan.gc.ca
 Herve Caumont	Terradue		herve.caumont@terradue.com
-Volker Mische	Couchbase		volker@couchbase.com>
+Pedro Gonçalves Terradue		pedro.goncalves@terradue.com
+Volker Mische	Couchbase		volker@couchbase.com
 
 With help from:
 	Ryan Dhal and the Node.js Team

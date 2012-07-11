@@ -50,8 +50,8 @@ function highlight(js) {
 function RipDoc(runner) {
 	Base.call(this, runner);
 
-	var rstr="";
-	var indent = 0;
+	var results	= "";
+	var indent 	= 0;	// used for socket.io to emit complete/valid html rather than partial
 	
 	var self 	= this
     , stats 	= this.stats;
@@ -59,13 +59,13 @@ function RipDoc(runner) {
 	 stats.total = runner.total;
 	 stats.duration = 0;
 	
-	  runner.on('suite', function(suite){
-		//console.log("suite %s starts", suite.fullTitle());
+	  runner.on('suite', function(suite) {
+		debug("suite %s starts", suite.fullTitle());
 	    if (suite.root) return;
-	    rstr += '<li class="suite">';
+	    results += '<li class="suite">';
 		var story_url = host+"?q="+utils.escapeRegexp(suite.fullTitle());
-	    rstr += util.format('<h1><a href=\"%s\">%s</a></h1>', story_url,suite.title);
-	    rstr += "<ul>";
+	    results += util.format('<h1><a href=\"%s\">%s</a></h1>', story_url,suite.title);
+	    results += "<ul>";
 		indent++;
 	  });
 
@@ -73,16 +73,16 @@ function RipDoc(runner) {
 		indent--;
 		debug("suite %s ends %d", suite.fullTitle(), indent);
 	    if (suite.root) return;
-	    rstr += '</ul>\n</li>';
+	    results += '</ul>\n</li>';
 	
-		if( indent == 0 ) {
-			app.sio.sockets.emit("rstats", JSON.stringify(stats) );
-			debug(rstr);
-			app.sio.sockets.emit("rsuite", rstr, function(data) {
-				console.log("got:"+data);
-			} );
-			rstr = "";
-		}
+		//if( indent == 0 ) {
+			//app.sio.sockets.emit("rstats", JSON.stringify(stats) );
+			//debug(rstr);
+			//app.sio.sockets.emit("rsuite", rstr, function(data) {
+			//	console.log("got:"+data);
+			//} );
+			//rstr = "";
+		//}
 			
 		//console.log("*** end");
 	  });
@@ -125,42 +125,48 @@ function RipDoc(runner) {
 		var onclick = "onclick='ShowHidePre(\""+pre_id+"\");'";
 	    
 	    if ('passed' == test.state) {
-	      rstr += util.format('<li class=\"test pass %s\"><h2 %s>%s<span class=\"duration\">%dms</span></h2>', 
+	      results += util.format('<li class=\"test pass %s\"><h2 %s>%s<span class=\"duration\">%dms</span></h2>', 
 				 test.speed, onclick, test.title, test.duration);
 	    } else if (test.pending) {
-	      rstr += util.format('<li class=\"test pass pending\"><h2 %s>%s</h2>', onclick, test.title);
+	      results += util.format('<li class=\"test pass pending\"><h2 %s>%s</h2>', onclick, test.title);
 	    } else {
-	      rstr += util.format('<li class=\"test fail\"><h2 %s>%s</h2>', onclick, test.title);
+	      results += util.format('<li class=\"test fail\"><h2 %s>%s</h2>', onclick, test.title);
 	      var str = test.err.stack || test.err.toString();
 	      if (!~str.indexOf(test.err.message)) {
 	        str = test.err.message + '\n' + str;
 	      }
-		  rstr += util.format('<pre class=\"error\">%s</pre>', str);
+		  results += util.format('<pre class=\"error\">%s</pre>', str);
 		}
 		
 		if (!test.pending) {
-	      rstr += util.format('<pre id=\"'+pre_id+'\" style=\"display: none;\"><code>%s</code></pre>', 
+	      results += util.format('<pre id=\"'+pre_id+'\" style=\"display: none;\"><code>%s</code></pre>', 
 			highlight(utils.clean(test.fn.toString())));
 	    }
-		rstr += "</li>"
+		results += "</li>"
 	 });
 	
 	runner.on('end', function(){
 		debug("tests end: %j", stats);
 		
-		//var duration 	= (stats.duration).toFixed(2)
-		//var statsTemplate = '<ul id=\"stats\">'
-		//  + '<li class=\"progress\"><canvas width=\"40\" height=\"40\"></canvas></li>'
-		//  + '<li class=\"passes\">passes: <em>%d</em></li>'
-		//  + '<li class=\"failures\">failures: <em>%d</em></li>'
-		//  + '<li class=\"duration\">duration: <em>%d</em>ms</li>'
-		//  + '</ul>';
-		//var statHtml = util.format(statsTemplate, stats.passes, stats.failures, duration);
-		//var report = "<ul id='report'>"+results+'</ul>';
-		//results = statHtml+report; 
+		var duration 		= (stats.duration).toFixed(2)
+		var statsTemplate 	= '<ul id=\"stats\">'
+		  + '<li class=\"progress\"><canvas width=\"40\" height=\"40\"></canvas></li>'
+		  + '<li class=\"passes\">passes: <em>%d</em></li>'
+		  + '<li class=\"failures\">failures: <em>%d</em></li>'
+		  + '<li class=\"duration\">duration: <em>%d</em>ms</li>'
+		  + '</ul>';
+		var statHtml 	= util.format(statsTemplate, stats.passes, stats.failures, duration);
+		var report 		= "<ul id='report'>"+results+'</ul>';
 		
-		app.sio.sockets.emit("rstats", JSON.stringify(stats) );
+		runner.results = statHtml+report;
+		
+		//console.log(util.inspect(this));
+		//app.sio.sockets.emit("rstats", JSON.stringify(stats) );
   	}); 
+}
+
+RipDoc.prototype.getResults = function(){
+	return this.results;
 }
 
 var test_files = [
@@ -187,6 +193,48 @@ test_files = test_files.map(function(path){
   return resolve(path);
 });
 
+// start test when web page is up and synchronized with socket.io
+function runTests( params, fn ) {
+	debug("Start:"+util.inspect(params));
+	
+	var mt = new mocha( {
+		ui: 		'bdd',
+		reporter: 	RipDoc,
+		globals:    ['url', "opensearch_href", "discovery_href", "discovery_doc", "results"]
+	});
+	
+	// need to pass that to tests global somehow
+	global.url= params['url'];
+	
+	var startDate = new Date;
+	for( h in always_files ) {
+		params[h] = always_files[h]
+	}
+
+	debug(util.inspect(params));
+
+	try {
+		selectFiles = [];
+		
+	  	test_files.forEach(function(file){
+	    	delete require.cache[file];
+			var base = path.basename(file,".js");
+			if( params[base] == 'on') {
+				debug("loading %s", file);
+				mt.addFile(file);
+			} else {
+				debug("base:"+base+" off");
+			}
+		});
+					
+		var runner = mt.run( function(total) {
+			fn( runner.results );
+		});					
+	} catch(e) {
+		console.trace("mocha run exception:"+e);
+	}			
+}
+
 module.exports = {
 	index: function(req, res) {				
 		res.render("tests/index.jade");					
@@ -200,48 +248,10 @@ module.exports = {
 		res.render("tests/form.jade");		
 	},
 	
-	// start test when web page is up and synchronized with socket.io
-	start: function( params ) {
-		debug("Start:"+util.inspect(params));
-		
-		var mt = new mocha( {
-			ui: 		'bdd',
-			reporter: 	RipDoc,
-			globals:    ['url', "opensearch_href", "discovery_href", "discovery_doc"]
-		});
-		//eyes.inspect(mt);
-		
-		// need to pass that to tests global somehow
-		global.url= params['url'];
-		
-		var startDate = new Date;
-		for( h in always_files ) {
-			params[h] = always_files[h]
-		}
-
-		try {
-			selectFiles = [];
-			
-		  	test_files.forEach(function(file){
-		    	delete require.cache[file];
-				var base = path.basename(file,".js");
-				if( params[base] == 'on') {
-					debug("load %s", file);
-					mt.addFile(file);
-				}
-			});
-						
-			mt.run( function(total) {
-				var duration = new Date - startDate;
-				debug("total tests duration: %d ms", duration);
-			});			
-	  
-		} catch(e) {
-			console.trace("mocha run exception:"+e);
-		}			
-	},
+	// Create a new test and render results on a web page
 	create: function(req, res) {
-		console.log("create tests params:"+util.inspect(req.body.params));
+		var params = req.body.params;
+		debug("create tests params:"+util.inspect(params));
 		
 		websocket_url 	= "http://"+req.headers.host;
 		host 			= "http://"+req.headers.host+"/ustories";
@@ -249,12 +259,14 @@ module.exports = {
 		// url endpoint to test
 		var test_url	= req.body.params['url'];
 		
-		var start = new Date;
-		res.render("tests/results.ejs", {
+		var results 	= runTests(params, function( results) {
+		  res.render("tests/results.ejs", {
 			layout: 	false,
 			url: 		test_url,
 			server_url: websocket_url,
-			params: 	req.body.params });
+			params: 	params,
+			results: 	results });
+		});
 	},
 	
 	show: function(req, res) {
