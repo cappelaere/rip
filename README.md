@@ -33,3 +33,29 @@ and point your browser to http://localhost:3000
 Go to tests.  Select or enter a web service end point for testing
 Select optional test and submit.
 
+## Contributors
+
+```
+Pat Cappelaere	Vightel			pat@cappelaere.com
+Peter Rushforth GeoConnections	Peter.Rushforth@NRCan-RNCan.gc.ca
+Herve Caumont	Terradue		herve.caumont@terradue.com
+Volker Mische	Couchbase		volker@couchbase.com>
+
+With help from:
+	Ryan Dhal and the Node.js Team
+	TJ Holowaychuk:		express, mocha, jade, EJS, debug, connect...
+	Jake Luer:			chai
+	Guillermo Rauch:	socket.io
+	Matt Ranney:		redis
+	Mikeal Rogers:		request
+	Mihai Bazon:		uglify
+	Caolan McMahon:		async
+	Alexis Sellier:		eyes
+	Pavel Minchenkov:	node-html-encoder
+	Ciaran Jessup:		oauth
+	Håvard Stranden:	openid
+	Jeremy Ashkenas:	underscore
+	Marek Kubica:		xml2js
+	and many others...
+	
+	
