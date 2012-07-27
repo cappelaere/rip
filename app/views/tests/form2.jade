@@ -1,6 +1,6 @@
 h2 Test RESTful Service
 
-form(method='post',action='/tests')
+form(method='post',action='/tests/sio')
 	p
 	table
 		tr
@@ -11,21 +11,18 @@ form(method='post',action='/tests')
 			td
 				label Options: &nbsp;
 				select(id='select_url', name='select_url' )
-					- for( u in urls )
-						option(value!=urls[u]) #{urls[u]}
+					option(value="http://radarsat.geobliki.com", selected ) http://radarsat.geobliki.com
+					option(value="http://eo-virtual-archive4.esa.int/search/html") http://eo-virtual-archive4.esa.int/search/html
+					option(value="http://geogratis.gc.ca/api/en") http://geogratis.gc.ca/api/en
+					option(value="http://server.arcgisonline.com/arcgis/rest/services") http://server.arcgisonline.com/arcgis/rest/services
 	p
 	With Selected Preferences:	
 	p
 	input(  type='checkbox', name='params[OpenSearch]', checked)
 	Label Check OpenSearch
-	p 
-	label Service Discovery:&nbsp;
-	select(id='params[discovery]', name='params[discovery]' )
-		option(value="GoogleDiscoveryAPI", selected ) Google Discovery API
-		option(value="NoDiscovery" ) None
-		option(value="AtompubDiscoveryAPI" ) AtomPub Service Document
-		option(value="GeoservicesDiscoveryAPI" ) GeoService Catalog Document
-			
+	p
+	input(  type='checkbox', name='params[GoogleDiscoveryAPI]', checked) 
+	Label Check Google Discovery API
 	p
 	input(type="submit", value="Submit")
 

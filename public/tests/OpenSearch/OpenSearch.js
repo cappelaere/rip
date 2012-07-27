@@ -19,8 +19,7 @@ describe('OpenSearch_Document', function(){
 		it('should be discoverable from landing page', function(done){
 			var doc_url = url+ opensearch_href;
 			console.log("Checking Opensearch doc:"+doc_url);
-			try {
-				request.get( doc_url, function(err, res, _body) {
+			request.get( doc_url, function(err, res, _body) {
 					res.statusCode.should.equal(200);
 					//console.log(_body);
 					
@@ -29,11 +28,7 @@ describe('OpenSearch_Document', function(){
 				        //console.log('Done:'+util.inspect(xmlDoc));
 						done();
 				    });
-				});
-			} catch(e) {
-				console.log("Exception:"+e);
-				done();
-			}
+			});
 		})
 		it('should be contain a URL of type text/html', function(done){
 			for( var at_url in xmlDoc['Url'] ) {
@@ -64,7 +59,6 @@ describe('OpenSearch_Document', function(){
 		it('should return valid HTML', function(done) {
 			if( html_search_url) {
 				var surl = html_search_url.replace(/{searchTerms}}/, "*");
-				try {
 					console.log("getting html_search_url:"+surl)
 					request.get( surl, function(err, res, _body) {
 						//console.log(err, res.statusCode);
@@ -72,10 +66,7 @@ describe('OpenSearch_Document', function(){
 						//console.log(_body);
 						done();
 					});
-				} catch(e) {
-					console.log("Exception:"+e);
-					done();
-				}
+			
 			} else {
 				console.log("not html_search_api defined");
 				done();
@@ -86,7 +77,6 @@ describe('OpenSearch_Document', function(){
 		it('should return a valid Atom Feed', function(done) {
 			if( atom_search_url ) {
 				var surl = atom_search_url.replace(/{searchTerms}}/, "*");
-				try {
 					console.log("getting atom_search_url:"+surl)
 					request.get( surl, function(err, res, _body) {
 						//console.log(err, res.statusCode);
@@ -99,10 +89,7 @@ describe('OpenSearch_Document', function(){
 							done();
 					    });
 					});
-				} catch(e) {
-					console.log("Exception:"+e);
-					done();
-				}
+			
 			} else {
 				console.log("no atom_search_api defined");
 				done();

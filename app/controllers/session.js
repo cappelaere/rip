@@ -81,6 +81,7 @@ module.exports = {
 		                      })];
 
 		var return_to = "http://"+req.headers.host + '/'+cfg.root_service+'/session/open_id_complete';
+		console.log("return_to:"+return_to);
 		
 		var relyingParty = new openid.RelyingParty(
 		    return_to, // Verification URL (yours)
@@ -89,16 +90,17 @@ module.exports = {
 		    false, // Strict mode
 		    extensions); // List of extensions to enable and include
 
-	        // Resolve identifier, associate, and build authentication URL
-	          relyingParty.authenticate(identifier, false, function(authUrl) {
-	                if (!authUrl) {
-	                  res.writeHead(500);
-	                  res.end();
-	                } else {
-	                  res.writeHead(302, { Location: authUrl });
-	                  res.end();
-	                }
-	              });		
+		// Resolve identifier, associate, and build authentication URL
+		relyingParty.authenticate(identifier, false, function(error, authUrl) {
+			console.log("authenticate:"+identifier+" error:"+error+" authUrl:"+authUrl);
+			if (!authUrl) {
+				res.writeHead(500);
+				res.end();
+			} else {
+				res.writeHead(302, { Location: authUrl });
+				res.end();
+			}
+	    });		
 	},
 	
 	open_id_complete: function(req,res) {
@@ -122,21 +124,25 @@ module.exports = {
 		}
 	
 		var user = new User(nickname, fullname, email, openid, credential, permissions, {});
+		console.log("Save user...")
 		user.save( function(err, u){
 			//var geoact = new GeoActivity(u, 'login', 0, GeoActivity.APPLICATION );
 			//geoact.save( function(err){});
+			console.log("redirect to /"+cfg.root_service)
+			
 			req.session.user = u;
 			res.redirect("/"+cfg.root_service, 302);			
 		});
 	},
 	
 	login: function(req,res) {
-		var req_url;
+		var req_url ="/";
 		
 		if( req.query && req.query.requested_url ) {
 			req_url = req.query.requested_url;
 		}
-
+		console.log("login req_url:"+req_url);
+		
 		res.render('session/login.ejs', {env: env, req_url: req_url});	
 	},
 	
@@ -147,5 +153,14 @@ module.exports = {
 		req.session.user = null;
 		
 		res.redirect("/"+cfg.root_service, 302);
+	},
+	
+	check: function(req,res) {
+		if( req.session.user) {
+			console.log("user session")
+			return res.render('session/logout.ejs')
+		} else {
+			return res.redirect('/session/login')
+		}
 	}
 };

@@ -1,0 +1,23 @@
+body
+	h1 Allow Representation Suffixes
+
+	#role	an External User
+	#want	control the output resource representation using additional suffixes to the url
+	#benefit can get a representation that I can process without using Accept Headers
+		
+	#rationale This allows an external user to get specific resource representation directly from the browser without using Accept headers
+
+	h2 Acceptance Criteria
+	#given	list a resource urls and for each url
+	#when	I add .html extension to the URL 
+	#then  	I obtain a resource with Content-Type=text/html
+
+	h2 Acceptance Criteria
+	#given	list a resource urls and for each url
+	#when	I add .json  extension to the URL
+	#then  	I obtain a resource with Content-Type=application/json
+	
+	h2 Acceptance Criteria
+	#given	list a resource urls and for each url
+	#when	I set .xyz or invalid extension to the URL
+	#then  	I get a 406 error

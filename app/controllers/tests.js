@@ -17,10 +17,10 @@ var expect		= chai.expect;
 
 var debug 		= require('debug')('tests');
 var host;
-//var results;
 
-var suite 		= new Suite('', new Context)
-suite.timeout(2000);	// timout in milliseconds;
+//var results;
+//var suite 		= new Suite('', new Context)
+//suite.timeout(10000);	// timout in milliseconds;
 
 // we need to overload this to allow for our own reporter
 mocha.prototype.reporter = function(name){
@@ -50,13 +50,13 @@ function highlight(js) {
 function RipDoc(runner) {
 	Base.call(this, runner);
 
-	var results	= "";
-	var indent 	= 0;	// used for socket.io to emit complete/valid html rather than partial
+	var results		= "";
+	var indent 		= 0;	// used for socket.io to emit complete/valid html rather than partial
 	
-	var self 	= this
-    , stats 	= this.stats;
+	var self 		= this
+    , stats 		= this.stats;
 	
-	 stats.total = runner.total;
+	 stats.total 	= runner.total;
 	 stats.duration = 0;
 	
 	  runner.on('suite', function(suite) {
@@ -75,51 +75,19 @@ function RipDoc(runner) {
 	    if (suite.root) return;
 	    results += '</ul>\n</li>';
 	
-		//if( indent == 0 ) {
-			//app.sio.sockets.emit("rstats", JSON.stringify(stats) );
+		if( global.sio && indent == 0 ) {
+			app.sio.sockets.emit("rstats", JSON.stringify(stats) );
 			//debug(rstr);
-			//app.sio.sockets.emit("rsuite", rstr, function(data) {
-			//	console.log("got:"+data);
-			//} );
-			//rstr = "";
-		//}
-			
-		//console.log("*** end");
+			app.sio.sockets.emit("rsuite", results, function(data) {
+				console.log("got:"+data);
+			} );
+			results = "";
+		}
 	  });
-
-	// runner.on('pass', function(test){
-	//	debug("test pass");
-		//stats.passes = stats.passes || 0; 
-	//	stats.passes++; 
-		
-	//	var medium = exports.slow / 2;
-	//  test.speed = test.duration > exports.slow
-	//      ? 'slow'
-	//      : test.duration > medium
-	//        ? 'medium'
-	//        : 'fast';
-	
-	//    results += util.format('<dt>%s</dt>', test.title);
-	//    var code = utils.escape(utils.clean(test.fn.toString()));
-	//    results += util.format('<dd><pre><code>%s</code></pre></dd>', code);
-    //  });
-	
-	//  runner.on('fail', function(test, err){
-	//	debug("test fail");
-	    //stats.failures = stats.failures || 0;
-	//    stats.failures++;
-	//    test.err = err;
-	//    failures.push(test);
-	//  });
-	 
-	//  runner.on('pending', function(){
-	//	debug("test pending");
-	//    stats.pending++;
-	//  });
 	
 	 runner.on('test end', function(test) {
 		debug("test end:"+test.speed);
-
+		
 	    var pre_id = 'pre_'+stats.tests;
 	
 		var onclick = "onclick='ShowHidePre(\""+pre_id+"\");'";
@@ -146,8 +114,21 @@ function RipDoc(runner) {
 	 });
 	
 	runner.on('end', function(){
-		debug("tests end: %j", stats);
-		
+		console.log("tests url:"+url+" end: %j", stats);
+		app.db.get('services:'+url, function(err, data) {
+			if( !err ) {
+				var json = JSON.parse(data)
+				if( userid && json && userid == json.userid ) {
+					console.log("Valid user... updating db score")
+					json.passes = stats.passes;
+					json.failed = stats.failures;
+					json.date   = new Date
+					app.db.set('services:'+url, JSON.stringify(json));
+				} else {
+					console.log("Invalid user "+userid + " - no score update");
+				}
+			}
+		})
 		var duration 		= (stats.duration).toFixed(2)
 		var statsTemplate 	= '<ul id=\"stats\">'
 		  + '<li class=\"progress\"><canvas width=\"40\" height=\"40\"></canvas></li>'
@@ -161,7 +142,7 @@ function RipDoc(runner) {
 		runner.results = statHtml+report;
 		
 		//console.log(util.inspect(this));
-		//app.sio.sockets.emit("rstats", JSON.stringify(stats) );
+		if( sio ) app.sio.sockets.emit("rstats", JSON.stringify(stats) );
   	}); 
 }
 
@@ -174,17 +155,22 @@ var test_files = [
 , "./public/tests/EndPoint/ValidEndpoint.js"
 , "./public/tests/LandingPage/LandingPage.js"
 , "./public/tests/OpenSearch/OpenSearch.js"
-, "./public/tests/API/GoogleDiscoveryAPI.js"
+, "./public/tests/Discovery/GoogleDiscoveryAPI.js"
+, "./public/tests/Discovery/AtompubDiscoveryAPI.js"
+, "./public/tests/Discovery/GeoservicesDiscoveryAPI.js"
+, "./public/tests/Discovery/NoDiscovery.js"
 , "./public/tests/UniformInterface/UniformInterface.js"
+, "./public/tests/ContentNegotiation/ContentNegotiation.js"
 , "./public/tests/end_test.js"
 ];
 
 var always_files = {
-	"start_test": 		'on',
-	"ValidEndpoint": 	'on',
-	"LandingPage": 		'on',
-	"UniformInterface": 'on',
-	"end_test": 		'on'
+	"start_test": 			'on',
+	"ValidEndpoint": 		'on',
+	"LandingPage": 			'on',
+	"UniformInterface": 	'on',
+	"ContentNegotiation": 	'on',
+	"end_test": 			'on'
 }
 
 // resolve
@@ -194,17 +180,29 @@ test_files = test_files.map(function(path){
 });
 
 // start test when web page is up and synchronized with socket.io
-function runTests( params, fn ) {
+function runTests( params, sio, fn ) {
 	debug("Start:"+util.inspect(params));
 	
 	var mt = new mocha( {
 		ui: 		'bdd',
 		reporter: 	RipDoc,
-		globals:    ['url', "opensearch_href", "discovery_href", "discovery_doc", "results"]
+		globals:    [ 	'discovery_href', 
+						'discovery_doc', 
+						'opensearch_href', 
+						'resources_urls',
+						'results',
+						'sio', 
+						'service_doc', 
+						'url',
+						'userid'
+					],
+		timeout: 	2000
 	});
 	
 	// need to pass that to tests global somehow
-	global.url= params['url'];
+	global.url		= params['url'];
+	global.sio 		= sio;					// use socket_io
+	global.userid 	= params['userid'];		// use socket_io
 	
 	var startDate = new Date;
 	for( h in always_files ) {
@@ -213,14 +211,19 @@ function runTests( params, fn ) {
 
 	debug(util.inspect(params));
 
-	try {
+	//try {
 		selectFiles = [];
+		
+		// fix discovery option
+		var discovery = params['discovery'];
+		params[discovery] = 'on';
+		delete discovery;
 		
 	  	test_files.forEach(function(file){
 	    	delete require.cache[file];
 			var base = path.basename(file,".js");
 			if( params[base] == 'on') {
-				debug("loading %s", file);
+				console.log("loading %s", file);
 				mt.addFile(file);
 			} else {
 				debug("base:"+base+" off");
@@ -230,9 +233,9 @@ function runTests( params, fn ) {
 		var runner = mt.run( function(total) {
 			fn( runner.results );
 		});					
-	} catch(e) {
-		console.trace("mocha run exception:"+e);
-	}			
+//	} catch(e) {
+//		console.trace("mocha run exception:"+e);
+//	}			
 }
 
 module.exports = {
@@ -245,13 +248,26 @@ module.exports = {
 	},
 	
 	form: function(req, res) {
-		res.render("tests/form.jade");		
+		app.db.smembers('services', function(err, replies) {	
+			console.log("form urls:"+util.inspect(replies))
+			res.render("tests/form.jade", {urls: replies});		
+		})
+	},
+
+	// this is to be used to force socket_io
+	form2: function(req, res) {
+		res.render("tests/form2.jade");		
 	},
 	
-	// Create a new test and render results on a web page
-	create: function(req, res) {
+	sio_start: function(params, sio) {
+		runTests(params, sio, function( results) {
+		});
+	},
+	// This is going to start the tests and stream results to the page in realtime
+	// using socket_io
+	sio: function(req, res ) {
 		var params = req.body.params;
-		debug("create tests params:"+util.inspect(params));
+		console.log("sio tests params:"+util.inspect(params));
 		
 		websocket_url 	= "http://"+req.headers.host;
 		host 			= "http://"+req.headers.host+"/ustories";
@@ -259,7 +275,32 @@ module.exports = {
 		// url endpoint to test
 		var test_url	= req.body.params['url'];
 		
-		var results 	= runTests(params, function( results) {
+		res.render("tests/results_sio.ejs", {
+			layout: 	false,
+			url: 		test_url,
+			server_url: websocket_url,
+			params: 	params });
+	},
+	
+	// Create a new test and render results on a web page
+	create: function(req, res) {
+		var params = req.body.params;
+		console.log("create tests params:"+util.inspect(params));
+		
+		if( req.session.user) {
+			var user = User.newInstance(req.session.user);
+			console.log("User:"+ util.inspect(user))
+			params['userid'] = user.id
+		}
+		
+		websocket_url 	= "http://"+req.headers.host;
+		host 			= "http://"+req.headers.host+"/ustories";
+
+		// url endpoint to test
+		var test_url	= req.body.params['url'];
+		
+		var results 	= runTests(params, false, function( results) {
+			
 		  res.render("tests/results.ejs", {
 			layout: 	false,
 			url: 		test_url,

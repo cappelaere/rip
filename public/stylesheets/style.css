@@ -30,3 +30,7 @@ a:hover {
   font-weight: bold;
 }
 
+#right-sidebar {
+  float: right;
+  width: 100px;
+}

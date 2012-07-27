@@ -17,6 +17,7 @@ var express 		= require('express'),
 	tests			= require('./app/controllers/tests'),
 	services		= require('./app/controllers/services'),
 	discovery		= require('./app/controllers/discovery'),
+	session			= require('./app/controllers/session'),
 	api				= require('./app/controllers/api'),
  	debug			= require('debug'),
 	cfg				= require('./lib/config'),
@@ -101,7 +102,7 @@ function restrict(req, res, next) {
   } else {
     console.log("restrict failed!");
     req.session.error 	= 'Access denied!';
-	var redirect_to		= '/radarsat/session/login?requested_url='+req.url;
+	var redirect_to		= '/session/login?requested_url='+req.url;
 	console.log("unauthorized! redirect to:"+redirect_to);
     res.redirect(redirect_to, 302);
   }
@@ -158,6 +159,8 @@ require('./mvc').boot(app);
 // Home page -> app
 app.get('/', 											home.index);
 app.get('/home', 										home.index);
+app.get('/rip', 										home.index);
+app.get('/about', 										home.about);
 
 // Documentations
 app.get('/docs/:page.:format',							docs.index);
@@ -178,14 +181,30 @@ app.get('/ustories/:cat/:id/:id2',						stories.show);
 // Tests
 app.get('/tests',										tests.index);
 app.post('/tests',										tests.create);
+app.post('/tests/sio',									tests.sio);
 app.get('/tests/form',									tests.form);
+app.get('/tests/form2',									tests.form2);
 app.get('/tests/test',									tests.test);
 app.get('/tests/:id',									tests.show);
 
 // Services
 app.get('/services',									services.index);
-app.get('/services/form',								services.form);
+app.get('/services/form',								restrict, services.form);
+app.post('/services/create',							services.create);
 app.get('/services/:id',								services.show);
+
+app.get('/session/check', 								session.check);
+app.get('/session/login', 								session.login);
+app.get('/session/logout', 								session.logout);
+app.get('/session/open_id_complete', 					session.open_id_complete);
+app.get('/session', 									session.index);
+
+app.get('/rip/session/check', 								session.check);
+app.get('/rip/session/login', 								session.login);
+app.get('/rip/session/logout', 								session.logout);
+app.get('/rip/session/open_id_complete', 					session.open_id_complete);
+app.get('/rip/session', 									session.index);
+
 
 // Process the API request
 app.post('/processReq',api.oauth, api.processRequest, function(req, res) {
@@ -226,87 +245,87 @@ if( app.settings.env == 'development') {
 
 console.log(server_url + " trying to start...");
 
+var USE_SOCKET_IO = false;
+
 if (!module.parent) {
 	app.listen(port);
 	console.log('RIP started on port:'+port);
 	
 	//===============================================================================
-	if( false ) { // remove socket.io for now... does not work properly everywhere...
-	
-	// Attach socket.io
-	app.sio = sio.listen(app);
+	if( USE_SOCKET_IO ) {	
+		// Attach socket.io
+		app.sio = sio.listen(app);
 
-	app.sio.sockets.on('connection', function (socket) {
-		debug("socket.io on");
+		app.sio.sockets.on('connection', function (socket) {
+			debug("socket.io on");
 		
-		// send connected message to browser
-		socket.emit('connected');
+			// send connected message to browser
+			socket.emit('connected');
 		
-		socket.on('disconnect', function () {
-			debug("socket.io disconnected");
+			socket.on('disconnect', function () {
+				debug("socket.io disconnected");
+			});
+		
+			// receive startTest from Browser and start tests
+			socket.on('startTest', function (data) {
+				var encoder = new Encoder('entity');
+				var params = JSON.parse(encoder.htmlDecode(data))
+				console.log("please start tests:"+ util.inspect(params));
+				tests.sio_start(params, true);
+			});
 		});
-		
-		// receive startTest from Browser and start tests
-		socket.on('startTest', function (data) {
-			var encoder = new Encoder('entity');
-			var params = JSON.parse(encoder.htmlDecode(data))
-			//console.log("please start tests:"+ util.inspect(params));
-			tests.start(params);
-		});
-	});
 	
-	// Configure it
-	app.sio.configure('production', function() {
-		if( true ) {
-			console.log("++ Socket.io production settings... RedisStore at:"+rtg.hostname+":"+rtg.port);
+		// Configure it
+		app.sio.configure('production', function() {
+			if( true ) {
+				console.log("++ Socket.io production settings... RedisStore at:"+rtg.hostname+":"+rtg.port);
 		
-			var sioredis = require('socket.io/node_modules/redis');
-			var pub = sioredis.createClient(rtg.port, rtg.hostname);
-			pub.on("error", function (err) { console.log("Socket.io pub Redis Database Error " + err); });
-			pub.auth(passwd, function() { console.log("pub auth")});
+				var sioredis = require('socket.io/node_modules/redis');
+				var pub = sioredis.createClient(rtg.port, rtg.hostname);
+				pub.on("error", function (err) { console.log("Socket.io pub Redis Database Error " + err); });
+				pub.auth(passwd, function() { console.log("pub auth")});
 		
-			var sub = sioredis.createClient(rtg.port, rtg.hostname);
-			sub.on("error", function (err) { console.log("Socket.io sub Redis Database Error " + err);});
-			sub.auth(passwd, function() { console.log("sub auth")});
+				var sub = sioredis.createClient(rtg.port, rtg.hostname);
+				sub.on("error", function (err) { console.log("Socket.io sub Redis Database Error " + err);});
+				sub.auth(passwd, function() { console.log("sub auth")});
 		
-			var cli = sioredis.createClient(rtg.port, rtg.hostname);
-			cli.on("error", function (err) {  console.log("Socket.io cli Redis Database Error " + err);	});
-			cli.auth(passwd, function() { console.log("cli auth")});
+				var cli = sioredis.createClient(rtg.port, rtg.hostname);
+				cli.on("error", function (err) {  console.log("Socket.io cli Redis Database Error " + err);	});
+				cli.auth(passwd, function() { console.log("cli auth")});
 		
-			console.log("Creating socket.io store...");
-			var SIORedisStore = require('socket.io/lib/stores/redis');
-			app.sio.set('store', new SIORedisStore({
-				redisPub: 		pub,
-				redisSub: 		sub,
-				redisClient: 	cli
-			}));
-		} else {
-			console.log("Socket.io production settings... MemoryStore");
-			var SocketIOMemoryStore = require('socket.io/lib/stores/memory');
-			app.sio.set('store', new SocketIOMemoryStore());
-	    }
-		app.sio.enable('browser client minification');  // send minified client
-		app.sio.enable('browser client etag');          // apply etag caching logic based on version number
-		app.sio.enable('browser client gzip');          // gzip the file
-		app.sio.set('log level', 1);                    // reduce logging
-		app.sio.set('transports', [                     // enable all transports (optional if you want flashsocket)
-//		    'websocket'
-//		  , 'flashsocket'
-//		  , 'htmlfile'
-		  , 'xhr-polling'
-//		  , 'jsonp-polling'
-		]);
-		app.sio.set("polling duration", 10);
-	})
+				console.log("Creating socket.io store...");
+				var SIORedisStore = require('socket.io/lib/stores/redis');
+				app.sio.set('store', new SIORedisStore({
+					redisPub: 		pub,
+					redisSub: 		sub,
+					redisClient: 	cli
+				}));
+			} else {
+				console.log("Socket.io production settings... MemoryStore");
+				var SocketIOMemoryStore = require('socket.io/lib/stores/memory');
+				app.sio.set('store', new SocketIOMemoryStore());
+		    }
+			app.sio.enable('browser client minification');  // send minified client
+			app.sio.enable('browser client etag');          // apply etag caching logic based on version number
+			app.sio.enable('browser client gzip');          // gzip the file
+			app.sio.set('log level', 1);                    // reduce logging
+			app.sio.set('transports', [                     // enable all transports (optional if you want flashsocket)
+			    'websocket'
+			  , 'flashsocket'
+			  , 'htmlfile'
+			  , 'xhr-polling'
+			  , 'jsonp-polling'
+			]);
+			app.sio.set("polling duration", 10);
+		})
 
-	app.sio.configure('development', function() {
-		console.log("Socket.io development settings");
+		app.sio.configure('development', function() {
+			console.log("Socket.io development settings");
 		
-		app.sio.set('log level', 1);
-	})	
-	
-	} // end of socketio removal
-	// ==========================================
+			app.sio.set('log level', 1);
+		})	
+	} 	// end of socketio implementation
+		// ==========================================
 	 
 	console.log("RIP Server ready...")
 }

@@ -1,0 +1,17 @@
+{ "admin":
+  { "nickname":  	"admin",
+  	"email":     	"pat@cappelaere.com",
+  	"fullname":  	"Admin User",
+	"permissions": 	["nasa:admin", "nasa:read", "nasa:radarsat"],
+	"credential": 	"VSMT25946875",
+	"openid": 	  	"https://op.geobliki.com/user/cappelaere"
+  },
+"joe":
+  { "nickname":  "joe",
+  	"email":     "joe@geobliki.com",
+  	"fullname":  "Joe, the Tester",
+	"permissions": ["nasa:read"],
+	"credential": "VSMT14936874",
+	"openid": 	  "https://op.geobliki.com/user/joe"
+  }
+}

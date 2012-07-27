@@ -1,0 +1,4 @@
+http://radarsat.geobliki.com
+http://eo-virtual-archive4.esa.int/search/html
+http://geogratis.gc.ca/api/en
+http://server.arcgisonline.com/arcgis/rest/services

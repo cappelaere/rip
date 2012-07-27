@@ -1,26 +1,23 @@
 var path 	= require('path');
-var request	= require('request');
 var util	= require('util');
-var should  = require('chai').should();
+var request	= require('superagent');
+//var req		= require('request');
+//var should  = require('chai').should();
+var assert = require('assert')
 
-describe('API_Discovery_Document', function(){
+describe('Google_API_Discovery_Document', function(){
 	describe('is accessible', function() {
 		it('should exists', function(done){
 			var doc_url = url+ discovery_href;
 			console.log("Checking discovery_url:"+doc_url);
-			try {
-				request.get( doc_url, function(err, res, _body) {
-					res.statusCode.should.equal(200);
-					discovery_doc = JSON.parse(_body);
-					done();
-				}).on("error", function(e) {
-					console.log("http error:"+e+" accessing:"+doc_url);
-					done();
-				});
-			} catch(e) {
-				console.log("Exception:"+e);
+		
+			request
+			.get( doc_url)
+			.end( function(res) {
+				res.status.should.equal(200);
+				discovery_doc = res.body;
 				done();
-			}
+			})
 		})
 	})
 	describe('contains API metadata', function() {

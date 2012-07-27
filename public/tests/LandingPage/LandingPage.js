@@ -1,24 +1,22 @@
-var util 	= require('util');
-var request	= require('request');
-var cheerio	= require('cheerio');
+var util 			= require('util');
+var request			= require('request');
+var cheerio			= require('cheerio');
+var chai			= require('chai');
+var AssertionError	= chai.AssertionError;
 
 describe('Landing_Page', function(){
 	var $;
 	
 	before( function(done) {
 		console.log("Check Landing Page at:"+url);
-		try {
-			request( url, function(err, resp, _body ) {
-				if (err || resp.statusCode != 200) {
+		request( url, function(err, resp, _body ) {
+			if (err || resp.statusCode != 200) {
 				    console.log('Error when contacting:'+url);
-				} else {
+			} else {
 					$ = cheerio.load(_body)
 					done();
-				}
-			});
-		} catch(e) {
-			console.log("Exception before Landing Page:"+e);
-		}
+			}
+		});
 	});
 	
 	describe('uses HTML5', function() {
@@ -28,7 +26,7 @@ describe('Landing_Page', function(){
 			if( xmlns == 'http://www.w3.org/1999/xhtml') {
 				done();
 			} else {
-				throw "invalid xmlns:"+xmlns;
+				throw new AssertionError({ 'message':"invalid xmlns:"+xmlns});
 			}
 		})
 	})
@@ -52,7 +50,7 @@ describe('Landing_Page', function(){
 				console.log("opensearch_href:"+opensearch_href)
 				done();
 			} else {
-				throw "opensearch link not found";
+				throw new AssertionError({'message':"opensearch link not found"});
 			}
 		})
 	})

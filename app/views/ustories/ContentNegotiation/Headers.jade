@@ -1,0 +1,24 @@
+body
+	h1 Accepts and Content-Type Headers
+
+	#role	an External Application
+	#want	control the output resource representation using Accept Headers
+	#benefit can get a representation that I can process
+		
+	#rationale This allows an external application to get resources using a specific representation that may be easier to process.
+
+	h2 Acceptance Criteria
+	#given	list a resource urls and for each url
+	#when	I set the header: Accept=text/html 
+	#then  	I obtain a resource with Content-Type=text/html
+
+	h2 Acceptance Criteria
+	#given	list a resource urls and for each url
+	#when	I set the header: Accept=application/json 
+	#then  	I obtain a resource with Content-Type=application/json
+	
+	h2 Acceptance Criteria
+	#given	list a resource urls and for each url
+	#when	I set the header: Accept=application/rip_me (or any invalid mime type) 
+	#then  	I get a 406 error
+	

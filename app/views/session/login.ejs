@@ -1,0 +1,50 @@
+
+<%- messages() %>
+
+<form name='login_form' action='/session'>
+
+<% if ( env == 'development' ) { %>
+<div id='about'>
+<h1>Login Required</h1>
+
+Warning: In Development Mode...<br/><br/>
+User Email Address:
+<input id='email' name="email" type="text" size=20 value="" ><br/><br/>
+<input name='req_url' type='hidden' value=<%= req_url %> />&nbsp;
+<input name='commit' value="Enter" type='submit' />&nbsp;
+</div>
+<% } else { %>
+
+<style>
+
+#op_identifier {
+  background: 			url('http://openid.net/login-bg.gif') no-repeat;
+  #background-color: 	#fff;
+  background-position: 	0 50%;
+  #color: 				#000;
+  padding-left: 		18px;
+}
+
+#flash
+{
+    font-weight: 	bold;
+    color: 			red;
+    padding-top: 	7px;
+    padding-left: 	7px;
+    padding-bottom: 10px;
+}
+</style>
+<h1><img src='/images/OGC.png' width='50' />&nbsp;OpenID Login</h1>
+
+<p>
+  Append Your Login Name To Provided Openid Url:
+</p>
+
+<p>
+  <input id='op_identifier' name="op_url" TYPE="text" size=80 VALUE="https://op.geobliki.com/user/" >
+</p>
+  <input name='req_url' type='hidden' value=<%= req_url %> />&nbsp;
+  <input name='commit' value="Enter" type='submit' />&nbsp;
+</p>
+<% } %>
+</form>

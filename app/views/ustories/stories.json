@@ -34,9 +34,15 @@
         }       
     },
     "Content_Negotiation": {
-        "uses Accept and Content-Type headers": {},
-        "allows representation suffixes html|json|txt|xml": {},
-		"supports custom mime-type": {}
+        "uses Accept and Content-Type headers": {
+            "link": { "href": "/ContentNegotiation/Headers"}
+		},
+        "allows representation suffixes": 	{
+	            "link": { "href": "/ContentNegotiation/Suffixes"}
+		},
+		"supports custom mime-type": 		{
+		            "link": { "href": "/ContentNegotiation/MimeTypes"}
+		}
     },
 	"Atom Feeds": {
 		"extends ATOM": {},

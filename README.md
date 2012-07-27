@@ -44,7 +44,7 @@ Volker Mische	Couchbase		volker@couchbase.com
 
 With help from:
 	Ryan Dhal and the Node.js Team
-	TJ Holowaychuk:		express, mocha, jade, EJS, debug, connect...
+	TJ Holowaychuk:		express, mocha, supertest, jade, EJS, debug, connect...
 	Jake Luer:			chai
 	Guillermo Rauch:	socket.io
 	Matt Ranney:		redis
