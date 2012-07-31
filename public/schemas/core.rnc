@@ -1,0 +1,51 @@
+# RELAX NG Compact Syntax Grammar
+# Description: Common Extended Feed
+
+namespace atom = "http://www.w3.org/2005/Atom"
+namespace openSearch = "http://a9.com/-/spec/opensearch/1.1/"
+namespace radarsat	 = "http://radarsat.geobliki.com/schemas/2009"
+
+include "atom.rnc"
+{
+	atomCommonAttributes &= etag_attribute?
+
+# replace atomFeed to replace atomLink by feedLink and add opensearch elements
+	atomFeed = element atom:feed {
+	atomCommonAttributes,
+    (atomAuthor*
+     & atomCategory*
+     & atomContributor*
+     & atomGenerator?
+     & atomIcon?
+     & atomId
+     & feedLink*
+     & atomLogo?
+     & atomRights?
+     & atomSubtitle?
+     & atomTitle
+     & atomUpdated
+     & extensionElement*
+     ),
+     opensearch_startIndex,
+     opensearch_itemsPerPage,
+    atomEntry*
+	}
+ }
+
+# define etag attribute
+	etag_attribute = attribute modis:etag { xsd:string }
+
+# Describes the number of items that will be returned per page for paged feeds
+	opensearch_itemsPerPage = element openSearch:itemsPerPage { xsd:int }
+
+# Describes the starting index of the contained entries for paged feeds
+	opensearch_startIndex = element openSearch:startIndex { xsd:int }
+
+# Upgrade feed link options
+	feedLink = element atom:link {
+	    attribute href { xsd:string },
+	    attribute length { xsd:long }?,
+	    attribute rel { "alternate" | "edit" | "search" | "next" | "previous" |  "related" | "self" },
+	    attribute title { xsd:string }?,
+	    attribute type { xsd:string },
+	    undefinedContent? }

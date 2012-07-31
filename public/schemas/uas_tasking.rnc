@@ -1,0 +1,47 @@
+# RELAX NG Compact Syntax Grammar
+# Description: WCPS UAS Tasking
+
+namespace atom 	= 'http://www.w3.org/2005/Atom'
+namespace w 	= 'http://radarsat.geobliki.com/schemas/2010/wcps/uas_tasking'
+
+include 'core.rnc'
+{
+# Redefine atomEntry with our own extension
+atomEntry = element atom:entry {
+ atomCommonAttributes,
+ (atomAuthor*
+ & atomCategory*
+ & atomContent?
+ & atomContributor*
+ & atomId
+ & atomLink*
+ & atomPublished?
+ & atomRights?
+ & atomSource?
+ & atomSummary?
+ & atomTitle
+ & atomUpdated
+ & uas_extensionElement )
+  }
+}
+
+# Define UAS extensionElement
+uas_extensionElement = (
+	uas_tasking_item_type,
+	uas_tasking_context_data,
+	uas_tasking_result_data )
+}
+
+uas_tasking_item_type = element w:item_type { "processes" }
+
+uas_tasking_context_data = element w:context_data {
+  element w:status 			{ text }
+  element w:configuration 	{ text }
+  element w:latitude 		{ xsd:float }
+  element w:longitude 		{ xsd:float }
+  element w:algorithm 		{ text }
+}
+
+uas_tasking_result_data = element uas_tasking:result_data {
+  element w:link 			{ attribute rel {"result"}, attribute href type {atomUri}, attribute type {'application/png'}
+}

@@ -22,9 +22,10 @@ var express 		= require('express'),
  	debug			= require('debug'),
 	cfg				= require('./lib/config'),
 	OAuthVerify		= require('./lib/oauth_verify'),
+	// libxml 		= require("libxml"),
 	
 	//form			= require('connect-form'),
-	//twitter		= require('twitter/index'),
+	twitter			= require('twitter/index'),
   	RedisStore 		= require('connect-redis')(express),
  	redis			= require('redis');
 
@@ -199,11 +200,11 @@ app.get('/session/logout', 								session.logout);
 app.get('/session/open_id_complete', 					session.open_id_complete);
 app.get('/session', 									session.index);
 
-app.get('/rip/session/check', 								session.check);
-app.get('/rip/session/login', 								session.login);
-app.get('/rip/session/logout', 								session.logout);
-app.get('/rip/session/open_id_complete', 					session.open_id_complete);
-app.get('/rip/session', 									session.index);
+app.get('/rip/session/check', 							session.check);
+app.get('/rip/session/login', 							session.login);
+app.get('/rip/session/logout', 							session.logout);
+app.get('/rip/session/open_id_complete', 				session.open_id_complete);
+app.get('/rip/session', 								session.index);
 
 
 // Process the API request
@@ -221,16 +222,16 @@ app.post('/processReq',api.oauth, api.processRequest, function(req, res) {
 // ==========================================
 // Startup
 //
-//app.twit = new twitter({
-//	consumer_key: 			cfg.twitter_consumer_key,
-//	consumer_secret: 		cfg.twitter_consumer_secret,
-//	access_token_key: 		cfg.twitter_oauth_token,
-//	access_token_secret: 	cfg.twitter_oauth_secret
-//});
+app.twit = new twitter({
+	consumer_key: 			cfg.twitter_consumer_key,
+	consumer_secret: 		cfg.twitter_consumer_secret,
+	access_token_key: 		cfg.twitter_oauth_token,
+	access_token_secret: 	cfg.twitter_oauth_secret
+});
 
-//app.twit.updateStatus('Radarsat Server started - ' + new Date(),
+//app.twit.updateStatus('RIP REST Tester started - ' + new Date(),
 //	function (data) {
-//		console.log(util.inspect(data));
+//		console.log("Twitter resp:"+ util.inspect(data));
 //	}
 //);
 

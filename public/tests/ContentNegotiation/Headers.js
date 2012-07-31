@@ -1,9 +1,8 @@
-var util 	= require('util');
-var request	= require('superagent');
-var async	= require('async');
-var chai	= require('chai');
-var _	= require('underscore');
-
+var util 			= require('util');
+var request			= require('superagent');
+var async			= require('async');
+var _				= require('underscore');
+var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
 
 describe('uses Accept and Content-Type headers', function() {
@@ -21,6 +20,8 @@ describe('uses Accept and Content-Type headers', function() {
 	describe('should support Accept & Content-type headers', function() {
 		it( 'should support text/html Accept header and return text/html Content-type', function(done) {
 
+			if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
+			
 			async.forEachSeries( urls, function( u, callback ) {	
 				request
 				.get(u)
@@ -43,6 +44,7 @@ describe('uses Accept and Content-Type headers', function() {
 		
 		it( 'should support application/json Accept header and return application/json Content-type', function(done) {
 	
+			if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 			async.forEachSeries( urls, function( u, callback ) {	
 				request
 				.get(u)
@@ -64,6 +66,7 @@ describe('uses Accept and Content-Type headers', function() {
 		})
 		
 		it( 'should return 406 on bad Accept', function(done) {	
+			if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 			async.forEachSeries( urls, function( u, callback ) {	
 				request
 				.get(u)

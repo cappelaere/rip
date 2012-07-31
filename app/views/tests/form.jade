@@ -14,10 +14,8 @@ form(method='post',action='/tests')
 					- for( u in urls )
 						option(value!=urls[u]) #{urls[u]}
 	p
-	With Selected Preferences:	
-	p
-	input(  type='checkbox', name='params[OpenSearch]', checked)
-	Label Check OpenSearch
+	<b>With Selected Preferences:</b>
+
 	p 
 	label Service Discovery:&nbsp;
 	select(id='params[discovery]', name='params[discovery]' )
@@ -25,7 +23,36 @@ form(method='post',action='/tests')
 		option(value="NoDiscovery" ) None
 		option(value="AtompubDiscoveryAPI" ) AtomPub Service Document
 		option(value="GeoservicesDiscoveryAPI" ) GeoService Catalog Document
-			
+
+	p
+	input(  type='checkbox', name='params[OpenSearch]', checked)
+	Label Uses OpenSearch
+
+	p
+	input(  type='checkbox', name='params[Atom]', checked)
+	Label Uses Atom Protocol for Data Feeds
+
+	p
+	input(  type='checkbox', name='params[ExtendAtom]', checked)
+	Label Extends Atom Feeds using
+	
+	&nbsp;
+	
+	select(id='params[AtomExtension]', name='params[AtomExtension]' )
+		option(value="GData2", selected ) GData 2.0
+		option(value="GData1" ) GData 1.0
+		option(value="OData1" ) OData 1.0
+		
+		
+	p
+	input(  type='checkbox', name='params[ExtendJSON]', checked)
+	Label Extends JSON using
+	&nbsp;
+
+	select(id='params[JSONExtension]', name='params[JSONExtension]' )
+		option(value="Siren", selected ) Siren
+		option(value="HAL" ) HAL
+		
 	p
 	input(type="submit", value="Submit")
 

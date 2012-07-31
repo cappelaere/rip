@@ -15,7 +15,7 @@ describe('OpenSearch_Document', function(){
 		done()
 	})
 	
-	describe('is accesible', function() {
+	describe('is accessible', function() {
 		it('should be discoverable from landing page', function(done){
 			var doc_url = url+ opensearch_href;
 			console.log("Checking Opensearch doc:"+doc_url);

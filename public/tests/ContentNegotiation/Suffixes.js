@@ -19,6 +19,7 @@ describe('allows representation suffixes', function(){
 	})
 	
 	it('should support url.html', function(done){
+		if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 		async.forEachSeries( urls, function( u, callback ) {	
 			request
 			.get(u+".html")
@@ -39,6 +40,7 @@ describe('allows representation suffixes', function(){
 	})
 	
 	it('should support url.json', function(done){
+		if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 		async.forEachSeries( urls, function( u, callback ) {	
 			request
 			.get(u+".json")

@@ -1,8 +1,12 @@
-var path 	= require('path');
-var request	= require('request');
-var util	= require('util');
-var should  = require('chai').should();
-var _		= require('underscore');
+var path 			= require('path');
+var request			= require('request');
+var util			= require('util');
+//var should  = require('chai').should();
+
+var _				= require('underscore');
+
+var chai  			= require('chai');
+var AssertionError	= chai.AssertionError;
 
 describe('GeoService_Discovery_Catalog', function() {
 	
@@ -16,11 +20,11 @@ describe('GeoService_Discovery_Catalog', function() {
 					discovery_doc = JSON.parse(_body);
 					done();
 				}).on("error", function(e) {
-					throw("http error:"+e+" accessing:"+doc_url);
+					throw new AssertionError({'message':"http error:"+e+" accessing:"+doc_url});
 					done();
 				});
 			} catch(e) {
-				throw("Exception:"+e);
+				throw new AssertionError({'message':"Exception:"+e});
 				done();
 			}
 		})
@@ -31,11 +35,11 @@ describe('GeoService_Discovery_Catalog', function() {
 				try {
 					isjson = JSON.parse(_body);
 				} catch(e) {
-					throw "JSON not returned"
+					throw new AssertionError({'message':"JSON not returned"});
 				}
 				done();
 			}).on("error", function(e) {
-				throw("http error:"+e+" accessing:"+doc_url);
+				throw new AssertionError({'message':"http error:"+e+" accessing:"+doc_url});
 				done();
 			});			
 		});
@@ -67,10 +71,10 @@ describe('GeoService_Discovery_Catalog', function() {
 					request.get( surl, function(err, res, _body) {
 						if( res ) res.statusCode.should.equal(200);	
 					}).on("error", function(e) {
-						throw("http error:"+e+" accessing:"+surl);
+						throw new AssertionError({'message':"http error:"+e+" accessing:"+surl});
 					});
 				} catch(e) {
-					throw("Exception:"+e);
+					throw new AssertionError({'message':"Exception:"+e});
 				}
 			})
 			done();
@@ -99,15 +103,15 @@ describe('GeoService_Discovery_Catalog', function() {
 		})
 
 		it('service description document should contain list of published resources', function() {
-			throw('no published resources');
+			throw new AssertionError({'message':'no published resources'});
 		})
 
 		it('service description document should contain list of schemas', function() {
-			throw('no published schemas');
+			throw new AssertionError({'message':'no published schemas'});
 		})
 
 		it('service description document should contain security information', function() {
-			throw('no security information');
+			throw new AssertionError({'message':'no security information'});
 		})
 
 	})
@@ -122,10 +126,10 @@ describe('GeoService_Discovery_Catalog', function() {
 					request.get( surl, function(err, res, _body) {
 						if( res ) res.statusCode.should.equal(200);	
 					}).on("error", function(e) {
-						throw("http error:"+e+" accessing:"+surl);
+						throw new AssertionError({'message':"http error:"+e+" accessing:"+surl});
 					});
 				} catch(e) {
-					throw("Exception:"+e);
+					throw new AssertionError({'message':"Exception:"+e});
 				}
 			})
 			done();

@@ -141,7 +141,12 @@ function RipDoc(runner) {
 		
 		runner.results = statHtml+report;
 		
-		//console.log(util.inspect(this));
+		var tmsg = 'RIP:'+url+ " passes:"+passes+" failures:"+failures+ " - " + new Date;
+		app.twit.updateStatus(tmsg, function (data) {
+				console.log("twitter:"+util.inspect(data));
+			}
+		);
+		
 		if( sio ) app.sio.sockets.emit("rstats", JSON.stringify(stats) );
   	}); 
 }
@@ -161,6 +166,10 @@ var test_files = [
 , "./public/tests/Discovery/NoDiscovery.js"
 , "./public/tests/UniformInterface/UniformInterface.js"
 , "./public/tests/ContentNegotiation/ContentNegotiation.js"
+, "./public/tests/Atom/Atom.js"
+, "./public/tests/Caching/Caching.js"
+, "./public/tests/Compression/Compression.js"
+, "./public/tests/HATEOAS/HATEOAS.js"
 , "./public/tests/end_test.js"
 ];
 
@@ -169,7 +178,10 @@ var always_files = {
 	"ValidEndpoint": 		'on',
 	"LandingPage": 			'on',
 	"UniformInterface": 	'on',
+	"Caching": 			 	'on',
 	"ContentNegotiation": 	'on',
+	"HATEOAS": 				'on',
+	"Compression": 			'on',
 	"end_test": 			'on'
 }
 
@@ -194,16 +206,20 @@ function runTests( params, sio, fn ) {
 						'sio', 
 						'service_doc', 
 						'url',
-						'userid'
+						'userid',
+						'params'
 					],
-		timeout: 	2000
+		timeout: 	5000
 	});
+	//console.log("mt:"+util.inspect(mt));
 	
 	// need to pass that to tests global somehow
 	global.url		= params['url'];
 	global.sio 		= sio;					// use socket_io
 	global.userid 	= params['userid'];		// use socket_io
 	
+	global.params 	= params;
+
 	var startDate = new Date;
 	for( h in always_files ) {
 		params[h] = always_files[h]
@@ -232,7 +248,12 @@ function runTests( params, sio, fn ) {
 					
 		var runner = mt.run( function(total) {
 			fn( runner.results );
-		});					
+		});	
+		
+		// stash globals
+		//runner.globals(params);
+		//console.log(util.inspect(runner._globals))
+						
 //	} catch(e) {
 //		console.trace("mocha run exception:"+e);
 //	}			

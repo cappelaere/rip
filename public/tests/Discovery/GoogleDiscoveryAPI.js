@@ -21,20 +21,20 @@ describe('Google_API_Discovery_Document', function(){
 		})
 	})
 	describe('contains API metadata', function() {
-		it('should be contain service metadata', function(){
+		it('should contain service metadata', function(){
 			discovery_doc.should.have.property('id');
 			discovery_doc.should.have.property('name');
 			discovery_doc.should.have.property('version');
 			discovery_doc.should.have.property('title');
 			discovery_doc.should.have.property('description');
 		})
-		it('should be contain resource collections', function(){
+		it('should contain resource collections', function(){
 			discovery_doc.should.have.property('resources');
 		})
-		it('should be contain schemas', function(){
+		it('should contain schemas', function(){
 			discovery_doc.should.have.property('schemas');
 		})
-		it('should be contain security protocol', function(){
+		it('should contain security protocol', function(){
 			discovery_doc.should.have.property('auth');
 		})
 	})

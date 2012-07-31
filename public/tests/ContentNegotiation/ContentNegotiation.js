@@ -1,10 +1,8 @@
-var util 	= require('util');
-var _ 		= require('underscore');
-var request	= require('superagent');
-var async	= require('async');
-var chai	= require('chai');
-//var assert	= require('assert');
-
+var util 			= require('util');
+var _ 				= require('underscore');
+var request			= require('superagent');
+var async			= require('async');
+var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
 
 describe('Content_Negotiation', function() {
@@ -20,7 +18,7 @@ describe('Content_Negotiation', function() {
 	before( function(done) {
 		// let's make sure we have a discovery document that points to a list of resources
 		resources_urls = [];
-			
+		
 		if( discovery_doc ) {
 			var path = url + discovery_doc['basePath'];
 			
@@ -38,7 +36,7 @@ describe('Content_Negotiation', function() {
 				}
 			})
 			
-			//console.log("resources:"+util.inspect(resources_urls));
+			//console.log("CN resources:"+util.inspect(resources_urls));
 			
 		} else {
 			console.log("no discovery_doc");
@@ -48,6 +46,6 @@ describe('Content_Negotiation', function() {
 	
 	require('./Headers.js');
 	require('./Suffixes.js');
-	require('./MimeTypes.js');
-
+	
+	// require('./MimeTypes.js');
 })

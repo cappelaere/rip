@@ -8,13 +8,18 @@ describe('Landing_Page', function(){
 	var $;
 	
 	before( function(done) {
-		console.log("Check Landing Page at:"+url);
+		console.log("Before Check Landing Page at:"+url);
 		request( url, function(err, resp, _body ) {
 			if (err || resp.statusCode != 200) {
-				    console.log('Error when contacting:'+url);
+				throw new AssertionError({'message':'Error when contacting:'+url});
+				done();
 			} else {
+				try {
 					$ = cheerio.load(_body)
 					done();
+				} catch(e) {
+					throw new AssertionError({'message':"Parsing Landing Page Exception"});
+				}
 			}
 		});
 	});
