@@ -16,36 +16,40 @@ describe('Content_Negotiation', function() {
 
 	
 	before( function(done) {
-		// let's make sure we have a discovery document that points to a list of resources
-		resources_urls = [];
+		try {
+			// let's make sure we have a discovery document that points to a list of resources
+			resources_urls = [];
 		
-		if( discovery_doc ) {
-			var path = url + discovery_doc['basePath'];
+			if( discovery_doc ) {
+				var path = url + discovery_doc['basePath'];
+				//console.log("Discovery path:"+path);
 			
-			var resources = discovery_doc['resources'];
-			//console.log("building resources..."+ util.inspect(resources));
+				var resources = discovery_doc['resources'];
+				//console.log("building resources..."+ util.inspect(resources));
 			
-			_.each(resources, function(k,v) {
-				//console.log("resources:"+ util.inspect(k)+ " - "+ util.inspect(v))
-				if( k && k.methods ) {
-					_.each(k.methods, function(which, name) {
-						//console.log("method:"+util.inspect(which));
-						// focus on list methods					
-						if( name == 'list') add_url( path, which)
-					})
-				}
-			})
+				_.each(resources, function(k,v) {
+					//console.log("resources:"+ util.inspect(k)+ " - "+ util.inspect(v))
+					if( k && k.methods ) {
+						_.each(k.methods, function(which, name) {
+							//console.log("method:"+util.inspect(which));
+							// focus on list methods					
+							if( name == 'list') add_url( path, which)
+						})
+					}
+				})
 			
-			//console.log("CN resources:"+util.inspect(resources_urls));
+				//console.log("CN resources:"+util.inspect(resources_urls));
 			
-		} else {
-			console.log("no discovery_doc");
-		}
-		done()
+			} else {
+				console.log("no discovery_doc");
+			}
+			//console.log(util.inspect(resources_urls))
+			done()
+		} catch(e) { console.error("** CN Exception:"+e)}
 	});
+	
 	
 	require('./Headers.js');
 	require('./Suffixes.js');
-	
-	// require('./MimeTypes.js');
+	require('./MimeTypes.js');
 })

@@ -5,29 +5,28 @@ var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
 
 describe('Landing_Page', function(){
-	var $;
 	
 	before( function(done) {
-		console.log("Before Check Landing Page at:"+url);
+		console.log("Before LandingPage")
 		request( url, function(err, resp, _body ) {
 			if (err || resp.statusCode != 200) {
+				console.error("failed getting url:"+url)
 				throw new AssertionError({'message':'Error when contacting:'+url});
-				done();
 			} else {
 				try {
 					$ = cheerio.load(_body)
 					done();
 				} catch(e) {
+					console.error("failed parsing landing page:"+url)
 					throw new AssertionError({'message':"Parsing Landing Page Exception"});
 				}
 			}
 		});
 	});
-	
+
 	describe('uses HTML5', function() {
 		it('should use the html5 namespace', function(done) {
-			var html = $('html')[0];
-			var xmlns = $('html').attr('xmlns')
+			var xmlns 	= $('html').attr('xmlns')
 			if( xmlns == 'http://www.w3.org/1999/xhtml') {
 				done();
 			} else {
@@ -42,7 +41,7 @@ describe('Landing_Page', function(){
 			var link = head.find('link[rel=discovery]')
 			if( link ) {
 				discovery_href = link.attr('href');
-				console.log("discovery_href:"+discovery_href)
+				//console.log("discovery_href:"+discovery_href)
 				done();
 			}
 		})
@@ -52,7 +51,7 @@ describe('Landing_Page', function(){
 			var link = head.find('link[rel=search]')
 			if( link ) {
 				opensearch_href = link.attr('href');
-				console.log("opensearch_href:"+opensearch_href)
+				//console.log("opensearch_href:"+opensearch_href)
 				done();
 			} else {
 				throw new AssertionError({'message':"opensearch link not found"});

@@ -35,3 +35,25 @@ app.configure(function(){
 	    res.render('404', {status:404});
 	});  
 });
+
+Date.prototype.rfc339 =	function() {
+ var pad = function (amount, width) {
+  var padding = "";
+  while (padding.length < width - 1 && amount < Math.pow(10, width - padding.length - 1))
+   padding += "0";
+  return padding + amount.toString();
+ }
+ date = this;	//date ? date : new Date();
+ var offset = date.getTimezoneOffset();
+ console.log("rfc339 offset:"+ offset);
+ return pad(date.getFullYear(), 4)
+   + "-" + pad(date.getMonth() + 1, 2)
+   + "-" + pad(date.getDate(), 2)
+   + "T" + pad(date.getHours(), 2)
+   + ":" + pad(date.getMinutes(), 2)
+   + ":" + pad(date.getSeconds(), 2)
+   + "." + pad(date.getMilliseconds(), 3)
+   + (offset > 0 ? "-" : "+")
+   + pad(Math.floor(Math.abs(offset) / 60), 2)
+   + ":" + pad(Math.abs(offset) % 60, 2);
+}

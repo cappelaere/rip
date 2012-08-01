@@ -4,8 +4,9 @@ var util	= require('util');
 var _  		= require('underscore');
 var async	= require('async');
 
-var should  = require('chai').should();
-var xml2js	= require('xml2js');
+var chai			= require('chai');
+var AssertionError	= chai.AssertionError;
+var should  		= chai.should();
 
 describe('Caching', function(){
 	var urls 	= [];
@@ -22,7 +23,7 @@ describe('Caching', function(){
 	})
 	
 	describe("Caching Headers", function() {
-		if( params['AtomExtension'] == 'GData2') {
+		if( params['ExtendAtom'] && params['AtomExtension'] == 'GData2') {
 			describe("GData 2.0 Caching Headers", function() {
 				
 				it("should use GData-Version 2.0 in headers", function(done) {
@@ -35,7 +36,7 @@ describe('Caching', function(){
 						.set('Accept', 'application/atom+xml')
 						.end( function(res) {
 							//console.log( res.headers );
-							var gdata = res.headers['GData-Version']
+							var gdata = res.headers['gdata-version']
 							should.exist(gdata)
 							gdata.should.equal('2.0')
 							//GData-Version: 2.0
@@ -56,7 +57,7 @@ describe('Caching', function(){
 						.set('Accept', 'application/atom+xml')
 						.end( function(res) {
 							//console.log( res.headers );
-							var etag = res.headers['ETag']
+							var etag = res.headers['etag']
 							should.exist(etag)
 
 							callback()
@@ -76,8 +77,8 @@ describe('Caching', function(){
 						.set('Accept', 'application/atom+xml')
 						.end( function(res) {
 							//console.log( res.headers );
-							var etag = res.headers['Last-Modified']
-							should.exist(etag)
+							var lastm = res.headers['last-modified']
+							should.exist(lastm)
 
 							callback()
 						})
@@ -85,11 +86,87 @@ describe('Caching', function(){
 						done();
 					})
 				})
+				
+				it("should return a 304 Not Modified if using If-None-Match: etag", function(done) {
+					if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 
-				it("should return a 304 Not Modified", function() {
+					async.forEachSeries( urls, function( u, callback ) {
+						///console.log("H "+u);	
+						request
+						.get(u)
+						.set('Accept', 'application/atom+xml')
+						.end( function(res) {
+							//console.log( res.headers );
+							var etag = res.headers['etag']
+							
+							// try again and we need to get a 304
+							request
+							.get(u)
+							.set('Accept', 'application/atom+xml')
+							.set('If-None-Match', etag)
+							.end( function(res) {
+								res.status.should.equal(304)
+								callback();
+							})
+						})
+					}, function(err) {
+						done();
+					})				
 				})
 
-				it("should support Conditional Retrieval with If-None-Match in headers", function() {
+				it("should return a 304 Not Modified if using Last-Modified: last-modified", function(done) {
+					if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
+
+					async.forEachSeries( urls, function( u, callback ) {
+						///console.log("H "+u);	
+						request
+						.get(u)
+						.set('Accept', 'application/atom+xml')
+						.end( function(res) {
+							//console.log( res.headers );
+							var lastm = res.headers['last-modified']
+							
+							// try again and we need to get a 304
+							request
+							.get(u)
+							.set('Accept', 'application/atom+xml')
+							.set('Last-Modified', lastm)
+							.end( function(res) {
+								res.status.should.equal(304)
+								callback();
+							})
+						})
+					}, function(err) {
+						done();
+					})
+					
+				})
+
+				it("should support Conditional Retrieval with If-None-Match in headers", function(done) {
+					if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
+
+					async.forEachSeries( urls, function( u, callback ) {
+						///console.log("H "+u);	
+						request
+						.get(u)
+						.set('Accept', 'application/atom+xml')
+						.end( function(res) {
+							//console.log( res.headers );
+							var etag = res.headers['etag']
+							
+							// try again with invalid tag and we need to get a 200
+							request
+							.get(u)
+							.set('Accept', 'application/atom+xml')
+							.set('If-None-Match', etag+"xyz")
+							.end( function(res) {
+								res.status.should.equal(200)
+								callback();
+							})
+						})
+					}, function(err) {
+						done();
+					})				
 				})				
 				
 				it("should support Conditional Replace with If-Match: <etag> in headers", function() {

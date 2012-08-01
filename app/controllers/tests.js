@@ -75,7 +75,7 @@ function RipDoc(runner) {
 	    if (suite.root) return;
 	    results += '</ul>\n</li>';
 	
-		if( global.sio && indent == 0 ) {
+		if( params['sio'] && indent == 0 ) {
 			app.sio.sockets.emit("rstats", JSON.stringify(stats) );
 			//debug(rstr);
 			app.sio.sockets.emit("rsuite", results, function(data) {
@@ -118,14 +118,46 @@ function RipDoc(runner) {
 		app.db.get('services:'+url, function(err, data) {
 			if( !err ) {
 				var json = JSON.parse(data)
-				if( userid && json && userid == json.userid ) {
+
+				var tweet_it = false;
+				
+				// no tweeting while local testing
+				if( url != "http://localhost") {
+					if( json ) {
+						// make sure there is a significant change
+						if( (json.passes != stats.passes) || (json.failures != stats.failures) ) {
+							tweet_it = true;
+						}
+					} else {
+						tweet_it = true;
+					}
+				}
+
+				var tmsg = url+ " - Pass:"+stats.passes+" Fail:"+stats.failures + " with:";
+				for( h in always_files ) { delete params[h]; }
+				delete params['url'];
+				delete params['discovery'];
+				
+				var keys = []
+				for( var key in params ) { keys.push(key); }
+				tmsg += keys.join(", ")
+				
+				//console.log("tweet:"+ tmsg);
+				
+				if(tweet_it ) try {
+					app.twit.updateStatus(tmsg, function (data) {
+							//console.log("twitter:"+util.inspect(data));
+					});
+				} catch(e) { console.error("err:"+e+" connecting to twitter") }
+				
+				if( params['userid'] && json && userid == json.userid ) {
 					console.log("Valid user... updating db score")
 					json.passes = stats.passes;
 					json.failed = stats.failures;
 					json.date   = new Date
 					app.db.set('services:'+url, JSON.stringify(json));
 				} else {
-					console.log("Invalid user "+userid + " - no score update");
+					console.log("Invalid user "+ params['userid'] + " - no score update");
 				}
 			}
 		})
@@ -141,13 +173,8 @@ function RipDoc(runner) {
 		
 		runner.results = statHtml+report;
 		
-		var tmsg = 'RIP:'+url+ " passes:"+passes+" failures:"+failures+ " - " + new Date;
-		app.twit.updateStatus(tmsg, function (data) {
-				console.log("twitter:"+util.inspect(data));
-			}
-		);
 		
-		if( sio ) app.sio.sockets.emit("rstats", JSON.stringify(stats) );
+		if( params['sio'] ) app.sio.sockets.emit("rstats", JSON.stringify(stats) );
   	}); 
 }
 
@@ -155,6 +182,7 @@ RipDoc.prototype.getResults = function(){
 	return this.results;
 }
 
+// explicit list to force order
 var test_files = [
  "./public/tests/start_test.js"
 , "./public/tests/EndPoint/ValidEndpoint.js"
@@ -164,12 +192,17 @@ var test_files = [
 , "./public/tests/Discovery/AtompubDiscoveryAPI.js"
 , "./public/tests/Discovery/GeoservicesDiscoveryAPI.js"
 , "./public/tests/Discovery/NoDiscovery.js"
-, "./public/tests/UniformInterface/UniformInterface.js"
 , "./public/tests/ContentNegotiation/ContentNegotiation.js"
+, "./public/tests/ContentNegotiation/Headers.js"
+, "./public/tests/ContentNegotiation/Suffixes.js"
+, "./public/tests/ContentNegotiation/MimeTypes.js"
+, "./public/tests/UniformInterface/UniformInterface.js"
 , "./public/tests/Atom/Atom.js"
 , "./public/tests/Caching/Caching.js"
 , "./public/tests/Compression/Compression.js"
 , "./public/tests/HATEOAS/HATEOAS.js"
+, "./public/tests/HATEOAS/HAL.js"
+, "./public/tests/HATEOAS/Siren.js"
 , "./public/tests/end_test.js"
 ];
 
@@ -177,9 +210,9 @@ var always_files = {
 	"start_test": 			'on',
 	"ValidEndpoint": 		'on',
 	"LandingPage": 			'on',
+	"ContentNegotiation": 	'on',
 	"UniformInterface": 	'on',
 	"Caching": 			 	'on',
-	"ContentNegotiation": 	'on',
 	"HATEOAS": 				'on',
 	"Compression": 			'on',
 	"end_test": 			'on'
@@ -192,7 +225,7 @@ test_files = test_files.map(function(path){
 });
 
 // start test when web page is up and synchronized with socket.io
-function runTests( params, sio, fn ) {
+function runTests( params, fn ) {
 	debug("Start:"+util.inspect(params));
 	
 	var mt = new mocha( {
@@ -203,22 +236,25 @@ function runTests( params, sio, fn ) {
 						'opensearch_href', 
 						'resources_urls',
 						'results',
-						'sio', 
 						'service_doc', 
 						'url',
-						'userid',
-						'params'
+						'params',
+						'$'
 					],
 		timeout: 	5000
 	});
 	//console.log("mt:"+util.inspect(mt));
 	
 	// need to pass that to tests global somehow
-	global.url		= params['url'];
-	global.sio 		= sio;					// use socket_io
-	global.userid 	= params['userid'];		// use socket_io
-	
-	global.params 	= params;
+	global.url				= params['url'];	
+	global.params 			= params;
+	global.discovery_href 	= undefined;
+	global.discovery_doc 	= undefined;
+	global.opensearch_href 	= undefined;
+	global.resources_urls 	= [];
+	global.results 			= "";
+	global.service_doc 		= undefined;
+
 
 	var startDate = new Date;
 	for( h in always_files ) {
@@ -227,9 +263,7 @@ function runTests( params, sio, fn ) {
 
 	debug(util.inspect(params));
 
-	//try {
-		selectFiles = [];
-		
+	try {		
 		// fix discovery option
 		var discovery = params['discovery'];
 		params[discovery] = 'on';
@@ -250,13 +284,15 @@ function runTests( params, sio, fn ) {
 			fn( runner.results );
 		});	
 		
-		// stash globals
-		//runner.globals(params);
+		runner.global_vars = {
+			'url': params['url']
+		};
+		
 		//console.log(util.inspect(runner._globals))
 						
-//	} catch(e) {
-//		console.trace("mocha run exception:"+e);
-//	}			
+	} catch(e) {
+		console.trace("mocha run exception:"+e);
+	}			
 }
 
 module.exports = {
@@ -281,14 +317,15 @@ module.exports = {
 	},
 	
 	sio_start: function(params, sio) {
-		runTests(params, sio, function( results) {
+		params['sio'] = true;
+		runTests(params, function( results) {
 		});
 	},
 	// This is going to start the tests and stream results to the page in realtime
 	// using socket_io
 	sio: function(req, res ) {
 		var params = req.body.params;
-		console.log("sio tests params:"+util.inspect(params));
+		//console.log("sio tests params:"+util.inspect(params));
 		
 		websocket_url 	= "http://"+req.headers.host;
 		host 			= "http://"+req.headers.host+"/ustories";
@@ -310,7 +347,6 @@ module.exports = {
 		
 		if( req.session.user) {
 			var user = User.newInstance(req.session.user);
-			console.log("User:"+ util.inspect(user))
 			params['userid'] = user.id
 		}
 		
@@ -320,7 +356,7 @@ module.exports = {
 		// url endpoint to test
 		var test_url	= req.body.params['url'];
 		
-		var results 	= runTests(params, false, function( results) {
+		var results 	= runTests(params, function( results) {
 			
 		  res.render("tests/results.ejs", {
 			layout: 	false,

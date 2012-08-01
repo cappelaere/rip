@@ -19,13 +19,13 @@ function NamedTag(arr, tag) {
 }
 
 describe('Atom Feeds', function() {
-	var urls 	= [];
+	var atom_urls 	= [];
 	var feeds 	= [];
 	
 	before( function(done) {
 
 		// we need to filter out the templated urls 
-		urls = _.map(resources_urls, function(url) {
+		atom_urls = _.map(resources_urls, function(url) {
 			var path = url['path'];
 			return path.replace(".{fmt}", "")
 		})
@@ -34,9 +34,9 @@ describe('Atom Feeds', function() {
 
 	describe('are available for lists of resources', function() {
 		it( 'should support application/atom+xml Accept header and return application/atom+xml Content-type', function(done) {
-			if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
+			if( atom_urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 
-			async.forEachSeries( urls, function( u, callback ) {	
+			async.forEachSeries( atom_urls, function( u, callback ) {	
 				request
 				.head(u)
 				.set('Accept', 'application/atom+xml')
@@ -56,9 +56,9 @@ describe('Atom Feeds', function() {
 		})
 
 		it( 'should be valid Atom feeds', function(done) {
-			if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
+			if( atom_urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 
-			async.forEachSeries( urls, function( u, callback ) {	
+			async.forEachSeries( atom_urls, function( u, callback ) {	
 				request
 				.get(u)
 				.set('Accept', 'application/atom+xml')
@@ -161,6 +161,8 @@ describe('Atom Feeds', function() {
 				it("entries use etag attribute", function(done) {
 					async.forEachSeries( feeds, function( e, callback ) {
 						if( e.entry && e.entry.length>0 ) {
+							//console.log("Checking url:"+e.url+ " entry:"+ util.inspect(e.entry));
+							//console.log(e.entry.html());
 							var etag = e.entry[0].attribs['gd:etag'];
 							//console.log("Entry etag:"+util.inspect(e.entry[0]))
 							//console.log("Entry etag:"+util.inspect(etag))

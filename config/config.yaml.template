@@ -1,0 +1,14 @@
+{
+    "root_service":                 "rip",
+    "realm":                        "/rip",
+    "server_url":                   "http://rip.jit.su",
+	
+	"debug":						true,
+		
+	"twitter_consumer_key": 		"XXXXXX",
+	"twitter_consumer_secret":		"XXXXXX",
+	"twitter_oauth_token":			"XXX-XXX",
+	"twitter_oauth_secret": 		"XXX",
+
+	"pubsubhubbub_url":				"http://geobliki.superfeedr.com"
+}

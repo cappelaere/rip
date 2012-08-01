@@ -229,11 +229,16 @@ app.twit = new twitter({
 	access_token_secret: 	cfg.twitter_oauth_secret
 });
 
-//app.twit.updateStatus('RIP REST Tester started - ' + new Date(),
-//	function (data) {
-//		console.log("Twitter resp:"+ util.inspect(data));
-//	}
-//);
+var json_package 	= JSON.parse(fs.readFileSync(__dirname + '/package.json', 'utf-8'));
+app.version  		= json_package['version'];
+
+if( app.settings.env != 'development') {
+	app.twit.updateStatus('RIP REST Tester version:'+app.version+' started...',
+		function (data) {
+			console.log("Twitter resp:"+ util.inspect(data));
+		}
+	);
+}
 
 // port set based on NODE_ENV settings (production, development or test)
 //console.log(util.inspect(process.env));
@@ -244,7 +249,7 @@ if( app.settings.env == 'development') {
 	server_url = "http://localhost:"+port;
 }
 
-console.log(server_url + " trying to start...");
+console.log(server_url + " trying to start...version:"+app.version);
 
 var USE_SOCKET_IO = false;
 
@@ -327,6 +332,7 @@ if (!module.parent) {
 		})	
 	} 	// end of socketio implementation
 		// ==========================================
-	 
+	
+	
 	console.log("RIP Server ready...")
 }
