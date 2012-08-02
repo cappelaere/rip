@@ -4,6 +4,7 @@ var async			= require('async');
 var _				= require('underscore');
 var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
+var debug 			= require('debug')('tests:Headers');
 
 describe('uses Accept and Content-Type headers', function() {
 	var urls = [];
@@ -29,7 +30,7 @@ describe('uses Accept and Content-Type headers', function() {
 				.end( function(res) {
 					try {
 						res.status.should.equal(200)
-						console.log("Checked:"+u)				
+						debug("Checked html Accept Headers of:"+u)				
 						res.headers['content-type'].should.contain('text/html')
 						callback();
 					} catch(e) {
@@ -52,7 +53,7 @@ describe('uses Accept and Content-Type headers', function() {
 				.end( function(res) {
 					try {
 						res.status.should.equal(200)
-						console.log("Checked:"+u)				
+						debug("Checked json Accept Headers of :"+u)				
 						res.headers['content-type'].should.contain('application/json')
 						callback();
 					} catch(e) {
@@ -73,7 +74,6 @@ describe('uses Accept and Content-Type headers', function() {
 				.set('Accept', 'application/rip_me')
 				.end( function(res) {
 					try {
-						console.log("Checked:"+u)				
 						res.status.should.equal(406)
 						callback();
 					} catch(e) {

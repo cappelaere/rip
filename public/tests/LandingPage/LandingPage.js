@@ -3,11 +3,11 @@ var request			= require('request');
 var cheerio			= require('cheerio');
 var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
+var debug 			= require('debug')('tests:LandingPage');
 
 describe('Landing_Page', function(){
 	
 	before( function(done) {
-		console.log("Before LandingPage")
 		request( url, function(err, resp, _body ) {
 			if (err || resp.statusCode != 200) {
 				console.error("failed getting url:"+url)
@@ -41,7 +41,7 @@ describe('Landing_Page', function(){
 			var link = head.find('link[rel=discovery]')
 			if( link ) {
 				discovery_href = link.attr('href');
-				//console.log("discovery_href:"+discovery_href)
+				debug("discovery_href:"+discovery_href)
 				done();
 			}
 		})
@@ -51,7 +51,7 @@ describe('Landing_Page', function(){
 			var link = head.find('link[rel=search]')
 			if( link ) {
 				opensearch_href = link.attr('href');
-				//console.log("opensearch_href:"+opensearch_href)
+				debug("opensearch_href:"+opensearch_href)
 				done();
 			} else {
 				throw new AssertionError({'message':"opensearch link not found"});

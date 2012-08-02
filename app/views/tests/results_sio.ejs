@@ -8,8 +8,12 @@
 
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script type="text/javascript">
+	  var socket = undefined;
+	
 	  function init_sio() {
-		var socket = io.connect('<%= server_url %>');
+		if( socket ) return;
+		
+		socket = io.connect('<%= server_url %>');
 		
 	  	socket.on('rstats', function (data) {
 		    var stats = JSON.parse(data);

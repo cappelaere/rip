@@ -1,15 +1,14 @@
-var path 	= require('path');
-var util	= require('util');
-var request	= require('superagent');
-//var req		= require('request');
-//var should  = require('chai').should();
-var assert = require('assert')
+var path 		= require('path');
+var util		= require('util');
+var request		= require('superagent');
+var assert 		= require('assert')
+var debug 		= require('debug')('Discovery');
 
 describe('Google_API_Discovery_Document', function(){
 	describe('is accessible', function() {
 		it('should exists', function(done){
 			var doc_url = url+ discovery_href;
-			console.log("Checking discovery_url:"+doc_url);
+			debug("Checking discovery_url:"+doc_url);
 		
 			request
 			.get( doc_url)

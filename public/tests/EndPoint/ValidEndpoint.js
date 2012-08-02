@@ -1,5 +1,6 @@
-var request	= require('request');
-var should 	= require('chai').should();
+var request			= require('request');
+var should 			= require('chai').should();
+var debug 			= require('debug')('tests:Caching');
 
 function Abort (message) {
   this.message = message;
@@ -21,7 +22,7 @@ describe('End_Point', function(){
 	describe('is valid and available', function() {
 		
 		it('should be up and running', function(done) {
-			console.log("Checking valid endpoint:"+url)
+			debug("Checking valid endpoint:"+url)
 			//console.log("Checking myvars in it:"+ util.inspect(this))
 	
 			var start = new Date

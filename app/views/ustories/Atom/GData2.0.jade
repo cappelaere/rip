@@ -1,0 +1,16 @@
+body
+	h1 Atom Feeds can be extended using Gdata 2.0 protocol
+	#role	a server
+	#want	extend the ATOM protocol using GData 2.0
+	#benefit can publish my own resources in a meaningful way
+		
+	#rationale This allows an external Application to have access to the resources in a meaningful way without having to parse the HTML content
+
+	h2 Acceptance Criteria
+	#given	list of resources, for each resource end point
+	#when	I use GET with an application/atom+xml Accept Header
+	#then  	feed uses etag attribute
+	#and    feed uses category tag and proper accessible schema
+	#and	feed uses OpenSearch namespace and attributes
+	#and 	entries use etag attribute
+	#and 	entries use category tag and proper accessible format

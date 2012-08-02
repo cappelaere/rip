@@ -29,7 +29,7 @@ var express 		= require('express'),
   	RedisStore 		= require('connect-redis')(express),
  	redis			= require('redis');
 
-	var server_url = cfg.server_url;
+	var server_url 	= cfg.server_url;
 
 	var app = module.exports = express.createServer();
 
@@ -43,12 +43,12 @@ var express 		= require('express'),
 	//
 	if( app.settings.env == 'production') {
 
-		console.log("* Connecting to nodejitsu redis...")
+		console.log("* Connecting to redis:"+cfg.redis_conn_url)
 	
 		// jitsu databases create redis rip2
-		// jitsu databases list
-		var conn_url 		= 'redis://nodejitsu:ff6691395536b4d5636a81627530830d@drum.redistogo.com:9774/';
-		rtg 				= url.parse(conn_url);
+		// jitsu databases list and update config.yaml
+		//var conn_url 		= 'redis://nodejitsu:ff6691395536b4d5636a81627530830d@drum.redistogo.com:9774/';
+		rtg 				= url.parse(cfg.redis_conn_url);
 		passwd 				= rtg.auth.split(':')[1];
 		
 		db				    = redis.createClient(rtg.port, rtg.hostname);
@@ -251,7 +251,7 @@ if( app.settings.env == 'development') {
 
 console.log(server_url + " trying to start...version:"+app.version);
 
-var USE_SOCKET_IO = false;
+var USE_SOCKET_IO = true;
 
 if (!module.parent) {
 	app.listen(port);
@@ -259,6 +259,10 @@ if (!module.parent) {
 	
 	//===============================================================================
 	if( USE_SOCKET_IO ) {	
+		
+		// redis clients
+		var pub, sub, cli;
+		
 		// Attach socket.io
 		app.sio = sio.listen(app);
 
@@ -270,6 +274,9 @@ if (!module.parent) {
 		
 			socket.on('disconnect', function () {
 				debug("socket.io disconnected");
+				pub.quit();
+				sub.quit();
+				cli.quit();
 			});
 		
 			// receive startTest from Browser and start tests
@@ -283,34 +290,29 @@ if (!module.parent) {
 	
 		// Configure it
 		app.sio.configure('production', function() {
-			if( true ) {
-				console.log("++ Socket.io production settings... RedisStore at:"+rtg.hostname+":"+rtg.port);
+			
+			console.log("++ Socket.io production settings... RedisStore at:"+rtg.hostname+":"+rtg.port);
+	
+			var sioredis = require('socket.io/node_modules/redis');
+			pub = sioredis.createClient(rtg.port, rtg.hostname);
+			pub.on("error", function (err) { console.log("Socket.io pub Redis Database Error " + err); });
+			pub.auth(passwd, function() { console.log("pub auth")});
+	
+			sub = sioredis.createClient(rtg.port, rtg.hostname);
+			sub.on("error", function (err) { console.log("Socket.io sub Redis Database Error " + err);});
+			sub.auth(passwd, function() { console.log("sub auth")});
+	
+			cli = sioredis.createClient(rtg.port, rtg.hostname);
+			cli.on("error", function (err) {  console.log("Socket.io cli Redis Database Error " + err);	});
+			cli.auth(passwd, function() { console.log("cli auth")});
+	
+			var SIORedisStore = require('socket.io/lib/stores/redis');
+			app.sio.set('store', new SIORedisStore({
+				redisPub: 		pub,
+				redisSub: 		sub,
+				redisClient: 	cli
+			}));			
 		
-				var sioredis = require('socket.io/node_modules/redis');
-				var pub = sioredis.createClient(rtg.port, rtg.hostname);
-				pub.on("error", function (err) { console.log("Socket.io pub Redis Database Error " + err); });
-				pub.auth(passwd, function() { console.log("pub auth")});
-		
-				var sub = sioredis.createClient(rtg.port, rtg.hostname);
-				sub.on("error", function (err) { console.log("Socket.io sub Redis Database Error " + err);});
-				sub.auth(passwd, function() { console.log("sub auth")});
-		
-				var cli = sioredis.createClient(rtg.port, rtg.hostname);
-				cli.on("error", function (err) {  console.log("Socket.io cli Redis Database Error " + err);	});
-				cli.auth(passwd, function() { console.log("cli auth")});
-		
-				console.log("Creating socket.io store...");
-				var SIORedisStore = require('socket.io/lib/stores/redis');
-				app.sio.set('store', new SIORedisStore({
-					redisPub: 		pub,
-					redisSub: 		sub,
-					redisClient: 	cli
-				}));
-			} else {
-				console.log("Socket.io production settings... MemoryStore");
-				var SocketIOMemoryStore = require('socket.io/lib/stores/memory');
-				app.sio.set('store', new SocketIOMemoryStore());
-		    }
 			app.sio.enable('browser client minification');  // send minified client
 			app.sio.enable('browser client etag');          // apply etag caching logic based on version number
 			app.sio.enable('browser client gzip');          // gzip the file

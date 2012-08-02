@@ -1,19 +1,17 @@
 var path 			= require('path');
 var request			= require('request');
 var util			= require('util');
-//var should  = require('chai').should();
-
 var _				= require('underscore');
-
 var chai  			= require('chai');
 var AssertionError	= chai.AssertionError;
+var debug 			= require('debug')('tests:Geoservices');
 
 describe('GeoService_Discovery_Catalog', function() {
 	
 	describe('is accessible', function() {
 		it('should exists', function(done){
 			var doc_url = url+ "?f=json";
-			console.log("Checking discovery_url:"+doc_url);
+			debug("Checking discovery_url:"+doc_url);
 			try {
 				request.get( doc_url, function(err, res, _body) {
 					res.statusCode.should.equal(200);
@@ -66,7 +64,7 @@ describe('GeoService_Discovery_Catalog', function() {
 			var services = discovery_doc['services'];
 			_.each( services, function(s) {
 				var surl = url + "/" + s['name'] + "/" + s['type'] + "?f=json&pretty=true";
-				console.log("check service:"+surl);
+				debug("check service:"+surl);
 				try {
 					request.get( surl, function(err, res, _body) {
 						if( res ) res.statusCode.should.equal(200);	
@@ -121,7 +119,7 @@ describe('GeoService_Discovery_Catalog', function() {
 			var folders = discovery_doc['folders'];
 			_.each( folders, function(f) {
 				var surl = url + "/" + f + "?f=json&pretty=true";
-				console.log("check folder:"+surl);
+				deubg("check folder:"+surl);
 				try {
 					request.get( surl, function(err, res, _body) {
 						if( res ) res.statusCode.should.equal(200);	

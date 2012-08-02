@@ -1,10 +1,10 @@
-var util 	= require('util');
-var request	= require('superagent');
-var async	= require('async');
-var _		= require('underscore');
-
+var util 			= require('util');
+var request			= require('superagent');
+var async			= require('async');
+var _				= require('underscore');
 var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
+var debug 			= require('debug')('tests:Suffixes');
 
 describe('allows representation suffixes', function(){
 	var urls = [];
@@ -26,7 +26,7 @@ describe('allows representation suffixes', function(){
 			.end( function(res) {
 				try {
 					res.status.should.equal(200)
-					console.log("Checked:"+u+".html")				
+					debug("Checked html suffix:"+u+".html")				
 					res.headers['content-type'].should.contain('text/html')
 					callback();
 				} catch(e) {
@@ -47,7 +47,7 @@ describe('allows representation suffixes', function(){
 			.end( function(res) {
 				try {
 					res.status.should.equal(200)
-					console.log("Checked:"+u+".json")				
+					debug("Checked suffix json:"+u+".json")				
 					res.headers['content-type'].should.contain('application/json')
 					callback();
 				} catch(e) {

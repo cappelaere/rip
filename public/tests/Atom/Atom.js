@@ -6,6 +6,7 @@ var cheerio			= require('cheerio');
 var chai			= require('chai');
 var should			= require('chai').should();
 var AssertionError	= chai.AssertionError;
+var debug 			= require('debug')('tests:Atom');
 
 function NamedTag(arr, tag) {
 	var array = arr.children().toArray();
@@ -64,7 +65,7 @@ describe('Atom Feeds', function() {
 				.set('Accept', 'application/atom+xml')
 				.end( function(res) {
 					try {
-						console.log("Atom get:"+u)				
+						debug("Atom get:"+u)				
 						res.status.should.equal(200)
 						res.type.should.contain('application/atom+xml')
 					
@@ -112,7 +113,7 @@ describe('Atom Feeds', function() {
 	describe("may be extended", function() {
 		if( params['AtomExtension'] == 'GData2') {
 			//require(__dirname+'/GData2.js')
-			describe('are extended using GDAta 2.0 protocol', function() {
+			describe('are extended using GData 2.0 protocol', function() {
 				it("feed uses etag attribute", function(done) {
 					async.forEachSeries( feeds, function( e, callback ) {
 						var etag = e.doc('feed').attr('gd:etag');
@@ -129,7 +130,7 @@ describe('Atom Feeds', function() {
 						should.exist(category);
 						var scheme = category.attr('scheme')
 						should.exist(scheme);
-						console.log("scheme:"+util.inspect(scheme))
+						debug("scheme:"+util.inspect(scheme))
 						// check schema availability
 						request
 							.get(scheme)
@@ -161,11 +162,7 @@ describe('Atom Feeds', function() {
 				it("entries use etag attribute", function(done) {
 					async.forEachSeries( feeds, function( e, callback ) {
 						if( e.entry && e.entry.length>0 ) {
-							//console.log("Checking url:"+e.url+ " entry:"+ util.inspect(e.entry));
-							//console.log(e.entry.html());
 							var etag = e.entry[0].attribs['gd:etag'];
-							//console.log("Entry etag:"+util.inspect(e.entry[0]))
-							//console.log("Entry etag:"+util.inspect(etag))
 							should.exist(etag);
 						}
 						callback(null);
@@ -178,11 +175,10 @@ describe('Atom Feeds', function() {
 					async.forEachSeries( feeds, function( e, callback ) {
 						if( e.entry && e.entry.length>0 ) {
 							var category = e.entry.find('category');
-							//console.log("Entry etag:"+util.inspect(category))
 							should.exist(category);
 							var scheme = category.attr('scheme')
 							should.exist(scheme);
-							console.log("entry scheme:"+scheme)
+							debug("entry scheme:"+scheme)
 							request
 								.get(scheme)
 								.end( function(res) {

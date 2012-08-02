@@ -1,12 +1,12 @@
-var path 	= require('path');
-var request	= require('superagent');
-var util	= require('util');
-var _  		= require('underscore');
-var async	= require('async');
-
+var path 			= require('path');
+var request			= require('superagent');
+var util			= require('util');
+var _  				= require('underscore');
+var async			= require('async');
 var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
 var should  		= chai.should();
+var debug 			= require('debug')('tests:Caching');
 
 describe('Caching', function(){
 	var urls 	= [];
@@ -51,15 +51,12 @@ describe('Caching', function(){
 					if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 
 					async.forEachSeries( urls, function( u, callback ) {
-						//console.log("H "+u);	
 						request
 						.get(u)
 						.set('Accept', 'application/atom+xml')
 						.end( function(res) {
-							//console.log( res.headers );
 							var etag = res.headers['etag']
 							should.exist(etag)
-
 							callback()
 						})
 					}, function(err) {
@@ -71,15 +68,12 @@ describe('Caching', function(){
 					if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 
 					async.forEachSeries( urls, function( u, callback ) {
-						///console.log("H "+u);	
 						request
 						.get(u)
 						.set('Accept', 'application/atom+xml')
 						.end( function(res) {
-							//console.log( res.headers );
 							var lastm = res.headers['last-modified']
 							should.exist(lastm)
-
 							callback()
 						})
 					}, function(err) {
@@ -91,12 +85,10 @@ describe('Caching', function(){
 					if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 
 					async.forEachSeries( urls, function( u, callback ) {
-						///console.log("H "+u);	
 						request
 						.get(u)
 						.set('Accept', 'application/atom+xml')
 						.end( function(res) {
-							//console.log( res.headers );
 							var etag = res.headers['etag']
 							
 							// try again and we need to get a 304
@@ -118,12 +110,10 @@ describe('Caching', function(){
 					if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 
 					async.forEachSeries( urls, function( u, callback ) {
-						///console.log("H "+u);	
 						request
 						.get(u)
 						.set('Accept', 'application/atom+xml')
 						.end( function(res) {
-							//console.log( res.headers );
 							var lastm = res.headers['last-modified']
 							
 							// try again and we need to get a 304
@@ -146,12 +136,10 @@ describe('Caching', function(){
 					if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});
 
 					async.forEachSeries( urls, function( u, callback ) {
-						///console.log("H "+u);	
 						request
 						.get(u)
 						.set('Accept', 'application/atom+xml')
 						.end( function(res) {
-							//console.log( res.headers );
 							var etag = res.headers['etag']
 							
 							// try again with invalid tag and we need to get a 200
@@ -169,32 +157,27 @@ describe('Caching', function(){
 					})				
 				})				
 				
-				it("should support Conditional Replace with If-Match: <etag> in headers", function() {
-				})
+				it("should support Conditional Replace with If-Match: <etag> in headers")
 				
-				it("should support Override Replace with If-Match: * in headers", function() {
-				})
+				it("should support Override Replace with If-Match: * in headers")
 				
-				it("should support Conditional Delete with If-Match: <etag> in headers", function() {
-				})
+				it("should support Conditional Delete with If-Match: <etag> in headers")
 				
-				it("should support Delete with If-Match: * in headers", function() {
-				})
+				it("should support Delete with If-Match: * in headers")
 			})
 		}
 	})
 	
 	describe("Expires Headers", function() {
-		it("should use Expires Headers for increase  caching", function() {
+		it("should use Expires Headers for increase  caching" )
 			// test for Expires:
 			// test for cache-control
-		})
 	});
 	
 	describe("Frontend Caching", function() {
-		it("should use server-side caching", function() {
+		it("should use server-side caching" )
 			// test for Nginx, Squid or Varnish
-		})
+	
 	});
 	
 

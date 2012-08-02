@@ -16,17 +16,9 @@ var chai		= require("chai");
 var expect		= chai.expect;
 
 var debug 		= require('debug')('tests');
-var host;
-
-//var results;
-//var suite 		= new Suite('', new Context)
-//suite.timeout(10000);	// timout in milliseconds;
 
 // we need to overload this to allow for our own reporter
 mocha.prototype.reporter = function(name){
-  //name = name || 'dot';
-  //this._reporter = require('./reporters/' + name);
-  //if (!this._reporter) throw new Error('invalid reporter "' + name + '"');
   this._reporter = name;
   return this;
 };
@@ -59,31 +51,30 @@ function RipDoc(runner) {
 	 stats.total 	= runner.total;
 	 stats.duration = 0;
 	
-	  runner.on('suite', function(suite) {
+	 runner.on('suite', function(suite) {
 		debug("suite %s starts", suite.fullTitle());
 	    if (suite.root) return;
 	    results += '<li class="suite">';
-		var story_url = host+"?q="+utils.escapeRegexp(suite.fullTitle());
+		var story_url = runner.params['host']+"?q="+utils.escapeRegexp(suite.fullTitle());
 	    results += util.format('<h1><a href=\"%s\">%s</a></h1>', story_url,suite.title);
 	    results += "<ul>";
 		indent++;
-	  });
+	 });
 
-	  runner.on('suite end', function(suite){
+	 runner.on('suite end', function(suite){
 		indent--;
 		debug("suite %s ends %d", suite.fullTitle(), indent);
 	    if (suite.root) return;
 	    results += '</ul>\n</li>';
 	
-		if( params['sio'] && indent == 0 ) {
+		if( runner.params['sio'] && indent == 0 ) {
 			app.sio.sockets.emit("rstats", JSON.stringify(stats) );
-			//debug(rstr);
 			app.sio.sockets.emit("rsuite", results, function(data) {
-				console.log("got:"+data);
+				debug("got:"+data);
 			} );
 			results = "";
 		}
-	  });
+	 });
 	
 	 runner.on('test end', function(test) {
 		debug("test end:"+test.speed);
@@ -114,7 +105,7 @@ function RipDoc(runner) {
 	 });
 	
 	runner.on('end', function(){
-		console.log("tests url:"+url+" end: %j", stats);
+		debug("tests url:"+url+" end: %j", stats);
 		app.db.get('services:'+url, function(err, data) {
 			if( !err ) {
 				var json = JSON.parse(data)
@@ -122,7 +113,7 @@ function RipDoc(runner) {
 				var tweet_it = false;
 				
 				// no tweeting while local testing
-				if( url != "http://localhost") {
+				if( runner.params['url'] != "http://localhost") {
 					if( json ) {
 						// make sure there is a significant change
 						if( (json.passes != stats.passes) || (json.failures != stats.failures) ) {
@@ -133,13 +124,13 @@ function RipDoc(runner) {
 					}
 				}
 
-				var tmsg = url+ " - Pass:"+stats.passes+" Fail:"+stats.failures + " with:";
-				for( h in always_files ) { delete params[h]; }
-				delete params['url'];
-				delete params['discovery'];
+				var tmsg = runner.params['url'] + " - Pass:"+stats.passes+" Fail:"+stats.failures + " with:";
+				for( h in always_files ) { delete runner.params[h]; }
+				delete runner.params['url'];
+				delete runner.params['discovery'];
 				
 				var keys = []
-				for( var key in params ) { keys.push(key); }
+				for( var key in runner.params ) { keys.push(key); }
 				tmsg += keys.join(", ")
 				
 				//console.log("tweet:"+ tmsg);
@@ -150,14 +141,14 @@ function RipDoc(runner) {
 					});
 				} catch(e) { console.error("err:"+e+" connecting to twitter") }
 				
-				if( params['userid'] && json && userid == json.userid ) {
-					console.log("Valid user... updating db score")
+				if( runner.params['userid'] && json && runner.params['userid'] == json.userid ) {
+					debug("Valid user... updating db score")
 					json.passes = stats.passes;
 					json.failed = stats.failures;
 					json.date   = new Date
-					app.db.set('services:'+url, JSON.stringify(json));
+					app.db.set('services:'+runner.params['url'], JSON.stringify(json));
 				} else {
-					console.log("Invalid user "+ params['userid'] + " - no score update");
+					debug("Invalid user "+ runner.params['userid'] + " - no score update");
 				}
 			}
 		})
@@ -174,7 +165,7 @@ function RipDoc(runner) {
 		runner.results = statHtml+report;
 		
 		
-		if( params['sio'] ) app.sio.sockets.emit("rstats", JSON.stringify(stats) );
+		if( runner.params['sio'] ) app.sio.sockets.emit("rstats", JSON.stringify(stats) );
   	}); 
 }
 
@@ -255,14 +246,15 @@ function runTests( params, fn ) {
 	global.results 			= "";
 	global.service_doc 		= undefined;
 
-
 	var startDate = new Date;
-	for( h in always_files ) {
+	for( var h in always_files ) {
 		params[h] = always_files[h]
 	}
 
 	debug(util.inspect(params));
 
+	var runner;
+	
 	try {		
 		// fix discovery option
 		var discovery = params['discovery'];
@@ -273,22 +265,18 @@ function runTests( params, fn ) {
 	    	delete require.cache[file];
 			var base = path.basename(file,".js");
 			if( params[base] == 'on') {
-				console.log("loading %s", file);
+				debug("loading %s", file);
 				mt.addFile(file);
 			} else {
 				debug("base:"+base+" off");
 			}
 		});
 					
-		var runner = mt.run( function(total) {
+		runner = mt.run( function(total) {
 			fn( runner.results );
 		});	
 		
-		runner.global_vars = {
-			'url': params['url']
-		};
-		
-		//console.log(util.inspect(runner._globals))
+		runner.params = params;
 						
 	} catch(e) {
 		console.trace("mocha run exception:"+e);
@@ -306,14 +294,17 @@ module.exports = {
 	
 	form: function(req, res) {
 		app.db.smembers('services', function(err, replies) {	
-			console.log("form urls:"+util.inspect(replies))
+			debug("form urls:"+util.inspect(replies))
 			res.render("tests/form.jade", {urls: replies});		
 		})
 	},
 
 	// this is to be used to force socket_io
 	form2: function(req, res) {
-		res.render("tests/form2.jade");		
+		app.db.smembers('services', function(err, replies) {	
+			debug("form urls:"+util.inspect(replies))
+			res.render("tests/form2.jade", {urls: replies});		
+		})
 	},
 	
 	sio_start: function(params, sio) {
@@ -325,10 +316,10 @@ module.exports = {
 	// using socket_io
 	sio: function(req, res ) {
 		var params = req.body.params;
-		//console.log("sio tests params:"+util.inspect(params));
+		debug("sio tests params:"+util.inspect(params));
 		
 		websocket_url 	= "http://"+req.headers.host;
-		host 			= "http://"+req.headers.host+"/ustories";
+		params['host']	= "http://"+req.headers.host+"/ustories";
 
 		// url endpoint to test
 		var test_url	= req.body.params['url'];
@@ -343,7 +334,7 @@ module.exports = {
 	// Create a new test and render results on a web page
 	create: function(req, res) {
 		var params = req.body.params;
-		console.log("create tests params:"+util.inspect(params));
+		debug("create tests params:"+util.inspect(params));
 		
 		if( req.session.user) {
 			var user = User.newInstance(req.session.user);
@@ -351,7 +342,7 @@ module.exports = {
 		}
 		
 		websocket_url 	= "http://"+req.headers.host;
-		host 			= "http://"+req.headers.host+"/ustories";
+		params['host']	= "http://"+req.headers.host+"/ustories";
 
 		// url endpoint to test
 		var test_url	= req.body.params['url'];

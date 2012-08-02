@@ -17,14 +17,21 @@
             "link": { "href": "/OpenSearch/DiscoveryDoc"}                      
         }
     },
-    "API_Discovery_Document": {
-        "is accessible": {
-            "link": { "href": "/API/DiscoveryDoc"}                      
+    "Discovery_Document": {
+        "Google_API_Discovery_Document": {
+            "link": { "href": "/Discovery/GoogleDiscoveryAPI"}                      
         },
-        "contains API metadata": {
-            "link": { "href": "/API/MetaData"}                      
-        }      
+        "Geoservices_Discovery": {
+            "link": { "href": "/Discovery/GeoServices"}
+        },
+       "Atompub": {
+            "link": { "href": "/Discovery/Atompub"}
+        },
+       "None": {
+            "link": { "href": "/Discovery/None"}
+        }    
     },
+
     "Uniform_Interface": {
         "uses limited http verbs": {
             "link": { "href": "/UniformInterface/Verbs"}                      
@@ -33,6 +40,7 @@
             "link": { "href": "/UniformInterface/Idempotence"}                      
         }       
     },
+
     "Content_Negotiation": {
         "uses Accept and Content-Type headers": {
             "link": { "href": "/ContentNegotiation/Headers"}
@@ -44,22 +52,45 @@
 		            "link": { "href": "/ContentNegotiation/MimeTypes"}
 		}
     },
+
 	"Atom Feeds": {
-		"extends ATOM": {},
-		"uses proper custom format":{},
-		"connects to one or more aggregators": {}
+		"are available of lists of resources": {        
+			"link": { "href": "/Atom/Atom"}
+		},
+		"may be extended":{ 
+			"link": { "href": "/Atom/Extend"}
+		},
+		"are extended using GData 2.0 protocol": {        
+			"link": { "href": "/Atom/GData2.0"}
+		}
 	},
-    "HATEOAS": {
-        "uses links in resources": {},
-        "defines links relations": {}
-    },
+	
+    "Compression": {
+        "should use GZIP as possible to reduce bandwidth": {
+			"link": { "href": "/Compression/Compression"}
+		}
+    },	
+
     "Caching": {
-        "uses caching frontend": {},
-        "uses ETAGS": {}
+        "Caching Headers": {
+			"link": { "href": "/Caching/Caching"}
+		},
+        "GData 2.0 Caching Headers": {
+			"link": { "href": "/Caching/GData2.0"}
+		},
+	    "Expires Headers": {},
+       	"Frontend Caching": {}
+    },	
+
+    "Hypermedia As The Engine Of State": {
+        "Embedded links in resources": {},
+        "Defines links relations": {}
     },
+
     "Security": {
         "defines security protocol": {}
 	},
+	
     "CORS": {
         "supports cross-origin resource sharing": {}
 	}
