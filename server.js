@@ -19,13 +19,15 @@ var express 		= require('express'),
 	discovery		= require('./app/controllers/discovery'),
 	session			= require('./app/controllers/session'),
 	api				= require('./app/controllers/api'),
+	analytics		= require('./app/controllers/analytics'),
+	//tweets			= require('./app/controllers/tweets'),
  	debug			= require('debug'),
 	cfg				= require('./lib/config'),
 	OAuthVerify		= require('./lib/oauth_verify'),
 	// libxml 		= require("libxml"),
 	
 	//form			= require('connect-form'),
-	twitter			= require('twitter/index'),
+	twitter			= require('twitter'),
   	RedisStore 		= require('connect-redis')(express),
  	redis			= require('redis');
 
@@ -35,7 +37,11 @@ var express 		= require('express'),
 
 	global.app 			= app;
 	global.server_url 	= server_url;
-
+	global.trackingID   = cfg.trackingID;
+	global.clientID 	= cfg.clientID;
+	global.googleAPIKey = cfg.googleAPIKey;
+	global.table_id 	= "ga:"+cfg.profileID;
+	
 	var db, sessionStore;
 	var rtg, passwd;
 	
@@ -174,6 +180,9 @@ app.get('/discovery',									discovery.index);
 // Play with API
 app.get('/api',											api.index);
 
+app.get('/analytics',									analytics.index);
+//app.get('/tweets',										tweets.index);
+
 // Features
 app.get('/ustories',									stories.index);
 app.get('/ustories/:cat/:id',							stories.show);
@@ -183,8 +192,8 @@ app.get('/ustories/:cat/:id/:id2',						stories.show);
 app.get('/tests',										tests.index);
 app.post('/tests',										tests.create);
 app.post('/tests/sio',									tests.sio);
+app.get('/tests/old_form',								tests.old_form);
 app.get('/tests/form',									tests.form);
-app.get('/tests/form2',									tests.form2);
 app.get('/tests/test',									tests.test);
 app.get('/tests/:id',									tests.show);
 
@@ -192,6 +201,7 @@ app.get('/tests/:id',									tests.show);
 app.get('/services',									services.index);
 app.get('/services/form',								restrict, services.form);
 app.post('/services/create',							services.create);
+app.get('/services/results',							services.results);
 app.get('/services/:id',								services.show);
 
 app.get('/session/check', 								session.check);
@@ -274,16 +284,15 @@ if (!module.parent) {
 		
 			socket.on('disconnect', function () {
 				debug("socket.io disconnected");
-				pub.quit();
-				sub.quit();
-				cli.quit();
+				if( pub ) pub.quit();
+				if( sub ) sub.quit();
+				if( cli) cli.quit();
 			});
 		
 			// receive startTest from Browser and start tests
 			socket.on('startTest', function (data) {
 				var encoder = new Encoder('entity');
 				var params = JSON.parse(encoder.htmlDecode(data))
-				console.log("please start tests:"+ util.inspect(params));
 				tests.sio_start(params, true);
 			});
 		});

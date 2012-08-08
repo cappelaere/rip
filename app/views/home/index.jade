@@ -1,25 +1,44 @@
-<img src='/images/RIP.png' width=200 />
+table
+	tr
+		td(width='400')
+			img(src='/images/RIP.png', width='200')
+		td
+			a(href='https://twitter.com/ripjitsu')
+				img(src='/images/twitter_icon.png', width='50')
+			&nbsp;
+			a(href='http://www.facebook.com/rip.jitsu')
+				img(src='/images/facebook.png', width='50')
 
-<h2>Welcome</b> to the REST Interface Policy Checker!</h2>
+p version: #{app.version}
 
-<p>We are currently researching the best practices to be used for the next generation of RESTful services. This "REST Interface Policy (RIP) Checker constitutes an investigative tool to gather feedback from the community at large.</p>
+h2 Welcome to the REST Interface Policy Evaluator!
 
-<p>The vision is to create the user stories that encapsulate those best practices, and test them against user specified end points. The results ought to give an idea of how far such best practices may constitute an enforceable policy or standard for RESTful services.</p>
+p We are currently researching the best practices to be used for the next generation of RESTful services. This "REST Interface Policy (RIP) Checker constitutes an investigative tool to gather feedback from the community at large.
 
-<p>Feel free to browse the current user stories <a href='/ustories'>here</a> and then run them against a service <a href='/tests'>here</a>.</p>
-<p>Join and Participate in our <a href='https://groups.google.com/forum/embed/?place=forum/ripjitsu&showsearch=true&showpopout=true&showtabs=false'>RIP Google Group</a></p>
+p The vision is to create the user stories that encapsulate those best practices, and test them against user specified end points. The results ought to give an idea of how far such best practices may constitute an enforceable policy or standard for RESTful services.
 
+p Feel free to browse the current user stories <a href='/ustories'>here</a> and then run them against a service <a href='/tests'>here</a>
+p Join and Participate in our 
+	a(href='https://groups.google.com/forum/embed/?place=forum/ripjitsu&showsearch=true&showpopout=true&showtabs=false') RIP Google Group 
+	and/or
+p
+	a(href="https://twitter.com/RIPJITSU", class="twitter-follow-button", data-dnt="true")
+		Follow @RIPJITSU
+	div(class="g-plusone", data-annotation="inline", data-width="300")
+	div(class="fb-like", data-href="http://rip.jit.su", data-send="true", data-width="450", data-show-faces="false")
+	
 
-<a href="https://twitter.com/RIPJITSU" class="twitter-follow-button" data-dnt="true">Follow @RIPJITSU</a>
+script(type="text/javascript")
+	(function() { var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true; po.src = 'https://apis.google.com/js/plusone.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);})();
 
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+script
+	!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
 
+p	Contact <a href='mailto:pat@cappelaere.com'> me </a> for any questions or interest in hosting your own independent testing as a service.
 
-<p>Contact <a href='mailto:pat@cappelaere.com'>me</a> for any questions or interest in hosting your own independent testing as a service.</p>
+h3 Disclaimers:
 
-<h3>Disclaimers:</h3>
-<dl>
-<li>This is currently in Open Source beta with no guaranty of 24x7 availability</li>
-<li>Please consider a production version of this capability if necessary</li>
-<li>These user stories have not been approved by any Community</li>
-</dl> 
+ul
+	li This is currently in Open Source beta with no guaranty of 24x7 availability
+	li Please consider a production version of this capability if necessary
+	li These user stories have not been approved by any Community

@@ -6,32 +6,43 @@ var debug		= require('debug')('ustories');;
 var stories 	= JSON.parse(fs.readFileSync("./app/views/ustories/stories.json"));
 
 function find(h, q, fn) {
+	var found = false;
 	debug("**Find:"+q+" in:"+util.inspect(h));
-	Object.keys(h).forEach( function(k,v) {
+//	Object.keys(h).forEach( function(k,v) {
+	for( var k in h ) {
+		var v = h[k];
+		
 		debug("k:"+k);
 		if( q && q.indexOf(k)>=0 ) {
 			// remove it from the string
 			nq = q.replace(k,"").trim();
 			debug("nq length:"+nq.length+" nq:"+nq + " in:"+util.inspect(h[k]));
 			if(nq.length>0) {
-				find(h[k], nq, fn);
+				return find(h[k], nq, fn);
 			} else {
 				var next = h[k];
 				if( next["link"] ) {
-					find(h[k], nq, fn)
+					return find(h[k], nq, fn)
 				} else {
 					debug("return anchor");
-					fn("/ustories#"+k);
+					found = true;
+					return fn("/ustories#"+k);
 				}
 			}
 		} else if( k.indexOf("link") >= 0 ) {
 			var link = h["link"];
 			if( link) {
 				var href = link["href"];
-				fn(href);
+				found = true;
+				return fn(href);
 			}
 		}
-	});
+	};
+	
+	if( ! found ) {
+		debug("Not found:");
+		fn(null);
+	}
 }
 
 function search( req, res, fn) {
@@ -67,7 +78,7 @@ function htmlize(h, indent ) {
 			indent--;
 			str += "</ul></li>\n";
 		}
-		debug("htmlize:%s - %s", k, str);
+		//debug("htmlize:%s - %s", k, str);
 	});
 	return str;
 }
@@ -76,21 +87,25 @@ module.exports = {
 	index: function(req, res) {				
 		var q = req.query['q'];
 		if( q ) {
-			debug("search q:"+q);
+			debug("**** search q:"+q);
+
 			search(req,res, function(viewName) {
+				debug("** search returned:"+viewName)
 				if( viewName ) {
 					if( viewName.indexOf('#') < 0 ) {
+						console.log("render:"+viewName)
 						return res.render(viewName);
 					} else {
-						res.redirect(viewName);
+						console.log("render:"+viewName)
+						return res.redirect(viewName);
 					}
 				} else {
-					res.send("Feature not found:"+q);
+					return res.send("Feature not found:"+q);
 				}
 			});
 		} else {	// it is a toc
 			var html = htmlize(stories, 2);
-			res.render("ustories/toc.ejs", {html: html });
+			return res.render("ustories/toc.ejs", {html: html });
 		}		
 	},
 	

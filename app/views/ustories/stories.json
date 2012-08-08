@@ -15,19 +15,26 @@
     "OpenSearch_Document": {
         "is accessible": {
             "link": { "href": "/OpenSearch/DiscoveryDoc"}                      
-        }
-    },
-    "Discovery_Document": {
-        "Google_API_Discovery_Document": {
-            "link": { "href": "/Discovery/GoogleDiscoveryAPI"}                      
         },
-        "Geoservices_Discovery": {
+        "HTML API Search": {
+            "link": { "href": "/OpenSearch/HTMLSearch"}                      
+        },
+        "Atom API Search": {
+            "link": { "href": "/OpenSearch/ATOMSearch"}                      
+        }
+
+    },
+    "Discovery Service": {
+        "Using_Google_API_Discovery_Document": {
+            "link": { "href": "/Discovery/GoogleDiscovery"}                      
+        },
+        "Using_Geoservices_Discovery_Catalog": {
             "link": { "href": "/Discovery/GeoServices"}
         },
-       "Atompub": {
+       "Using_Atompub": {
             "link": { "href": "/Discovery/Atompub"}
         },
-       "None": {
+       "Non Discovery Document": {
             "link": { "href": "/Discovery/None"}
         }    
     },
@@ -46,15 +53,15 @@
             "link": { "href": "/ContentNegotiation/Headers"}
 		},
         "allows representation suffixes": 	{
-	            "link": { "href": "/ContentNegotiation/Suffixes"}
+	        "link": { "href": "/ContentNegotiation/Suffixes"}
 		},
-		"supports custom mime-type": 		{
-		            "link": { "href": "/ContentNegotiation/MimeTypes"}
+		"supports custom mime types": 		{
+		    "link": { "href": "/ContentNegotiation/MimeTypes"}
 		}
     },
 
 	"Atom Feeds": {
-		"are available of lists of resources": {        
+		"are available for lists of resources": {        
 			"link": { "href": "/Atom/Atom"}
 		},
 		"may be extended":{ 

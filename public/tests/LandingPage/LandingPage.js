@@ -36,25 +36,52 @@ describe('Landing_Page', function(){
 	})
 	
 	describe('has links to Discovery Documents in Head', function() {
-		it('should contain a link to Discovery API Document', function(done){
+		it('should contain a link to Discovery API Document', function(done) {
 			var head = $('head');
 			var link = head.find('link[rel=discovery]')
-			if( link ) {
+			if( link && link.length>0) {
 				discovery_href = link.attr('href');
 				debug("discovery_href:"+discovery_href)
 				done();
+			} else {
+				throw new AssertionError({'message':"discovery document link not found"});
 			}
 		})
-		
-		it('should contain a link to OpenSearch Document', function(done){
+
+		it('should contain a link to OpenSearch Document', function(done) {
 			var head = $('head');
 			var link = head.find('link[rel=search]')
-			if( link ) {
+			if( link && link.length>0) {
 				opensearch_href = link.attr('href');
 				debug("opensearch_href:"+opensearch_href)
 				done();
 			} else {
-				throw new AssertionError({'message':"opensearch link not found"});
+				throw new AssertionError({'message':"opensearch document link not found"});
+			}
+		})
+
+		it('should contain a link to API Explorer', function(done) {
+			var head = $('head');
+			var link = head.find('link[rel=explorer]')						
+			if( link && link.length>0 ) {
+				explorer_href = link.attr('href');
+				debug("explorer_href:"+explorer_href)
+				done();
+			} else {
+				console.log("NO LINK")
+				throw new AssertionError({'message':'API explorer document link not found'});
+			}
+		})
+		
+		it('should contain a link to Documentation', function(done) {
+			var head = $('head');
+			var link = head.find('link[rel=docs]')
+			if( link && link.length>0) {
+				docs_href = link.attr('href');
+				debug("docs_href:"+docs_href)
+				done();
+			} else {
+				throw new AssertionError({'message':"Docs link not found"});
 			}
 		})
 	})

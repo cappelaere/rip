@@ -2,8 +2,12 @@
 tr
 	td(style='width:400px) 
 		a(href='#{r.url}') #{r.url}
-	td(align='center')=r.passes-r.failed
-	td(align='center')=r.passes
-	td(align='center')=r.failed
+	td(align='center')=r.stats.passes-r.stats.failures
+	td(align='center')=r.stats.passes
+	td(align='center')=r.stats.failures
+	td(align='center')
+		a(href='/services/results?url=#{r.url}') 
+			img(src='/images/view-list-text-3.png', title="view test details")
+			&nbsp;
 	td(style='width:200px')=r.date
-	td=r.submittor
+	td(align='center')=r.version

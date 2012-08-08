@@ -10,7 +10,10 @@
 	"twitter_oauth_token":			"XXX-XXX",
 	"twitter_oauth_secret": 		"XXX",
 
-	"pubsubhubbub_url":				"http://geobliki.superfeedr.com",
-	"redis_conn_url":               "redis://nodejitsu:XX@drum.redistogo.com:9774/"
-	
+	"pubsubhubbub_url":				"XXX",
+	"redis_conn_url":               "redis://nodejitsu:XX@XXX.redistogo.com:XXX/",
+	"trackingID":                   "XXXX",
+	"googleAPIKey":                 "XXXXXXXX",
+	"clientID":                     "XXXX",
+	"profileID":                    "XXX"
 }

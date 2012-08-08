@@ -1,5 +1,5 @@
 var path 	= require('path');
-var request	= require('request');
+var request	= require('superagent');
 var util	= require('util');
 var should  = require('chai').should();
 var xml2js	= require('xml2js');
@@ -20,18 +20,22 @@ describe('OpenSearch_Document', function(){
 		it('should be discoverable from landing page', function(done){
 			var doc_url = url+ opensearch_href;
 			debug("Checking Opensearch doc:"+doc_url);
-			request.get( doc_url, function(err, res, _body) {
-					res.statusCode.should.equal(200);
-					//console.log(_body);
+			request
+			.get(doc_url)
+			.end( function(res) {
+				res.status.should.equal(200);
+				debug("body:"+util.inspect(res.text));
 					
-					xmlParser.parseString(_body, function (err, result) {
-				        xmlDoc = result;
-				        //console.log('Done:'+util.inspect(xmlDoc));
-						done();
-				    });
+				xmlParser.parseString(res.text, function (err, result) {
+			        xmlDoc = result;
+			        //debug('Done:'+util.inspect(xmlDoc));
+					done();
+			    });
 			});
 		})
 		it('should be contain a URL of type text/html', function(done){
+			should.exist(xmlDoc);
+			
 			for( var at_url in xmlDoc['Url'] ) {
 				var at_url 	= xmlDoc['Url'][at_url];
 				var surl 	= at_url['@']
@@ -44,6 +48,7 @@ describe('OpenSearch_Document', function(){
 			}
 		})
 		it('should be contain a URL of type application/atom+xml', function(done){
+			should.exist(xmlDoc);
 			for( var at_url in xmlDoc['Url'] ) {
 				var at_url  = xmlDoc['Url'][at_url];
 				var surl 	= at_url['@']
@@ -61,13 +66,15 @@ describe('OpenSearch_Document', function(){
 			if( html_search_url) {
 				var surl = html_search_url.replace(/{searchTerms}}/, "*");
 					debug("getting html_search_url:"+surl)
-					request.get( surl, function(err, res, _body) {
-						res.statusCode.should.equal(200);
+					request
+					.get( surl)
+					.end( function(res) {
+						res.status.should.equal(200);
 						done();
 					});
 			
 			} else {
-				console.error("not html_search_api defined");
+				debug("not html_search_api defined");
 				done();
 			}
 		})
@@ -77,17 +84,19 @@ describe('OpenSearch_Document', function(){
 			if( atom_search_url ) {
 				var surl = atom_search_url.replace(/{searchTerms}}/, "*");
 					debug("getting atom_search_url:"+surl)
-					request.get( surl, function(err, res, _body) {
-						res.statusCode.should.equal(200);
+					request
+					.get( surl)
+					.end(function(res) {
+						res.status.should.equal(200);
 					
-						xmlParser.parseString(_body, function (err, result) {
+						xmlParser.parseString(res.text, function (err, result) {
 					        xmlDoc = result;
 							done();
 					    });
 					});
 			
 			} else {
-				console.error("no atom_search_api defined");
+				debug("no atom_search_api defined");
 				done();
 			}
 		})

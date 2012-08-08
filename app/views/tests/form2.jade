@@ -20,9 +20,13 @@ form(method='post',action='/tests/sio')
 	label Service Discovery:&nbsp;
 	select(id='params[discovery]', name='params[discovery]' )
 		option(value="GoogleDiscoveryAPI", selected ) Google Discovery API
-		option(value="NoDiscovery" ) None
 		option(value="AtompubDiscoveryAPI" ) AtomPub Service Document
 		option(value="GeoservicesDiscoveryAPI" ) GeoService Catalog Document
+		option(value="ODataDiscoveryAPI" ) OData Service Document
+		option(value="GetCapabilities" ) OGC Capabilities Document
+		option(value="WSDL" ) WSDL Document
+		option(value="WADL" ) WADL Document
+		option(value="NoDiscovery" ) None
 
 	p
 	input(  type='checkbox', name='params[OpenSearch]', checked)

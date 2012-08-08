@@ -1,14 +1,17 @@
 h2 Scores
 
-+ <a href='/services/form'>Add</a> New Service to Score (Need to login) 
+//
+	a(href='/services/form') Add
+	&nbsp; New Service to Score (Need to login) 
+
 hr
 table
 	th URL
 	th Score
 	th Passes
 	th Failed
-	th Date
-	th Submitted By
-	
+	th Details
+	th Date	
+	th Version
 	- for(r in results)
 		!=partial('services/url', { locals: { r: results[r] } })

@@ -1,3 +1,4 @@
+var fs			= require('fs');
 var util		= require('util');
 var path		= require('path');
 var eyes		= require('eyes');
@@ -44,26 +45,27 @@ function RipDoc(runner) {
 
 	var results		= "";
 	var indent 		= 0;	// used for socket.io to emit complete/valid html rather than partial
+	var output		= "";
 	
 	var self 		= this
     , stats 		= this.stats;
 	
-	 stats.total 	= runner.total;
-	 stats.duration = 0;
+	stats.total 	= runner.total;
+	stats.duration 	= 0;
 	
-	 runner.on('suite', function(suite) {
+	runner.on('suite', function(suite) {
 		debug("suite %s starts", suite.fullTitle());
 	    if (suite.root) return;
 	    results += '<li class="suite">';
 		var story_url = runner.params['host']+"?q="+utils.escapeRegexp(suite.fullTitle());
 	    results += util.format('<h1><a href=\"%s\">%s</a></h1>', story_url,suite.title);
-	    results += "<ul>";
+	    results += "<ul>";	
 		indent++;
-	 });
+	});
 
-	 runner.on('suite end', function(suite){
+	runner.on('suite end', function(suite){
 		indent--;
-		debug("suite %s ends %d", suite.fullTitle(), indent);
+		//console.log("suite %s ends %d", suite.fullTitle(), indent);
 	    if (suite.root) return;
 	    results += '</ul>\n</li>';
 	
@@ -72,11 +74,12 @@ function RipDoc(runner) {
 			app.sio.sockets.emit("rsuite", results, function(data) {
 				debug("got:"+data);
 			} );
+			output += results;
 			results = "";
 		}
-	 });
+	});
 	
-	 runner.on('test end', function(test) {
+	runner.on('test end', function(test) {
 		debug("test end:"+test.speed);
 		
 	    var pre_id = 'pre_'+stats.tests;
@@ -102,32 +105,37 @@ function RipDoc(runner) {
 			highlight(utils.clean(test.fn.toString())));
 	    }
 		results += "</li>"
-	 });
+	});
 	
 	runner.on('end', function(){
-		debug("tests url:"+url+" end: %j", stats);
-		app.db.get('services:'+url, function(err, data) {
+		debug("tests url:"+runner.params['url']+" end: %j", stats);
+		
+		app.db.get('services:'+runner.params['url'], function(err, data) {
 			if( !err ) {
 				var json = JSON.parse(data)
-
+				if( json == null ) {
+					json = { 	'url': runner.params['url'],
+								'passes': 0,
+								'failures':0 };
+				};
+				
 				var tweet_it = false;
 				
 				// no tweeting while local testing
+				// no tweet if results are identical
 				if( runner.params['url'] != "http://localhost") {
-					if( json ) {
-						// make sure there is a significant change
-						if( (json.passes != stats.passes) || (json.failures != stats.failures) ) {
-							tweet_it = true;
-						}
-					} else {
+					// make sure there is a significant change
+					if( (json.passes != stats.passes) || (json.failures != stats.failures) ) {
 						tweet_it = true;
 					}
 				}
 
 				var tmsg = runner.params['url'] + " - Pass:"+stats.passes+" Fail:"+stats.failures + " with:";
-				for( h in always_files ) { delete runner.params[h]; }
+				for( var h in always_files ) { delete runner.params[h]; }
 				delete runner.params['url'];
 				delete runner.params['discovery'];
+				delete runner.params['host'];
+				delete runner.params['sio'];
 				
 				var keys = []
 				for( var key in runner.params ) { keys.push(key); }
@@ -141,15 +149,19 @@ function RipDoc(runner) {
 					});
 				} catch(e) { console.error("err:"+e+" connecting to twitter") }
 				
-				if( runner.params['userid'] && json && runner.params['userid'] == json.userid ) {
-					debug("Valid user... updating db score")
-					json.passes = stats.passes;
-					json.failed = stats.failures;
-					json.date   = new Date
-					app.db.set('services:'+runner.params['url'], JSON.stringify(json));
-				} else {
-					debug("Invalid user "+ runner.params['userid'] + " - no score update");
-				}
+				// save in the database
+				json.stats 	= stats;
+				json.date   = new Date;
+				json.with   = keys.join(", ");
+				json.version= app.version;
+				
+				app.db.sadd('services', json.url);
+				app.db.set('services:'+ json.url, JSON.stringify(json));
+				app.db.set('services:output:'+ json.url, output);
+				
+				//console.log("saved:"+util.inspect(json));
+			} else {
+				console.log("error on getting data for:"+url)
 			}
 		})
 		var duration 		= (stats.duration).toFixed(2)
@@ -183,6 +195,7 @@ var test_files = [
 , "./public/tests/Discovery/AtompubDiscoveryAPI.js"
 , "./public/tests/Discovery/GeoservicesDiscoveryAPI.js"
 , "./public/tests/Discovery/NoDiscovery.js"
+, "./public/tests/Discovery/ODataDiscoveryAPI.js"
 , "./public/tests/ContentNegotiation/ContentNegotiation.js"
 , "./public/tests/ContentNegotiation/Headers.js"
 , "./public/tests/ContentNegotiation/Suffixes.js"
@@ -224,6 +237,8 @@ function runTests( params, fn ) {
 		reporter: 	RipDoc,
 		globals:    [ 	'discovery_href', 
 						'discovery_doc', 
+						'docs_href', 
+						'explorer_href', 
 						'opensearch_href', 
 						'resources_urls',
 						'results',
@@ -292,19 +307,29 @@ module.exports = {
 		res.render("tests/test.ejs", {layout:false});				
 	},
 	
-	form: function(req, res) {
+	// previous form with no html streaming
+	old_form: function(req, res) {
 		app.db.smembers('services', function(err, replies) {	
 			debug("form urls:"+util.inspect(replies))
 			res.render("tests/form.jade", {urls: replies});		
 		})
 	},
 
-	// this is to be used to force socket_io
-	form2: function(req, res) {
-		app.db.smembers('services', function(err, replies) {	
-			debug("form urls:"+util.inspect(replies))
-			res.render("tests/form2.jade", {urls: replies});		
-		})
+	// this is now using socket_io with streaming html
+	form: function(req, res) {
+		//app.db.smembers('services', function(err, replies) {	
+		//	debug("form urls:"+util.inspect(replies))
+		//	res.render("tests/form2.jade", {urls: replies});		
+		//})
+		var urls = [
+			"http://radarsat.geobliki.com",
+			"http://geogratis.gc.ca/api/en",
+			"http://geocommons.com/",
+ 			"http://eo-virtual-archive4.esa.int/search/html",
+			"http://geodata.epa.gov/ArcGIS/rest/services",
+			"http://localhost"
+		]
+		res.render("tests/form2.jade", {urls: urls});		
 	},
 	
 	sio_start: function(params, sio) {
@@ -318,8 +343,8 @@ module.exports = {
 		var params = req.body.params;
 		debug("sio tests params:"+util.inspect(params));
 		
-		websocket_url 	= "http://"+req.headers.host;
-		params['host']	= "http://"+req.headers.host+"/ustories";
+		var websocket_url 	= "http://"+req.headers.host;
+		params['host']		= "http://"+req.headers.host+"/ustories";
 
 		// url endpoint to test
 		var test_url	= req.body.params['url'];
@@ -341,8 +366,8 @@ module.exports = {
 			params['userid'] = user.id
 		}
 		
-		websocket_url 	= "http://"+req.headers.host;
-		params['host']	= "http://"+req.headers.host+"/ustories";
+		var websocket_url 	= "http://"+req.headers.host;
+		params['host']		= "http://"+req.headers.host+"/ustories";
 
 		// url endpoint to test
 		var test_url	= req.body.params['url'];

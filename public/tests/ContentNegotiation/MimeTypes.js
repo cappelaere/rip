@@ -6,7 +6,7 @@ var _		= require('underscore');
 
 var AssertionError	= chai.AssertionError;
 
-describe('support custom mime-types', function(){
+describe('supports custom mime types', function(){
 	var urls = [];
 
 	before( function(done) {
@@ -18,7 +18,7 @@ describe('support custom mime-types', function(){
 		done();
 	})
 
-	it('should extend existing mime-types', function(){
+	it('should extend existing mime types', function(){
 		
 	})
 	
