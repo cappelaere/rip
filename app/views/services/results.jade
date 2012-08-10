@@ -27,12 +27,19 @@ html
 		
 		h2	
 			b Results for: #{url}
-			
-		p Options: 
+		
+		p 
+			b RMM Level: 
+			=json.rmm_level
+		
+		p 
+			b Options: 
 			= json.with
-		p Version: 
+		p 
+			b Version: 
 			= json.version
-		p Date: 
+		p 
+			b Date: 
 			= json.date
 			
 		div(class="addthis_toolbox addthis_default_style ")
@@ -40,7 +47,6 @@ html
 			a(class="addthis_button_tweet")
 			a(class="addthis_button_pinterest_pinit")
 			a(class="addthis_counter addthis_pill_style")
-			
 			
 		hr	
 		div(id="mocha")

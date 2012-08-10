@@ -137,9 +137,15 @@ function RipDoc(runner) {
 				delete runner.params['host'];
 				delete runner.params['sio'];
 				
+				var RMM_Level = params['RMM_Level'];
+				delete runner.params['RMM_Level'];
+				
 				var keys = []
 				for( var key in runner.params ) { keys.push(key); }
 				tmsg += keys.join(", ")
+				
+				if( RMM_Level)
+					tmsg += "@ RMM Level:"+RMM_Level;
 				
 				//console.log("tweet:"+ tmsg);
 				
@@ -150,10 +156,12 @@ function RipDoc(runner) {
 				} catch(e) { console.error("err:"+e+" connecting to twitter") }
 				
 				// save in the database
-				json.stats 	= stats;
-				json.date   = new Date;
-				json.with   = keys.join(", ");
-				json.version= app.version;
+				json.stats 		= stats;
+				json.date   	= new Date;
+				json.with   	= keys.join(", ");
+				json.version	= app.version;
+				
+				if( RMM_Level) 	json.rmm_level 	= RMM_Level;
 				
 				app.db.sadd('services', json.url);
 				app.db.set('services:'+ json.url, JSON.stringify(json));
@@ -298,6 +306,15 @@ function runTests( params, fn ) {
 	}			
 }
 
+var urls = [
+	"http://radarsat.geobliki.com",
+	"http://geogratis.gc.ca/api/en",
+	"http://geocommons.com/",
+	"http://eo-virtual-archive4.esa.int/search/html",
+	"http://geodata.epa.gov/ArcGIS/rest/services",
+	"http://localhost"
+]
+
 module.exports = {
 	index: function(req, res) {				
 		res.render("tests/index.jade");					
@@ -315,20 +332,22 @@ module.exports = {
 		})
 	},
 
+	levels: function(req, res) {
+		var level = req.param('id');
+		
+		if( level  ) {
+			res.render("tests/level"+level+".jade",   {urls: urls});		
+		} else {
+			res.render("tests/levels.jade", {urls: urls});					
+		}
+	},
+	
 	// this is now using socket_io with streaming html
 	form: function(req, res) {
 		//app.db.smembers('services', function(err, replies) {	
 		//	debug("form urls:"+util.inspect(replies))
 		//	res.render("tests/form2.jade", {urls: replies});		
 		//})
-		var urls = [
-			"http://radarsat.geobliki.com",
-			"http://geogratis.gc.ca/api/en",
-			"http://geocommons.com/",
- 			"http://eo-virtual-archive4.esa.int/search/html",
-			"http://geodata.epa.gov/ArcGIS/rest/services",
-			"http://localhost"
-		]
 		res.render("tests/form2.jade", {urls: urls});		
 	},
 	

@@ -194,6 +194,8 @@ app.post('/tests',										tests.create);
 app.post('/tests/sio',									tests.sio);
 app.get('/tests/old_form',								tests.old_form);
 app.get('/tests/form',									tests.form);
+app.get('/tests/levels',								tests.levels);
+app.get('/tests/levels/:id',							tests.levels);
 app.get('/tests/test',									tests.test);
 app.get('/tests/:id',									tests.show);
 
@@ -201,8 +203,9 @@ app.get('/tests/:id',									tests.show);
 app.get('/services',									services.index);
 app.get('/services/form',								restrict, services.form);
 app.post('/services/create',							services.create);
+app.get('/services/destroy',							services.destroy);
 app.get('/services/results',							services.results);
-app.get('/services/:id',								services.show);
+app.get('/services/:id',								services.level);
 
 app.get('/session/check', 								session.check);
 app.get('/session/login', 								session.login);

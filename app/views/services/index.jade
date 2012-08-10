@@ -13,5 +13,6 @@ table
 	th Details
 	th Date	
 	th Version
+	th Actions
 	- for(r in results)
 		!=partial('services/url', { locals: { r: results[r] } })

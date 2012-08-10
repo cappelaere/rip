@@ -81,6 +81,61 @@ module.exports = {
 		});		
 	},
 	
+	destroy: function(req, res) {
+		var url 	= req.param('url');
+		console.log("Destroy it:"+url);
+		
+		// check if it already exists
+		app.db.sismember('services', url, function(err, result) {
+			app.db.srem('services', url);
+			// not that one 
+			// app.db.del('services:' + url);				
+			res.redirect("/services");			
+		});
+	},
+	
+	level: function(req, res) {
+		var id = req.param('id') || 3;
+		debug("service level:"+id);
+		//res.render("services/level"+id+".jade");
+		
+		var results = []
+		app.db.smembers('services', function(err, replies) {	
+			async.forEach(replies, function(r, callback) {
+				app.db.get('services:'+r, function(err, data) {
+					var json = JSON.parse(data)					
+					if( json ) {
+						json.url = r;
+						
+						// for forward capability
+						if( !json.rmm_level ) json.rmm_level = 1;
+						
+						results.push(json)
+					}
+					callback()
+				})
+			}, function(err) {
+				//console.log(util.inspect(results))
+				var sresults = _.filter(results, function(r) { 
+					return (r.rmm_level && (r.rmm_level == id)); });
+								
+				sresults = _.sortBy(sresults, function(r) { 
+						if( !r.stats) { 
+							r.stats = {
+								'passes':0,
+								'failures':0,
+								'duration':0
+							}
+						}
+						return -(r.stats.passes - r.stats.failures); 
+					})
+				res.render("services/level"+id+".jade", {results: sresults});									
+			})
+		});
+
+		
+	},
+	
 	show: function(req, res) {
 		var id = req.params['id'];
 		debug("show service:"+id);

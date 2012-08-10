@@ -11,3 +11,7 @@ tr
 			&nbsp;
 	td(style='width:200px')=r.date
 	td(align='center')=r.version
+	td(align='center') 
+		a(href='/services/destroy?url=#{r.url}') 
+			img(src='/images/trash.png', width='20', title='trash')
+	
