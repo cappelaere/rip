@@ -1,50 +1,22 @@
 <!DOCTYPE>
 <html>
-<head><title>RIP Analytics</title></head>
+<head>
+	<title>RIP Analytics</title>
+	<link rel="stylesheet" href="/stylesheets/style.css" />
+</head>
 <body>
 
-  <!-- Add Google Analytics authorization button -->
-  <button id="authorize-button" style="visibility: hidden">
-        Authorize Analytics</button>
+<h2><img src='/images/RIP.png' width='200' /> Analytics</h2>
 
-  <!-- Div element where the Line Chart will be placed -->
-  <div id='line-chart-example'></div>
+  <iframe src="http://www.seethestats.com/stats/6809/NewVisits_14c9c7a03_ifr.html" style="width:700px;height:300px;border:none;" scrolling="no" frameborder="0"></iframe>
 
-  <!-- Load all Google JS libraries -->
-  <script src="https://www.google.com/jsapi"></script>
-  <script src="/javascripts/gadash-1.0.js"></script>
-  <script src="https://apis.google.com/js/client.js?onload=gadashInit"></script>
-  <script>
-    // Configure these parameters before you start.
-    var API_KEY = '<%= googleAPIKey %>';
-    var CLIENT_ID = '<%= clientID %>';
-    var TABLE_ID = '<%= table_id %>';
-    // Format of table ID is ga:xxx where xxx is the profile ID.
+<iframe src="http://www.seethestats.com/stats/6809/Pageviews_a7dabc764_ifr.html" style="width:700px;height:300px;border:none;" scrolling="no" frameborder="0"></iframe>
 
-    gadash.configKeys({
-      'apiKey': API_KEY,
-      'clientId': CLIENT_ID
-    });
+<iframe src="http://www.seethestats.com/stats/6809/TimeOnSite_26ba39f5d_ifr.html" style="width:700px;height:300px;border:none;" scrolling="no" frameborder="0"></iframe>
 
-    // Create a new Chart that queries visitors for the last 30 days and plots
-    // visualizes in a line chart.
-    var chart1 = new gadash.Chart({
-      'type': 'LineChart',
-      'divContainer': 'line-chart-example',
-      'last-n-days':30,
-      'query': {
-        'ids': TABLE_ID,
-        'metrics': 'ga:visitors',
-        'dimensions': 'ga:date'
-      },
-      'chartOptions': {
-        height:600,
-        title: 'Visits',
-        hAxis: {title:'Date'},
-        vAxis: {title:'Visits'},
-        curveType: 'function'
-      }
-    }).render();
-  </script>
+<iframe src="http://www.seethestats.com/stats/6809/VisitsByCountry_d55c5d448_ifr.html" style="width:700px;height:300px;border:none;" scrolling="no" frameborder="0"></iframe>
+
+<iframe src="http://www.seethestats.com/stats/6809/Visits_192fe7c6b_ifr.html" style="width:700px;height:300px;border:none;" scrolling="no" frameborder="0"></iframe>
+
 </body>
 </html>

@@ -1,0 +1,21 @@
+tr
+	td
+		=el.id
+		
+	td(style='width:400px) 
+		a(href='#{el.url}') #{el.url}
+		
+	td(align='center')=el.latest.level
+	td(align='center')=el.latest.stats.passes-el.latest.stats.failures
+	td(align='center')=el.latest.stats.passes
+	td(align='center')=el.latest.stats.failures
+	td(align='center')
+		a(href='/tests/'+el.latest.id+"/results') 
+			img(src='/images/view-list-text-3.png', title="view test details")
+			&nbsp;
+	td(style='width:200px')=el.latest.stats.start
+	td(align='center')=el.latest.version
+	td(align='center') 
+		a(href='/rtests/history?url='+el.url) 
+			img(src='/images/find.png', width='20', title='history')
+		

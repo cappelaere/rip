@@ -5,30 +5,12 @@ var util		= require('util'),
 var source_enum 	= cfg.sources;
 var output_formats  = ['json', 'html', 'atom'];
 
-var discover_feasibility_create = function() {
-	var	create			= {
-		"id": 			"radarsat.feasibility.create",
-		"path": 		"sps/feasibilities",
-		"httpMethod": 	"POST",
-		"accept": 		"application/json",
-		"mediaType":    "application/json",
-		"description": 	"Create a new feasibility request for Radarsat-2 imaging in area of interest",
-		"request": {
-			"$ref":"FeasibilityEntry"
-		},		
-		"response": {
-			"$ref":"Feasibilities"
-		}
-	}
-	return create;	
-}
-
-var discover_task_get = function() {
+var discover_story_get = function() {
 	var	get			= {
-		"id": 			"radarsat.tasks.get",
-		"path": 		"sps/tasks/{id}.{fmt}",
+		"id": 			"rip.stories.get",
+		"path": 		"/ustories/{id}.{fmt}",
 		"httpMethod": 	"GET",
-		"description": 	"Get specific (previously created) task",
+		"description": 	"Get specific (previously created) story",
 		"parameters": {
 			"id": {
 				"type": 		"integer",
@@ -47,18 +29,18 @@ var discover_task_get = function() {
 		},
 		"parametersOrder": [ "id", "fmt"],
 		"response": {
-			"$ref":"Task"
+			"$ref":"Story"
 		}
 	}
 	return get;	
 }
 
-var discover_tasks_list = function() {
-	var task_list = {
-		"id": 			"radarsat.tasks.list",
-		"path": 		"sps/tasks.{fmt}",
+var discover_stories_list = function() {
+	var stories_list = {
+		"id": 			"rip.stories.list",
+		"path": 		"/ustories.{fmt}",
 		"httpMethod": 	"GET",
-		"description": 	"List all previously created tasks",
+		"description": 	"List all previously created stories",
 		"parameters": {
 			"fmt": {
 				"type": 		"string",
@@ -70,51 +52,51 @@ var discover_tasks_list = function() {
 			}
 		}
 	}
-	return task_list;
+	return stories_list;
 }
 
-var discover_task_create = function() {
+var discover_stories_create = function() {
 	var	post			= {
-		"id": 			"radarsat.tasks:create",
-		"path": 		"sps/tasks",
+		"id": 			"rip.stories:create",
+		"path": 		"/ustories",
 		"httpMethod": 	"POST",
-		"description": 	"Creates a new task",
+		"description": 	"Creates a new story",
 		"request": {
-			"$ref":"TaskEntry"
+			"$ref":"StoryEntry"
 		},
 		"response": {
-			"$ref":"Task"
+			"$ref":"Story"
 		}
 	}
 	return post;
 }
 
-var discover_task_update = function() {
+var discover_stories_update = function() {
 	var	update			= {
-		"id": 			"radarsat.tasks:update",
-		"path": 		"sps/tasks",
+		"id": 			"rip.stories:update",
+		"path": 		"/ustories",
 		"httpMethod": 	"PUT",
-		"description": 	"Updates an existing task",
+		"description": 	"Updates an existing story",
 		"request": {
-			"$ref":"TaskEntry"
+			"$ref":"StoryEntry"
 		},
 		"response": {
-			"$ref":"Task"
+			"$ref":"Story"
 		}
 	}
 	return update;	
 }
 
-var discover_task_delete = function() {
+var discover_stories_delete = function() {
 	var	del	= {
-		"id": 			"radarsat.tasks:delete",
-		"path": 		"sps/tasks/{id}",
+		"id": 			"rip.stories:delete",
+		"path": 		"/ustories/{id}",
 		"httpMethod": 	"DELETE",
-		"description": 	"Deletes an existing task",
+		"description": 	"Deletes an existing story",
 		"parameters": {
 			id: {
 			"type": "integer",
-			"description":"Task ID",
+			"description":"Story ID",
 			"required": true,
 			"location": "path"
 			}
@@ -123,442 +105,368 @@ var discover_task_delete = function() {
 	return del;
 }
 
-var	discover_observations_list = function(){
+// ==============
+//-- Services
+// ==============
+
+var	discover_tests_list = function(){
 	var list = {
-		"id": 			"radarsat.observations:list",
-		"path": 		"sos/observations",
+		"id": 			"rip.tests:list",
+		"path": 		"/rtests",
 		"httpMethod": 	"GET",
-		"description": 	"List Observations",
-		"request": {
-			"$ref":"ObservationEntry"
-		},
-		"response": {
-			"$ref":"Observation"
+		"description": 	"List Services",
+		"parameters": {
+			"fmt": {
+				"type": 		"string",
+				"enum": 		output_formats, 
+				"description": 	"output format",
+				"required": 	false,
+				"default": 		"json", 
+				"location": 	"query"  
+			}
 		}
 	}
 	return list;
 }
 
-var discover_observations_get = function() {
+var discover_tests_create = function() {
 	var get = {
-			"id": 			"radarsat.observations:get",
-			"path": 		"sos/observations",
-			"httpMethod": 	"GET",
-			"description": 	"Get observation",
+			"id": 			"rip.tests:post",
+			"path": 		"/rtests",
+			"httpMethod": 	"POST",
+			"description": 	"Create Test",
 			"request": {
-				"$ref":"ObservationEntry"
+				"$ref":"TestEntry"
 			},
 			"response": {
-				"$ref":"Observation"
+				"$ref":"Test"
+			}
+		}
+	return get;
+}
+
+var discover_tests_delete = function() {
+	var del = {
+			"id": 			"rip.tests:delete",
+			"path": 		"/rtests/{id}",
+			"httpMethod": 	"DELETE",
+			"description": 	"Delete service",
+			"parameters": {
+				id: {
+				"type": "integer",
+				"description":"Test ID",
+				"required": true
+				}
+			}
+		}
+	return del;
+}
+
+var discover_tests_get = function() {
+	var get = {
+			"id": 			"rip.tests:get",
+			"path": 		"/rtests/{id}.{fmt}",
+			"httpMethod": 	"GET",
+			"description": 	"Get Service",
+			"parameters": {
+				"id": {
+					"type": 		"integer",
+					"description": 	"Task id",
+					"required": 	true,
+					"location": 	"path"
+				},
+				"fmt": {
+					"type": 		"string",
+					"enum": 		output_formats, 
+					"description": 	"output format",
+					"required": 	false,
+					"default": 		"json", 
+					"location": 	"query"  
+				},
+			},
+			"parametersOrder": [ "id", "fmt"],
+			"response": {
+				"$ref":"Story"
 			}
 		}
 	return get;
 }
 	
 module.exports = {
-	tasks_list_schema: function() {
-		var tasks_list = {
-			"id": "TasksList",
-			"type": "object",
-			"properties": {
-				"kind": {
-					"type":"string",
-					"description": "Type of resource. Always 'radarsat#tasksList'.",
-					"default": "radarsat#tasksList",
-					"required": 	true
-				},
-				"selfLink": {
-					"type": "string",
-					"description": "url of this data feed",
-					"required": 	true
-				},
-				"etag": {
-					"type": "string",
-					"description": "ETag of the resource",
-					"required": 	true
-				},
-				"updated": {
-					"type": 		"date-time",
-					"description":  "Last Updated Time",
-					"required": 	true
-				},
-				"items": {
-					"type": "array",
-					"description": "Collection of Tasks",
-					"items": {
-						"$ref": "Task"
-					}
-				}			
-			}
-		}
-		return tasks_list;
-	},
-
-	task_schema: function() {
-		var task = {
-			"id": 	"Task",
-			"type": "Object",
-			"properties": {
-				"id": {
-					"type": "integer",
-					"description": "Task Id",
-				},
-				"kind": {
-					"type": "string",
-					"description": "Type of the resource.  This is always 'radarsat#task'. ",
-					"default": "radarsat#task",
-				},
-				"etag": {
-					"type": "string",
-					"description": "ETag of the resource",
-				},
-				"selfLink": {
-					"type": "string",
-					"description": "URL pointing to this task"
-				},
-				"createdAt": {
-					"type": "date-time",
-					"description": "Process Creation Time",
-				},
-				"updatedAt": {
-					"type": "date-time",
-					"description": "Process Last Updated Time",
-				},
-				"tags": {
-					"type": "string",
-					"description": "tags or categories associated by the user to that task",
-				},
-				"title": {
-					"type": "string",
-					"description": "short title of the task",
-				},
-				"description": {
-					"type": "string",
-					"description": "expanded description of that task",
-				},
-				"author": {
-					"type": "object",
-					"properties": {
-						"name": {
-							"type":"string"
-						},
-						"email":{
-							"type":"string"
-						}
-					}
-				},
-				"date": {
-					"type": "date",
-					"description": "MODIS Acquisition Data",
-				},
-				"tile": {
-					"type": "string",
-					"description": "MODIS Tile to be returned",
-				},
-				"status": {
-					"type": "string",
-					"enum": ['created', 'started', 'completed', 'failed'],
-					"description": "task status",
-				},
-				"error": {
-					"type": "integer",
-					"description": "error code (0 = no error)"
-				},
-				"error_msg": {
-					"type": "string",
-					"description": "error message if applicable"
-				},
-				"href": {
-					"type": "string",
-					"description": "link to output file (generated data product)"					
-				},
-				"mime_type": {
-					"type": "string",
-					"description": "mime-type of data product",
-					"default": "application/atom+xml",									
-				}
-			}
-		};
-		return task;
-	},
-	
-	task_entry_schema:  function( ) {
-		var task = {
-			"id": 	"TaskEntry",
+		
+	stories_entry_schema:  function( ) {
+		var story = {
+			"id": 	"StoryEntry",
 			"type": "Object",
 			"properties": {
 				"kind": {
 					"type": "string",
-					"description": "Type of the resource.  This is always 'radarsat#taskEntry'. ",
-					"default": "radarsat#taskEntry",
+					"description": "Type of the resource.  This is always 'rip#storyEntry'. ",
+					"default": "rip#storyEntry",
 					"required": 	true
 				},
-				"date": {
-					"type": "date",
-					"description": "Imaging date request",
-					"required": 	true
-				},
-				"latitude": {
-					"type": "float",
-					"description": "latitude in decimal degrees",
-					"required": 	true
-				},
-				"longitude": {
-					"type": "float",
-					"description": "longitude in decimal degrees",
-					"required": 	true
-				},
-				"beamMode": {
+				"content": {
 					"type": "string",
-					"description": "beam mode: wide | fine | ultra-fine",
-					"enum": [ "wide", "fine", "ultra-fine"],
-					"required": true
-				},
-				"polarization": {
-					"type": "string",
-					"description": "polarization: HH | VV | HH+VV",
-					"enum": [ "HH", "VV", "HH+VV"],
-					"required": true
-				},
-				"direction": {
-					"type": "string",
-					"description": "orbit direction: ascending | descending",
-					"enum": [ "ascending", "descending"],
-					"required": true
+					"description": "User Story Content",
+					"required": 	true
 				}
 			}
 		};
 		
-		return task;
+		return story;
 	},
 	
-	feasibility_entry_schema: function() {
-			var feasibility = {
-				"id": 	"FeasibilityEntry",
+	stories_list_schema: function() {
+			var story = {
+				"id": 	"StoriesList",
 				"type": "Object",
 				"properties": {
 					"kind": {
 						"type": "string",
-						"description": "Type of the resource.  This is always 'radarsat#feasibilityEntry'. ",
-						"default": "radarsat#feasibilityEntry",
+						"description": "Type of the resource.  This is always 'rip#storyEntry'. ",
+						"default": "rip#storyEntry",
 						"required": 	true
 					},
-					"latitude": {
-						"type":  		"float",
-						"default": 		10.0,
-						"description": "target latitude",
+					"content": {
+						"type":  		"string",
+						"description": "User story content",
 						"required": 	true
 					},
-					"longitude": {
-						"type":  		"float",
-						"default": 		10.0,
-						"description":  "target longitude",
-						"required": 	true
-					},
-					"swath": {
-						"type": "string",
-						"description": "prefered swath width: wide|medium|fine|ultra-fine",
-						"enum": [ "wide", "medium", "fine", "ultra-fine" ],
-						"default": "wide",
-						"required": true
-					},
-					"spatial_resolution": {
-						"type": "string",
-						"description": "prefered spatial resolution: coarse|medium|high",
-						"enum": [ "coarse", "medium", "high" ],
-						"default": "coarse",
-						"required": true
-					},
-					"day_night": {
-						"type": "string",
-						"description": "preferred observation time: day|night",
-						"enum": [ "day", "night" ],
-						"default": "day",
-						"required": false
-					}
 				}
 			};
-			return feasibility;
+			return story;
 	},
-	feasibility_schema: function() {
-			var feasibility = {
-				"id": 	"Feasibility",
+	
+	stories_schema: function() {
+			var story = {
+				"id": 	"Story",
 				"type": "Object",
 				"properties": {
 					"kind": {
 						"type": "string",
-						"description": "Type of the resource.  This is always 'radarsat#feasibility'. ",
-						"default": "radarsat#feasibility",
+						"description": "Type of the resource.  This is always 'rip#story'. ",
+						"default": "rip#story",
 						"required": 	true
 					},
-					"id": {
-						"type":  		"integer",
-						"description": "feasibility id",
+					"content": {
+						"type":  		"string",
+						"description":  "User story content",
 						"required": 	true
 					},
-					"date": {
-						"type":  		"date",
-						"description": "start imaging time latitude",
-						"required": 	true
-					},
-					"latitude": {
-						"type":  		"float",
-						"default": 		10.0,
-						"description": "target latitude",
-						"required": 	true
-					},
-					"longitude": {
-						"type":  		"float",
-						"default": 		10.0,
-						"description":  "target longitude",
-						"required": 	true
-					},
-					"swath": {
-						"type": "string",
-						"description": "prefered swath width: wide|medium|fine|ultra-fine",
-						"enum": [ "wide", "medium", "fine", "ultra-fine" ],
-						"default": "wide",
-						"required": true
-					},
-					"spatial_resolution": {
-						"type": "string",
-						"description": "prefered spatial resolution: coarse|medium|high",
-						"enum": [ "coarse", "medium", "high" ],
-						"default": "coarse",
-						"required": true
-					},
-					"day_night": {
-						"type": "string",
-						"description": "preferred observation time: day|night",
-						"enum": [ "day", "night" ],
-						"default": "day",
-						"required": true
-					},
+					
 					"links": {
 						"type": "array",
 						"description": "various links for that resource",
 						"items": {
-							$ref: "create_task_link_schema"
+							$ref: "create_story_link_schema"
 						}
 					}
 				}
 			};
-			return feasibility;
+			return story;
 	},
 
-	feasibilities_schema: function() {
-		var feasibilities = {
-			"id": 	"Feasibilities",
+	tests_schema: function() {
+		var tests = {
+			"id": 	"Test",
 			"type": "Object",
 			"properties": {
 				"kind": {
 					"type": "string",
-					"description": "Type of the resource.  This is always 'radarsat#feasibilities'. ",
-					"default": "radarsat#feasibilities",
+					"description": "Type of the resource.  This is always 'rip#Test'. ",
+					"default": "rip#Test",
 					"required": 	true
 				},
-				"items": {
-					"type": "array",
-					"description": "Collection of feasibilities",
-					"items": {
-						$ref: "feasibility_schema"
-					}
+				"id": {
+					"type": "integer",
+					"description": "Test ID. ",
+					"required": 	true
+				},
+				"etag": {
+					"type": "string",
+					"description": "test etag for cacheability"
+				},
+				"links": {},
+				"url": {
+					"type": "string",
+					"description": "Service URL that has been evaluated"
+				},
+				"version": {
+					"type": "string",
+					"description": "version number"
+				},
+				"options": {
+					"type": "string",
+					"description": "Comma delimited options used to select tests"
+				},
+				"stats": {
+					"$ref": "rip#Stats"
 				}
 			}
 		};
-		return feasibilities;
+		return tests;
 	},
 	
-	observation_entry_schema: function() {
-			var coverage = {
-				"id": 	"CoverageEntry",
-				"type": "Object",
-				"properties": {
-					"kind": {
-						"type": "string",
-						"description": "Type of the resource.  This is always 'radarsat#task_entry'. ",
-						"default": "radarsat#task_entry",
-						"required": 	true
-					},
-					"start_date": {
-						"type": "date",
-						"description": "Modis start date request",
-						"required": 	false
-					},
-					"end_date": {
-						"type": "date",
-						"description": "Modis end date request",
-						"required": 	false
-					},	
-					"date": {
-						"type": "date",
-						"description": "Modis date request",
-						"required": 	false
-					},
-					"tile": {
-						"type": "string",
-						"description": "MODIS tile",
-						"required": 	true
-					},
-					"alt": {
-						"type": "string",
-						"description": "output format",
-						"required": 	false
-					}
+	tests_entry_schema: function() {
+		var te = {
+			"id": 	"TestEntry",
+			"type": "Object",
+			"properties": {
+				"kind": {
+					"type": "string",
+					"description": "Type of the resource.  This is always 'rip#service_entry'. ",
+					"default": "rip#service_entry",
+					"required": 	true
+				},
+				"url": {
+					"type": 		"string",
+					"description": 	"service url",
+					"required": 	true
 				}
-			};
+			}
+		};
 
-			return coverage;
-		},
-	
-	observation_list_schema: function() {
-		
+		return te;
 	},
 	
+	tests_list_schema: function() {
+		var testList = {
+			"id": 	"TestList",
+			"type": "Object",
+			"properties": {
+				"kind": {
+					"type": "string",
+					"description": "Type of the resource.  This is always 'rip#testList'. ",
+					"default": "rip#testList",
+					"required": 	true
+				},
+				"links": {
+					"$ref": "links"
+				},
+				"etag": {
+					"type": "string",
+					"description": "test etag for cacheability",
+					"required": true
+				},
+				"updated": {
+					"type": 		"datetime",
+					"description": 	"start updated time in rfc339 format",
+					"required": 	true
+				},
+				"items": {
+					
+				}
+			}
+		};
+
+		return testList;
+	},
+	
+	stats_schema: function() {
+		var stats = {
+			"id": 	"Stats",
+			"type": "Object",
+			"properties": {
+				"suites": {
+					"type": "integer",
+					"description": "Number of test suites'. ",
+					"required": 	true
+				},
+				"tests": {
+					"type": 		"integer",
+					"description": 	"Number of independant tests",
+					"required": 	true
+				},
+				"passes": {
+					"type": 		"integer",
+					"description": 	"Number of independant tests that passed",
+					"required": 	true
+				},
+				"pending": {
+					"type": 		"integer",
+					"description": 	"Number of independant tests that are pending",
+					"required": 	true
+				},
+				"failures": {
+					"type": 		"integer",
+					"description": 	"Number of independant tests that failed",
+					"required": 	true
+				},
+				"total": {
+					"type": 		"integer",
+					"description": 	"Total Number of independant tests",
+					"required": 	true
+				},
+				"duration": {
+					"type": 		"integer",
+					"description": 	"Total duration in ms",
+					"required": 	true
+				},
+				"start": {
+					"type": 		"datetime",
+					"description": 	"start time in rfc339 format",
+					"required": 	true
+				},
+				"end": {
+					"type": 		"datetime",
+					"description": 	"end time in rfc339 format",
+					"required": 	true
+				}
+			}
+		};
+
+		return stats;
+	},
 	current_schema: function() {
 		var d = {
 			"kind": 			"discovery#restDescription",
-			"id":				"radarsat:v1",
-			"name":				"RADARSAT File Server",
+			"id":				"rip:v1",
+			"name":				"RIP",
 			"version":			"v1",
-			"title":			"NASA RADARSAT File Service",
-			"description":		"Let's you request RADARSAT Files",
-			"icons":			{ 'x16': server_url+"/images/sps_16.png",
-								  'x32': server_url+"/images/sps_32.png" },
-			"documentationLink": server_url+"/"+cfg.root_service+"/docs/overview.html",
+			"title":			"RIP Interface Protocol Evaluation and Test Service",
+			"description":		"RIP let's you evaluate and test RESTful services using user stories and acceptance test criteria",
+			
+			"icons":			{ 'x16': server_url+"/images/RIPx16.png",
+								  'x32': server_url+"/images/RIPx32.png" 
+								},
+			
+			"documentationLink": server_url+"/docs/overview.html",
+			
 			"labels":			['prototype'],
 			"preferred":		true,
 			"protocol":			"http",
-			"basePath":			"/"+cfg.root_service+"/",
-			"auth":				{ protocol: 'Openid/OAuth Hybrid'},
+			"basePath":			"",
+			
+			"auth":				{ protocol: 'Openid/OAuth Hybrid' },
+			
 			"schemas":			{
-				"FeasibilityEntry":		module.exports.feasibility_entry_schema(),
-				"Feasibilities": 		module.exports.feasibilities_schema(),
-				"Task": 				module.exports.task_schema(), 
-				"TaskEntry":  			module.exports.task_entry_schema(),
-				"TaskList":  			module.exports.tasks_list_schema(),
-				"ObservationEntry": 	module.exports.observation_entry_schema(),
-				"ObservationList": 		module.exports.observation_list_schema()
+				//"Stories": 			module.exports.stories_schema(),
+				//"StoryEntry":		module.exports.stories_entry_schema(),
+				//"StoryList":		module.exports.stories_list_schema(),
+				
+				"Test": 			module.exports.tests_schema(), 
+				"TestEntry":  		module.exports.tests_entry_schema(),
+				"TestsList": 	 	module.exports.tests_list_schema(),
+				
+				"Stats": 			module.exports.stats_schema(), 
 			},			
+			
 			"resources":  	{
-				"Feasibilities": {
-					"methods": 	{
-						"create": 		discover_feasibility_create()
-					}  
-				},
-				"Tasks": {
+				//"Stories": {
+				//	"methods": 	{
+				//		"get": 		discover_stories_create(),
+				//		"list": 	discover_stories_list(),
+				//		"create": 	discover_stories_create(),
+				//		"delete": 	discover_stories_delete()
+				//	}  
+				//},
+				
+				"Tests": {
 					"methods": {
-						"get": 			discover_task_get(),
-						"list":   		discover_tasks_list(),
-						"create": 		discover_task_create(),
-						"delete": 		discover_task_delete()
-						//"update":  		discover_task_update() 
-					}
-				},
-				"Observations": {
-					"methods": {
-						"list": 	discover_observations_list(),
-						"get": 		discover_observations_get()
+						"get": 		discover_tests_get(),
+						"list":   	discover_tests_list(),
+						"create": 	discover_tests_create(),
+						"delete": 	discover_tests_delete()
 					}
 				}
 			}	
@@ -574,6 +482,35 @@ module.exports = {
 	
 	// most stable service discovery document
 	index: function(req, res) {
-		res.redirect('/'+cfg.root_service+'/discovery/v1');			
+		res.redirect('/discovery/v1');			
+	},
+	
+	// return resource properties
+	resource: function(req, res) {
+		var resource 	= req.param('resource');
+		var schema 		= module.exports.current_schema();
+		var properties 	= schema.schemas[resource];
+		if( properties ) {
+			res.header('Content-Type', 'application/json; charset=utf-8');		
+			res.send(properties.properties);
+		} else {
+			console.log("Could not find schema for:"+resource);
+			res.send(404);
+		}
+	},
+	// Relax NG Compact Syntax
+	rnc: function(req, res ) {
+		try {
+		var name  = req.params['name'];
+		var file  = __dirname + "/../../public/schemas/"+name+".rnc";
+		//console.log("rnc:"+file);
+		var str = fs.readFileSync(file, 'utf-8');
+		
+		res.contentType('text');
+		res.send( str, {layout:false});
+		} catch(e) { 
+			console.error(e);
+			res.send(404) 
+		}
 	}
 };

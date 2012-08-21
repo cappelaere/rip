@@ -24,7 +24,7 @@
 	  function init_sio() {
 		if( socket ) return;
 		
-		socket = io.connect('<%= server_url %>');
+		socket = io.connect('<%= websocket_url %>');
 		
 	  	socket.on('rstats', function (data) {
 		    var stats = JSON.parse(data);

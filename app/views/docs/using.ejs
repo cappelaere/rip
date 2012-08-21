@@ -1,0 +1,941 @@
+<html>
+  <head>
+    
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Developer&#39;s Guide: Using the RIP API </title>
+
+<link href="http://code.google.com/css/codesite.css" type="text/css" rel="stylesheet">
+<script src="http://code.google.com/js/codesite_head.pack.04102009.js" type="text/javascript"></script>
+
+<!--[if IE]><link rel="stylesheet" type="text/css" href="/css/iehacks.css"><![endif]-->
+
+    <link href="http://code.google.com/css/semantic_headers.css" rel="stylesheet" type="text/css" />
+    <link href="http://code.google.com/apis/shared/css/apireference.css" type="text/css" rel="stylesheet"  />
+    
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript">
+google.load("jquery", "1.4.2");
+google.load("jqueryui", "1.5.3");
+
+$(document).ready(function() {
+  $('.code_list> ul').tabs();
+  $('.code_list').show();  // hack to remove trailing whitespace from page
+});
+</script>
+
+<link rel="stylesheet" href="http://code.google.com/apis/gdata/css/flora.tabs.css" type="text/css"/>
+<style type="text/css">
+.code_list { display:none; margin:10px; }
+.ui-wrapper { border: 1px solid #3366cc; }
+.ui-wrapper input, .ui-wrapper textarea { border: 0; }
+.ui-tabs-nav, .ui-tabs-panel {
+  font-size:inherit;
+  font-weight:inherit;
+  font-family:inherit;
+}
+.ui-tabs-panel { border: 1px solid #3366cc; }
+</style>
+
+  </head>
+
+  <body class="gc-documentation">
+	
+	<div id="codesiteContent">
+
+	<a id="gc-topnav-anchor"></a>
+	<div id="gc-topnav">
+	  <h1>RIP API </h1>
+
+	</div> <!-- end gc-topnav -->
+
+<%- partial('sidebar') %>
+
+     <div class="g-unit" id="gc-pagecontent">
+
+     <script type="text/javascript">CODESITE_docEarlyProcessing();</script>
+
+<h1 class="page_title">Developer&#39;s Guide: Using the API</h1>
+
+<p class="labswarning"><strong>Important:</strong> This version of the API is a prototype, and its features might change unexpectedly.</p>
+
+<p>This document describes how to use RESTful calling style and client libraries for various programming languages (currently <strong>Java</strong>, <strong>Python</strong>, and <strong>Ruby</strong>) to access the Web Coverage Processing Service and edit the tasking algorithms.</p>
+
+<h2>Contents</h2>
+<div class="toc">
+<ol>
+  <li><a href="#intro">Introduction</a>
+    <ol>
+      <li><a href="#setup">Setup</a></li>
+      <li><a href="#modeling">Modeling data representation classes</a></li>
+      <li><a href="#authentication">Authentication and authorization</a></li>
+      <li><a href="#client">Instantiating the clients</a></li>
+    </ol>
+  </li>
+  <li><a href="#discovery">Discovery</a>
+    <ol>
+      <li><a href="#google_discovery">Google Web API Discovery Service</a></li>
+      <li><a href="#modis_discover">Discover the RIP API</a></li>
+    </ol>
+  </li>
+
+  <li><a href="#task_lists">Working with Tasks</a>
+    <ol>
+      <li><a href="#retrieving_task_list">Retrieving the task list</a></li>
+      <li><a href="#retrieving_single_task">Retrieving a single task</a></li>
+      <li><a href="#creating_task">Creating a new task</a></li>
+      <li><a href="#deleting_task">Deleting a task</a></li>
+    </ol>
+  </li>
+  <li><a href="#algorithms">Working with Feasibilities</a>
+    <ol>
+      <li><a href="#creating_feasibility">Creating a feasibility request</a></li>
+     </ol>
+
+  </li>
+  <li><a href="#query-params">Query parameter reference</a></li>
+    <ol>
+      <li><a href="#st_params">Standard query parameters</a></li>
+      <li><a href="#api_params">Tasks-specific query parameters</a></li>
+    </ol>
+</ol>
+</div>
+
+<h2 id="intro">Introduction</h2>
+<p>This document is intended for developers who want to write applications that can interact with the RIP API in a RESTful manner.</p>
+
+
+<h3 id="setup">Setup</h3>
+<p>How to set up a client library varies by programming language. Select the tab for the language you're using for development.</p>
+
+<div class="code_list">
+  <ul>
+    <li><a href="#setup-js"><span><code style="color: white;">JavaScript</code></span></a></li>
+    <li><a href="#setup-ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+    <li><a href="#setup-python"><span><code style="color: white;">Python</code></span></a></li>
+  </ul>
+
+  <div id="setup-js">
+Install node.js (current version 0.4.8)
+<a href='http://nodejs.org/#download'>Download</a>
+<br/>
+Install the node package manager: <a href='https://github.com/isaacs/npm'>npm</a>
+
+
+  </div>
+
+  <div id="setup-ruby">
+	Coming soon...!
+  </div>
+
+  <div id="setup-python">
+	Coming soon...!
+  </div>
+
+</div>
+
+<h3 id="authentication">Authentication and authorization</h3>
+
+<p>For information about authorizing your requests to the RIP API, see the <a href="getting_started.html#auth">Getting Started</a> document.</p>
+
+<h2 id="client">Instantiating the client</h2>
+<p>You must instantiate a client to make requests to the API. All requests to the RIP API require authentication.</p>
+<p>The following code demonstrates how to configure your client and authenticate using <a href="/apis/accounts/docs/OAuth2.html#IA">OpenID/OAuth 1.0 for native applications</a>.</p>
+<div class="code_list">
+  <ul>
+
+      <li><a href="#client-js"><span><code style="color: white;">JavaScript</code></span></a></li>
+      <li><a href="#client-python"><span><code style="color: white;">Python</code></span></a></li>
+      <li><a href="#client-ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+  <div id="client-js">
+	COMING SOON!
+  </div>
+  <div id="client-python">
+	COMING SOON!
+  </div>
+  <div id="client-ruby">
+ 	COMING SOON!
+  </div>
+</div>
+
+
+<h2 id="discovery">Discovery</h2>
+<h3 id="google_discovery">Google Web API Discovery Service</h3>
+<p>If you're unfamiliar with Google API Discovery Service concepts, you should read <a href="http://code.google.com/apis/discovery/v1/getting_started.html">Getting Started</a> before starting to code.</p>
+Note: The API Discovery Service schemas are based on JSON Schema.
+
+<h3 id="modis_discover">Discovery Document</h3>
+<p>The RIP discovery document can be found at:
+
+	This section gives an overview of the Discovery document.
+
+	You can load the <a href='//discovery'>Discovery document</a> for the RIP API by executing this GET request:
+
+	<pre><code>GET <%= server_url %>/discovery</code></pre>
+
+<p>For more information about using this document, please go <a href='http://code.google.com/apis/discovery/v1/using.html'>there</a>.
+	
+	
+<h2 id="task_list">Working with tasks</h2>
+<p>The RIP API allows users to check the task list to retrieve data.</p>
+<p>This section gives an overview and some examples of the capabilities that the API provides for working with the task list.</p>
+
+<h3 id="retrieving_task_list">Retrieving the task list</h3>
+<p>To retrieve the task list, send a <code>GET</code> request to the following URL:</p>
+
+<pre>
+<%= server_url %><span class="apiparam">/tasks{.fmt}?{params}</span>
+</pre>
+<p>With the appropriate value in place of <span class="apiparam">fmt & params</span>.</p>
+<p class="note"><strong>Note</strong>: The RIP API currently only supports the special <span class="apiparam">fmt</span> values: <code>json, html</code>, indicating the output format.</p>
+
+<p>Upon success, the server responds with an HTTP <code>200 OK</code> status code and the task list.</p>
+<div class="code_list">
+  <ul>
+    <li><a href="#retrieving_task_list_protocol"><span><code style="color: white;">Protocol</code></span></a></li>
+    <li><a href="#retrieving_task_list_js"><span><code style="color: white;">JavaScript</code></span></a></li>
+    <li><a href="#retrieving_task_list_python"><span><code style="color: white;">Python</code></span></a></li>
+    <li><a href="#retrieving_task_list_ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+  <div id="retrieving_task_list_protocol">
+<p>Request:</p>
+<pre class="prettyprint">
+GET /modis/tasks.json
+</pre>
+<p>Response:</p>
+<pre class="prettyprint">
+HTTP/1.1 200 OK
+
+{
+    "kind":"modis:tasksList",
+    "items":
+    [
+        {
+            "id":1,
+            "title":"test",
+            "tags":"t",
+            "source":"ali_l1g",
+            "algorithm":"ali_visible",
+            "sceneid":"EO1A1800722011066110KF",
+            "use_cache":"1",
+            "author":
+            {
+                "name":"pat",
+                "email":"pat@cappelaere.com"
+            },
+            "published":"2011-06-01T17:37:27.000Z",
+            "updated":"2011-06-01T17:37:27.000Z",
+            "status":"completed",
+            "error":0,
+            "error_msg":"N/A",
+            "href":"http://localhost:3000/modis/products/ali_l2/2011/066/EO1A1800722011066110KF/ali_visible.atom",
+            "updatedAt":"2011-06-01T17:37:27.035Z",
+            "msg":"No Error",
+            "kind":"modis#task",
+            "selfLink":"http://localhost:3000/tasks/1",
+            "etag":"e27efdabaa6c6e88a5c19afa251886c940cac717"
+        },
+...
+    ],
+    "etag":"cb0c7cb4f42c9dee14b86e205bc059405adbaf22",
+    "selfLink":"http://localhost:3000/tasks.json",
+    "updated":"2011-06-01T17:37:27.000Z"
+}
+
+</pre>
+  </div>
+  <div id="retrieving_task_list_js">
+	
+  <pre class="prettyprint">
+COMING SOON!
+  </pre>
+</div>
+
+<div id="retrieving_task_list_python">
+<pre class="prettyprint">
+COMING SOON!
+</pre>
+
+  </div>
+  <div id="retrieving_task_list_ruby">
+<pre class="prettyprint">
+COMING SOON!
+</pre>
+  </div>
+</div>
+
+<h3 id="retrieving_single_task">Retrieving a single task</h3>
+<p>To retrieve a single task, send a <code>GET</code> request to the task list' <code>selfLink</code> URL.</p>
+
+<p>The URL is of the form:</p>
+<pre>
+<%= server_url %>/tasks/<span class="apiparam">id{.fmt}</span><span class="apiparam">?params</span>
+</pre>
+<p>With the appropriate values in place of <span class="apiparam">id</span>.</p>
+
+<p>Upon success, the server responds with an HTTP <code>200 OK</code> status code and the requested task list.</p>
+<div class="code_list">
+  <ul>
+    <li><a href="#retrieving_single_task_protocol"><span><code style="color: white;">Protocol</code></span></a></li>
+    <li><a href="#retrieving_single_task_java"><span><code style="color: white;">Java</code></span></a></li>
+    <li><a href="#retrieving_single_task_python"><span><code style="color: white;">Python</code></span></a></li>
+    <li><a href="#retrieving_single_task_ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+  <div id="retrieving_single_task_protocol">
+<p>Request:</p>
+<pre class="prettyprint">
+GET /modis/tasks/<var>id.json</var>
+
+</pre>
+<p>Response:</p>
+<pre class="prettyprint">
+HTTP/1.1 200 OK
+
+{
+  id: "<var>id</var>",
+  kind: "modis#task",
+  selfLink: "<%= server_url %>/modis/tasks<var>id</var>",
+  title: "Process 1",
+}
+</pre>
+  </div>
+
+  <div id="retrieving_single_task_java">
+<pre class="prettyprint">
+</pre>
+  </div>
+
+  <div id="retrieving_single_task_python">
+<pre class="prettyprint">
+
+</pre>
+
+  </div>
+  <div id="retrieving_single_task_ruby">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+</div>
+
+<h3 id="creating_task">Creating a new task</h3>
+<p>To create a new task, send a <code>POST</code> request to the task URL with the proper information in the body.</p>
+<pre>
+<%= server_url %>/modis/tasks/
+</pre>
+
+<p>Upon success, the server responds with an HTTP <code>201 Created</code> status code and the newly created task with some additional elements and properties (shown in bold) that are set by the server, such as <code>id</code>, <code>kind</code>, and various link elements and properties.</p>
+
+<div class="code_list">
+  <ul>
+    <li><a href="#creating_task_protocol"><span><code style="color: white;">Protocol</code></span></a></li>
+    <li><a href="#creating_task_java"><span><code style="color: white;">Java</code></span></a></li>
+    <li><a href="#creating_task_python"><span><code style="color: white;">Python</code></span></a></li>
+    <li><a href="#creating_task_ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+  <div id="creating_task_protocol">
+<p>Request:</p>
+<pre class="prettyprint">
+POST /modis/tasks
+
+
+{
+    "kind":"modis#task_entry",
+    "title":"RIP Process Entry to execute:ali_l1g/ali_visible",
+    "description":"Request Algorithm Classifier Processing",
+    "tags":"modis,classifier,tasking,ali_l1g,ali_visible",
+    "author": {
+        "name":"test",
+        "email":"test@geobliki.com"
+    },
+    "source":"ali_l1g",
+    "algorithm":"ali_visible",
+    "sceneid":"EO1A1800722011066110KF",
+    "use_cache":1
+}
+</pre>
+<p>Response:</p>
+<pre class="prettyprint">
+HTTP/1.1 201 CREATED
+Location: <%= server_url%>/<b><var>id</var></b>
+
+</pre>
+  </div>
+  <div id="creating_task_java">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+  <div id="creating_task_python">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+
+  <div id="creating_task_ruby">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+</div>
+
+<h3 id="updating_task_list">Updating a Process</h3>
+<p>To update a task, first retrieve that task, then modify the data, then send a <code>PUT</code> request to the task's <code>selfLink</code> URL with the modified task list in the body.</p>
+<p>Make sure to include the etag property.  If the task has changed and the etag does not match, the update will fail</p>
+
+<p>The URL is of the form:</p>
+<pre>
+<%= server_url %>/modis/tasks<span class="apiparam">id</span>
+</pre>
+
+<p>Upon success, the server responds with an HTTP <code>200 OK</code> status code and the updated task list.</p>
+<div class="code_list">
+  <ul>
+      <li><a href="#updating_task_protocol"><span><code style="color: white;">Protocol</code></span></a></li>
+      <li><a href="#updating_task_java"><span><code style="color: white;">Java</code></span></a></li>
+      <li><a href="#updating_task_python"><span><code style="color: white;">Python</code></span></a></li>
+      <li><a href="#updating_task_ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+  <div id="updating_task_protocol">
+<p>Request:</p>
+<pre class="prettyprint">
+PUT /modis/tasks/<span class="apiparam">id</span>
+{
+    "id":1,
+    "title":"test",
+    "tags":"t",
+    "source":"ali_l1g",
+    "algorithm":"ali_visible",
+    "sceneid":"EO1A1800722011066110KF",
+    "use_cache":"1",
+    "author":
+    {
+        "name":"pat",
+        "email":"pat@cappelaere.com"
+    },
+    "published":"2011-06-01T17:37:27.000Z",
+    "updated":"2011-06-01T17:37:27.000Z",
+    "status":"completed",
+    "error":0,
+    "error_msg":"N/A",
+    "href":"http://localhost:3000/modis/products/ali_l2/2011/066/EO1A1800722011066110KF/ali_visible.atom",
+    "updatedAt":"2011-06-01T17:37:27.035Z",
+    "msg":"No Error",
+    "kind":"modis#task",
+    "selfLink":"http://localhost:3000/tasks/1",
+    "etag":"e27efdabaa6c6e88a5c19afa251886c940cac717"
+}
+</pre>
+<p>Response:</p>
+<pre class="prettyprint">
+HTTP/1.1 200 OK
+Location: <%=server_url%>/modis/tasks/<b><var>id</var></b>
+
+{
+    "id":1,
+    "title":"test",
+    "tags":"t",
+    "source":"ali_l1g",
+    "algorithm":"ali_visible",
+    "sceneid":"EO1A1800722011066110KF",
+    "use_cache":"1",
+    "author":
+    {
+        "name":"pat",
+        "email":"pat@cappelaere.com"
+    },
+    "published":"2011-06-01T17:37:27.000Z",
+    "updated":"2011-06-01T17:37:27.000Z",
+    "status":"completed",
+    "error":0,
+    "error_msg":"N/A",
+    "href":"http://localhost:3000/modis/products/ali_l2/2011/066/EO1A1800722011066110KF/ali_visible.atom",
+    "updatedAt":"2011-06-01T17:37:27.035Z",
+    "msg":"No Error",
+    "kind":"modis#task",
+    "selfLink":"http://localhost:3000/tasks/1",
+    "etag":"e27efdabaa6c6e88a5c19afa251886c940cac717"
+}
+</pre>
+
+  </div>
+  <div id="updating_task_java">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+  <div id="updating_task_python">
+<pre class="prettyprint">
+</pre>
+  </div>
+  <div id="updating_task_ruby">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+</div>
+
+<h3 id="deleting_task">Deleting a task</h3>
+<p>To delete a task, send a <code>DELETE</code> request to the task's <code>selfLink</code> URL.</p>
+
+<p>The URL is of the form:</p>
+<pre>
+<%= server_url %>/modis/tasks/<span class="apiparam">id</span>
+</pre>
+
+<p>Upon success, the server responds with an HTTP <code>200 OK</code> status code.</p>
+<div class="code_list">
+  <ul>
+    <li><a href="#deleting_task_protocol"><span><code style="color: white;">Protocol</code></span></a></li>
+    <li><a href="#deleting_task_java"><span><code style="color: white;">Java</code></span></a></li>
+    <li><a href="#deleting_task_python"><span><code style="color: white;">Python</code></span></a></li>
+    <li><a href="#deleting_task_ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+  <div id="deleting_task_protocol">
+<p>Request:</p>
+<pre class="prettyprint">
+DELETE /modis/tasks/<span class="apiparam">id</span>
+</pre>
+<p>Response:</p>
+<pre class="prettyprint">
+
+HTTP/1.1 200 OK
+</pre>
+  </div>
+  <div id="deleting_task_java">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+  <div id="deleting_task_python">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+  <div id="deleting_task_ruby">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+</div>
+
+<h2 id="algorithms">Working with algorithms</h2>
+<p>This section gives an overview and some examples of the capabilities that the API provides for working with algorithms.</p>
+
+<h3 id="retrieving_algorithms">Retrieving algorithms</h3>
+<p>To retrieve algorithms defined for a particular source, send a <code>GET</code> request to the following URL:</p>
+<pre>
+<%=server_url%>/algorithms/<span class="apiparam">source/</span><span class="apiparam">algorithm.fmt?</span><span class="apiparam">params</span>
+
+</pre>
+<p>With the appropriate value in place of <span class="apiparam">source</span>, <span class="apiparam">algorithm</span> and <span class="apiparam">params</span>.</p>
+
+Output formats can be html, json or atom.
+
+<p>Upon success, the server responds with an HTTP <code>200 OK</code> status code and the requested algorithm list.</p>
+<div class="code_list">
+  <ul>
+
+    <li><a href="#retrieving_algorithms_protocol"><span><code style="color: white;">Protocol</code></span></a></li>
+    <li><a href="#retrieving_algorithms_java"><span><code style="color: white;">Java</code></span></a></li>
+    <li><a href="#retrieving_algorithms_python"><span><code style="color: white;">Python</code></span></a></li>
+    <li><a href="#retrieving_algorithms_ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+  <div id="retrieving_algorithms_protocol">
+<p>Request:</p>
+
+<pre class="prettyprint">
+GET /modis/algorithms/ali_l1g.json
+</pre>
+<p>Response:</p>
+<pre class="prettyprint">
+HTTP/1.1 200 OK
+
+{
+    kind: "modis:algorithmInstrumentList"
+    source: "ali_l1g"
+    selfLink: http://modis.geobliki.com/algorithms/ali_l1g
+    updated: "2011-05-09T12:15:14.000Z"
+    -
+    items: [
+        -
+        {
+            id: "ali_l1g/ali_active_fires"
+            kind: "modis#algorithm"
+            selfLink: http://localhost:3000/algorithms/ali_l1g/ali_active_fires
+            updated: "2011-05-05T18:26:21.000Z"
+            title: "ali_active_fires"
+            description: "EO-1 ALI active fires"
+            author: "Pat Cappelaere"
+            version: "1.0"
+            tags: "ali, fire"
+            content: "..."
+            etag: "350870f6150a8ea3f231cc48c1bf1e3037127764"
+        },...
+	]
+}
+
+</pre>
+  </div>
+  <div id="retrieving_algorithms_java">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+  <div id="retrieving_algorithms_python">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+
+  <div id="retrieving_algorithms_ruby">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+</div>
+
+<h3 id="retrieving_single_algorithm">Retrieving a single algorithm</h3>
+<p>To retrieve a single algorithm, send a <code>GET</code> request to the algorithm's <code>selfLink</code> URL for a particular source.</p>
+
+<p>The URL is of the form:</p>
+<pre>
+<%= server_url %>/modis/algorithms/<span class="apiparam">source</span>/<span class="apiparam">algorithm</span>
+</pre>
+<p>With the appropriate values in place of <span class="apiparam">source</span> and <span class="apiparam">algorithm</span>.
+
+<p>Upon success, the server responds with an HTTP <code>200 OK</code> status code and the requested algorithm data.</p>
+<div class="code_list">
+  <ul>
+    <li><a href="#retrieving_single_algorithm_protocol"><span><code style="color: white;">Protocol</code></span></a></li>
+    <li><a href="#retrieving_single_algorithm_java"><span><code style="color: white;">Java</code></span></a></li>
+    <li><a href="#retrieving_single_algorithm_python"><span><code style="color: white;">Python</code></span></a></li>
+    <li><a href="#retrieving_single_algorithm_ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+  <div id="retrieving_single_algorithm_protocol">
+<p>Request:</p>
+<pre class="prettyprint">
+GET /modis/algorithms/<span class="apiparam">source</span>/<span class="apiparam">algorithm.json</span>
+</pre>
+<p>Response:</p>
+<pre class="prettyprint">
+
+HTTP/1.1 200 OK
+
+{
+    id: "ali_l1g/ali_active_fires"
+    kind: "modis#algorithm"
+    selfLink: http://localhost:3000/algorithms/ali_l1g/ali_active_fires
+    updated: "2011-05-05T18:26:21.000Z"
+    title: "ali_active_fires"
+    description: "EO-1 ALI active fires"
+    author: "Pat Cappelaere"
+    version: "1.0"
+    tags: "ali, fire"
+    content: "..."
+    etag: "350870f6150a8ea3f231cc48c1bf1e3037127764"
+}
+</pre>
+  </div>
+  <div id="retrieving_single_algorithm_java">
+
+<pre class="prettyprint">
+
+</pre>
+  </div>
+  <div id="retrieving_single_algorithm_python">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+  <div id="retrieving_single_algorithm_ruby">
+
+<pre class="prettyprint">
+
+</pre>
+  </div>
+</div>
+
+<h3 id="creating_algorithm">Creating a new algorithm</h3>
+<p>To create a new algorithm, send an authenticated <code>POST</code> request to the following URL with the new algorithm data in the body:</p>
+<pre>
+
+<%=server_url%>/modis/algorithms/<span class="apiparam">source</span>
+</pre>
+<p>With the appropriate value in place of <span class="apiparam">source</span>.</p>
+
+
+<p>Upon success, the server responds with an HTTP <code>201 Created</code> status code and the newly created algorithm data with some additional elements and properties (shown in bold) that are set by the server, such as <code>id</code>, <code>updated</code>, and various link elements and properties.</p>
+<div class="code_list">
+  <ul>
+    <li><a href="#creating_algorithm_protocol"><span><code style="color: white;">Protocol</code></span></a></li>
+    <li><a href="#creating_algorithm_java"><span><code style="color: white;">Java</code></span></a></li>
+    <li><a href="#creating_algorithm_python"><span><code style="color: white;">Python</code></span></a></li>
+    <li><a href="#creating_algorithm_ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+  <div id="creating_algorithm_protocol">
+<p>Request:</p>
+<pre class="prettyprint">
+POST /algorithms/<span class="apiparam">source</span>
+
+{
+	kind: "modis#algorithmEntry"
+	title: "ali_active_fires"
+	author: {
+		name: "test",
+		email: "test@geobliki.com"
+	},
+	content: "...",
+	tree: "..."
+}
+</pre>
+<p>Response:</p>
+
+<pre class="prettyprint">
+HTTP/1.1 201 CREATED
+Location: <%=server_url%><var>source</var>/<var>algorithm</var>
+
+{
+    <b>id: "<var>source</var>/<var>algorithm</var>"</b>
+    kind: "modis#algorithm"
+    <b>selfLink: "/algorithms/<var>source</var>/<var>algorithm</var></b>
+    <b>updated: "2011-05-05T18:26:21.000Z"</b>
+    title: "<Var>algorithm</var>"
+    <b>description: "EO-1 ALI active fires"</b>
+    <b>author: "Pat Cappelaere"</b>
+    <b>version: "1.0"</b>
+    <b>tags: "ali, fire"</b>
+	content: "..."
+	tree: "..."
+    <b>etag: "350870f6150a8ea3f231cc48c1bf1e3037127764"</b>
+
+}
+
+</pre>
+  </div>
+  <div id="creating_algorithm_java">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+  <div id="creating_algorithm_python">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+
+  <div id="creating_algorithm_ruby">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+</div>
+
+<dl>
+  <dt>The <span class="apiparam">parent</span> parameter</dt>
+
+  <dd>Specifies the ID of the parent task under which the new task should be inserted; omitting this parameter moves the task to the top level of the list.</dd>
+  <dt>The <span class="apiparam">previous</span> parameter</dt>
+  <dd>Specifies the ID of the task after which the new task should be inserted; omitting this parameter moves the task to the first position of the sublist.</dd>
+</dl>
+<p class="note"><strong>Note</strong>: For more information about these parameters, see <a href="#ordering_task">Ordering a task</a>.</p>
+
+<h3 id="updating_algorithm">Updating an algorithm</h3>
+<p>To update an algorithm, send an authenticated <code>PUT</code> request to the algorithm's <code>selfLink</code> URL with the updated algorithm data in the body.</p>
+<p>The URL is of the form:</p>
+<pre>
+<%=server_url%>/modis/algorithms/<span class="apiparam">source</span>/<span class="apiparam">algorithm</span>
+
+</pre>
+<p>With the appropriate values in place of <span class="apiparam">source</span> and <span class="apiparam">algorithm</span>.</p>
+
+<p>Upon success, the server responds with an HTTP <code>200 OK</code> status code and the updated algorithm.</p>
+<div class="code_list">
+  <ul>
+    <li><a href="#updating_algorithm_protocol"><span><code style="color: white;">Protocol</code></span></a></li>
+    <li><a href="#updating_algorithm_java"><span><code style="color: white;">Java</code></span></a></li>
+    <li><a href="#updating_algorithm_python"><span><code style="color: white;">Python</code></span></a></li>
+    <li><a href="#updating_algorithm_ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+  <div id="updating_algorithm_protocol">
+<p>Request:</p>
+<pre class="prettyprint">
+PUT /modis/algorithms/<span class="apiparam">source</span>/
+
+  {
+	kind: "modis#algorithmEntry"
+	title: "<var>algorithm</var>"
+	author: {
+		name: "test",
+		email: "test@geobliki.com"
+	},
+	content: "...",
+	tree: "..."
+	etag: "..."
+}
+
+
+</pre>
+<p>Response:</p>
+<pre class="prettyprint">
+HTTP/1.1 200 OK
+
+{
+    <b>id: "<var>source</var>/<var>algorithm</var>"</b>
+    kind: "modis#algorithm"
+    <b>selfLink: "/algorithms/<var>source</var>/<var>algorithm</var></b>
+    <b>updated: "2011-05-05T18:26:21.000Z"</b>
+    title: "<Var>algorithm</var>"
+    <b>description: "EO-1 ALI active fires"</b>
+    <b>author: "Pat Cappelaere"</b>
+    <b>version: "1.0"</b>
+    <b>tags: "ali, fire"</b>
+	content: "..."
+	tree: "..."
+    <b>etag: "..."</b>
+ 
+}
+</pre>
+  </div>
+  <div id="updating_algorithm_java">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+  <div id="updating_algorithm_python">
+
+<pre class="prettyprint">
+
+</pre>
+  </div>
+  <div id="updating_algorithm_ruby">
+<pre class="prettyprint">
+
+</pre>
+  </div>
+</div>
+
+
+
+<h3 id="deleting_algorithm">Deleting an algorithm</h3>
+
+<p>To delete a task, send an authenticated <code>DELETE</code> request to the algorithm's <code>selfLink</code> URL.</p>
+<p>The URL is of the form:</p>
+<pre>
+<%=server_url%>/modis/algorithms/<span class="apiparam">source</span>/<span class="apiparam">algorithm</span>
+</pre>
+
+<p>With the appropriate values in place of <span class="apiparam">source</span> and <span class="apiparam">algorithm</span>.</p>
+
+<p>Upon success, the server responds with an HTTP <code>200 OK</code> status code.</p>
+
+<div class="code_list">
+  <ul>
+    <li><a href="#deleting_algorithm_protocol"><span><code style="color: white;">Protocol</code></span></a></li>
+    <li><a href="#deleting_algorithm_java"><span><code style="color: white;">Java</code></span></a></li>
+    <li><a href="#deleting_algorithm_python"><span><code style="color: white;">Python</code></span></a></li>
+    <li><a href="#deleting_algorithm_ruby"><span><code style="color: white;">Ruby</code></span></a></li>
+  </ul>
+
+  <div id="deleting_algorithm_protocol">
+<p>Request:</p>
+<pre class="prettyprint">
+DELETE /modis/algorithms/<span class="apiparam">source</span>/<span class="apiparam">algorithm</span>
+</pre>
+<p>Response:</p>
+<pre class="prettyprint">
+HTTP/1.1 200 OK
+</pre>
+  </div>
+  <div id="deleting_algorithm_java">
+
+<pre class="prettyprint">
+</pre>
+  </div>
+  <div id="deleting_algorithm_python">
+<pre class="prettyprint">
+</pre>
+  </div>
+  <div id="deleting_algorithm_ruby">
+
+<pre class="prettyprint">
+</pre>
+  </div>
+</div>
+
+
+
+<h2 id="query-params">Query parameter reference</h2>
+<p>The query parameters you can use with the Tasks API are summarized in the following tables. All parameter values need to be URL-encoded.</p>
+
+<h3 id="st_params">Standard query parameters</h3>
+
+<p>
+
+<p>All parameters are optional except where noted.</p>
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Meaning</th>
+
+    <th>Notes</th>
+    <th>Applicability</th>
+  </tr>
+  <tr>
+    <td id="alt | fmt | format"><code>alt</code></td>
+    <td><p>Data format for the response.</p></td>
+    <td><ul>
+
+      <li>Valid values: <code>json</code>, <code>atom</code>. </li>
+      <li>Default value: varies per API.</li>
+      <li>Not all values are available for every API.</li>
+    </ul>
+	</td>
+    <td><ul>
+      <li>Applies to all operations for all resources.</li>
+    </ul></td>
+  </tr>
+
+  <tr>
+    <td id="q"><code>q</code></td>
+    <td>Search Term.</td>
+    <td><ul>
+
+      <li>Used as a filter to limit or narrow down a list.</li>
+    </ul></td>
+    <td ></td>
+  </tr>
+  
+  
+</table>
+</p>
+
+<h3 id="api_params">Tasks-specific query parameters</h3>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+
+      <th>Meaning</th>
+      <th>Notes</th>
+      <th>Applicability</th>
+    </tr>
+  </thead>
+ 
+</table>
+
+      </div><!-- end gc-pagecontent -->
+    </div><!-- end gooey wrapper -->
+
+    </div> <!-- end codesite content -->
+
+
+<div id="gc-footer" dir="ltr">
+</div><!-- end gc-footer -->
+
+</div><!-- end gc-container -->
+
+  </body>
+</html>
+
+

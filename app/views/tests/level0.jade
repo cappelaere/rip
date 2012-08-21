@@ -1,0 +1,57 @@
+h2 Test RESTful Service 
+	a(href='http://www.crummy.com/writing/speaking/2008-QCon/act3.html') Richardson Maturity 
+	span Level 0
+i(style="color:gray")
+	ul
+		li One URI, one HTTP method
+		li XML-RPC and most SOAP Services
+
+ol(id="toc")
+	li(class='current')
+		a(href='/rtests/levels/0')
+			span Level 0
+	li
+		a(href="/rtests/levels/1")
+			span Level 1
+	li
+		a(href="/rtests/levels/2")
+			span Level 2
+	li
+		a(href="/rtests/levels/3")
+			span Level 3
+
+div(class="content")
+	form(method='post',action='/rtests/sio')
+		p
+		table
+			tr
+				td
+					label Enter URL: &nbsp;
+					input(type='text', id='inp', name='params[url]', value='http://frameworkwfs.usgs.gov/framework/wfs/wfs.cgi', size="50") &nbsp;
+		
+				td
+					label Options: &nbsp;
+					select(id='select_url', name='select_url' )
+						option(value="http://frameworkwfs.usgs.gov/framework/wfs/wfs.cgi") http://frameworkwfs.usgs.gov/framework/wfs/wfs.cgi
+						option(value="http://frameworkwfs.usgs.gov/framework/wms/wms.cgi") http://frameworkwfs.usgs.gov/framework/wms/wms.cgi
+		p
+		<b>With Selected Preferences:</b>
+
+		p 
+		label Service Discovery:&nbsp;
+		select(id='params[discovery]', name='params[discovery]' )
+			option(value="GetCapabilities" ) OGC Capabilities Document
+			option(value="NoDiscovery" ) None
+	
+		p
+				
+		input(name='params[RMM_Level]', type="hidden", value="0")
+		input(type="submit", value="Submit")
+
+		script(src='/javascripts/jquery-1.5.min.js')
+		script(type='text/javascript')
+			var selectoption = document.getElementById("select_url")
+			selectoption.onchange=function(){
+				var opt = this.options[this.selectedIndex].value
+				$('#inp').val(opt)
+			}

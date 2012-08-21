@@ -1,0 +1,17 @@
+tr
+	td
+		=el.id
+	td(align='center')=el.level
+	td(align='center')=el.stats.passes-el.stats.failures
+	td(align='center')=el.stats.passes
+	td(align='center')=el.stats.failures
+	td(align='center')
+		a(href='/rtests/'+el.id+'/results')
+			img(src='/images/view-list-text-3.png', title="view test details")
+			&nbsp;
+	td(style='width:200px')=el.stats.start				
+	td(align='center')=el.version
+
+	td(align='center') 
+		a(href='/rtests/'+el.id+'/destroy') 
+			img(src='/images/trash.png', width='20', title='trash')

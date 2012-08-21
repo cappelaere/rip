@@ -1,5 +1,6 @@
-var express = require('express'),
-	cfg     = require('../lib/config');
+var express 	= require('express'),
+	crypto		= require('crypto'),
+	cfg     	= require('../lib/config');
 
 app.configure(function(){
 	console.log("configure...");
@@ -56,4 +57,38 @@ Date.prototype.rfc339 =	function() {
    + (offset > 0 ? "-" : "+")
    + pad(Math.floor(Math.abs(offset) / 60), 2)
    + ":" + pad(Math.abs(offset) % 60, 2);
+}
+
+var http = require('http')
+  , req = http.IncomingMessage.prototype
+
+req.fmt = function() {
+	var fmt = this.param('format');
+	if( fmt == undefined && this.query) fmt = this.query['format'];
+	if( fmt == undefined && this.query) fmt = this.query['fmt'];
+	if( fmt == undefined && this.query) fmt = this.query['alt'];
+	if( fmt == undefined && this.query) fmt = this.query['output'];
+	if( fmt == undefined) {
+		var accept = this.headers.accept;
+		if( accept ) {
+			//console.log("Accept:"+util.inspect(accept))
+			if( accept.indexOf('json') >= 0 ){
+				fmt = 'json';
+			} else if( 	accept.indexOf('atom') >= 0 ){
+				fmt = 'atom';
+			} else if( 	accept.indexOf('html') >= 0 ){
+				fmt = 'html'
+			} else if( 	accept.indexOf('*/*') >= 0 ){
+				fmt = 'html'					
+			}
+		}
+	}	
+	return fmt;
+}
+
+String.prototype.sha1_hex = function() {
+	var s = this;
+    var hash = crypto.createHash('sha1');
+    hash.update(String(s));
+    return hash.digest('hex');
 }

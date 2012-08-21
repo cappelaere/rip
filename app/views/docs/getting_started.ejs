@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Developer&#39;s Guide (v1): Getting Started - SPS API</title>
+
+<link href="http://code.google.com//css/codesite.pack.04102009.css" type="text/css" rel="stylesheet">
+<script src="http://code.google.com//js/codesite_head.pack.04102009.js" type="text/javascript"></script>
+
+<!--[if IE]><link rel="stylesheet" type="text/css" href="/css/iehacks.css"><![endif]-->
+
+    <link href="http://code.google.com/css/semantic_headers.css" rel="stylesheet" type="text/css" />
+    <link type="text/css" rel="stylesheet" href="http://code.google.com/apis/shared/css/apireference.css" />
+    
+  </head>
+
+  <body class="gc-documentation">
+
+
+
+<div id="codesiteContent">
+
+<a id="gc-topnav-anchor"></a>
+<div id="gc-topnav">
+  <h1>SPS API </h1>
+
+</div> <!-- end gc-topnav -->
+
+
+<%- partial('sidebar') %>
+
+      <div class="g-unit" id="gc-pagecontent">
+        
+          <script type="text/javascript">CODESITE_docEarlyProcessing();</script>
+
+        
+        <h1 class="page_title">Developer&#39;s Guide (v1): Getting Started</h1>
+
+
+<p class="labswarning"><strong>Important:</strong> This version of the WCPS API is in <a href="/labs/">prototype</a>, and its features might change unexpectedly until it becomes fully operational.</p>
+
+
+<p>This document explains how to get started using the SPS API.</p>
+
+<h2>Contents</h2>
+<div class="toc">
+<ol>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#before_starting">Before you start</a>
+
+    <ol>
+      <li><a href="#familiarize">Get familiar with Web Processing Services</a></li>
+      <li><a href="#getaccount">Get an OpenID Account (OP)</a></li>
+      <li><a href="#auth">Learn how to authorize requests</a></li>
+    </ol>
+  </li>
+  <li><a href="#background">Web Processing background</a>
+
+    <ol>
+      <li><a href="#background_concepts">SPS concepts</a></li>
+      <li><a href="#background_resources">API data model</a></li>
+      <li><a href="#background_operations">API operations</a></li>
+    </ol>
+  </li>
+  <li><a href="#invoking">Calling style</a>
+
+    <ol>
+      <li><a href="#REST">REST</a></li>
+      </ol>
+  </li>
+  <li><a href="#working_with_data">Data format</a>
+    <ol>
+      <li><a href="#data-json">JSON</a></li>
+
+    </ol>
+  </li>
+  </ol>
+</div>
+
+<h2 id="intro">Introduction</h2>
+<p>This document is intended for developers who want to write applications that can interact with the SPS API.</p>
+
+<h2 id="before_starting">Before you start</h2>
+
+<h3 id="getaccount">Get an OpenID Account</h3>
+
+<p>You need a <a href="https://op.geobliki.com">OpenID Account</a> for testing purposes. If you already have a test account, then you're all set; you can visit the <a href="/modis">SPS</a> user interface to set up, edit, or view your data.</p>
+
+<h3 id="getaccount">Register Your Consumer Application</h3>
+
+<p>You need a <a href="https://op.geobliki.com">OpenID</a> for your application as well. If you already have a test account, then you're all set; 
+<ul>	
+<li>Go to Your Web Apps and create a new entry.
+You will need a short and unique Application Name as well as an optional application URL that a user can reference to find more about your app (to make sure it understands what this application will do with his delegation of authority)
+<li>You need to generate a Private and Public key to use for your OAuth transactions. Refer to the SSL topic for help
+Make sure that your Public key start with "-----BEGIN PUBLIC KEY-----" and ends with "-----END PUBLIC KEY-----"
+<li>You will be using your private key to sign the OAuth Transaction using RSA-SHA1 algorithm.
+<li>You will need to use you Web App OpenID as the Consumer Key. The User OpenID will be used as the oauth token.
+</ul>
+</p>
+
+
+<h3 id="familiarize">Get familiar with Web Processing Services</h3>
+<p>If you're unfamiliar with the concepts, read this Getting Started Guide and experiment with the <a href="/modis">user interface</a> before starting to code. This document assumes that you're familiar with web programming concepts and web data formats.</p>
+
+<h3 id="auth">Learn how to authorize requests</h3>
+
+<p>As a user, you have been granted some permissions by the system administrator. When you run your consumer application, you need to delegate your authority at runtime or grant authority permanently to your consumer to access the data on your behalf</p>
+
+<h4 id="AboutAuthorization">About authorization</h4>
+<p>Before your application can get access to data from a user's OP Account, the application must request authorization from the user or been been granted authority by the user.  Go to the <a href='http://op.geobliki.com'>OP web site</a> for more information</p>
+
+<p><a href="http://code.google.com/apis/accounts/docs/OpenID.html">Federated Hybrid OpenID/OAuth&nbsp;1.0</a> is the recommended authorization protocol for the API.</p>
+
+<p>An automatic OpenID Attribute exchange will take place to obtain user information and permission (as well as consumer public key to authenticate the transaction).</p>
+
+
+<h4 id="OAuth2Authorizing">Authorizing requests with OAuth</h4>
+
+<p>All requests to the SPS API must be authorized by an authenticated user.</p>
+
+You will need to know the proper security realm to access:
+/modis
+<br/>
+Ypu will need to have the proper permissions to execute algorithms and create/edit algorithms.
+
+
+<p class="note"><strong>Tip:</strong> The APIs client libraries can handle some of the authorization process for you. They are available for a variety of programming languages; check the <a href="http://code.google.com/apis/tasks/libraries.html">Libraries and Samples page</a> for more details.</p>
+
+<h2 id="background">WCPS API background</h2>
+
+<h3 id="background_concepts">WCPS concepts</h3>
+<p>The WCPS is built on RESTful concepts</p>
+<ol>
+	<li>A user/developer is only concerned with resources s/he can create/read/update or delete with a minimum set of HTTP operations (POST, GET, PUT/PATCH and DELETE).
+	</li>
+	<li>
+		The preferred objet notation is JSON.  An exception is made to publish data in Atom format when necessary.
+	</li>
+
+
+<h3 id="background_resources">API data model</h3>
+<p>A resource is an individual data entity with a unique identifier. The WCPS API operates on two types of resources:</p>
+<dl>
+  <dt>Algorithm Resource</dt>
+  <dd>Represents an algorithm that can be used to operate on the data and generate a specific product.</dd>
+
+  <dt>Process Resource</dt>
+  <dd>Represents a process that takes place when an algorithm has been selected and run against a particular scene.</dd>
+</dl>
+
+<p>The API data model is based on groups of resources, called collections:</p>
+<dl>
+  <dt><span class="apicollection">Algorithm List Collection</span></dt>
+  <dd>Each user has access to a default Algorithm List within a specific source.  Some users may have the capability to define their own algorithms.</dd>
+
+  <dt><span class="apicollection">Process List Collection</span></dt>
+  <dd>Consists of all the Process Resources that have been created.</dd>
+</dl>
+
+<h3 id="background_operations">WCPS API operations</h3>
+<p>You can invoke five different methods on collections and resources in the WCPS API, as described in the following table.</p>
+
+<table>
+  <tr>
+    <th>Operation</th>
+    <th>Description</th>
+    <th>REST HTTP mappings</th>
+  </tr>
+  <tr>
+    <td><span class="apimethod">list</span></td>
+
+    <td>Lists all resources within a collection. </td>
+    <td><code>GET</code> on a collection URI.</td>
+  </tr>
+  <tr>
+    <td><span class="apimethod">insert</span></td>
+    <td>Creates a new resource and inserts it into a collection.</td>
+
+    <td><code>POST</code> on a collection URI, where you pass in data for a new resource.</td>
+  </tr>
+  <tr>
+    <td><span class="apimethod">get</span></td>
+    <td>Gets a specific resource.</td>
+    <td><code>GET</code> on a resource URI.</td>
+
+  </tr>
+  <tr>
+    <td><span class="apimethod">update</span></td>
+    <td>Updates a specific resource.</td>
+    <td><code>PUT</code> on a resource URI, where you pass in data for the updated resource.</td>
+  </tr>
+  <tr>
+    <td><span class="apimethod">patch</span></td>
+    <td>Partial Update of a specific resource.</td>
+    <td><code>PATCH</code> on a resource URI, where you pass in data for the updated resource.</td>
+  </tr>
+
+  <tr>
+    <td><span class="apimethod">delete</span></td>
+    <td>Delete a specific resource.</td>
+    <td><code>DELETE</code> on a resource URI.</td>
+  </tr>
+</table>
+
+<h2 id="invoking">Calling styles</h2>
+<p>There are two ways to invoke the API:</p>
+<ul>
+  <li>Using <a href="#REST">REST</a> directly.</li>
+  <li>Using <a href="http://code.google.com/apis/tasks/libraries.html">client libraries</a>.</li>
+</ul>
+
+<h3 id="REST">REST</h3>
+
+<p>You can use REST to invoke this API. REST, or <a href="http://en.wikipedia.org/wiki/Representational_State_Transfer">Representational State Transfer</a>, is a web architecture for transferring data.  With REST, actions are taken on data resources using  HTTP verbs like <code>GET</code>, <code>POST</code>, <code>PUT</code>, or <code>DELETE</code>.  Each resource is accessible at a globally-unique URI of the form:</p>
+
+<pre>http://modis.geobliki.com/<span class="apiparam">modis</span>/<span class="apiparam">resourceID</span>?<span class="apiparam">parameters</span></pre>
+<p>Because all API resources are available as HTTP-accessible endpoints, REST enables data caching and is optimized to work with the web's distributed infrastructure.</p>
+
+
+<h4>REST in the SPS API</h4>
+<p>The supported API operations map directly to REST HTTP verbs, as described in <a href="#background_operations">SPS API operations</a>.</p>
+
+<p>The specific formats for the SPS API URIs are:</p>
+<pre>
+http://modis.geobliki.com/modis/algorithms/<span class="apiparam">source</span>?<span class="apiparam">parameters</span>
+http://modis.geobliki.com/modis/processes?<span class="apiparam">parameters</span>
+</pre>
+<p>The full set of URIs used for each supported operation in the API is summarized in the <a href="/modis/docs/reference.html">WCPS API Reference</a> document.</p>
+<p>THe API can also be discovered from the <a href='/modis/discovery/v1'>discovery document</a></p>
+
+<h2 id="working_with_data">Data format</h2>
+
+<h3 id="data-json">JSON</h3>
+<p>
+
+
+
+
+
+<p><a href="http://en.wikipedia.org/wiki/JSON">JSON</a> (JavaScript Object Notation) is a common Internet format that provides a simple method of representing arbitrary data structures.  According to <a href="http://www.json.org">json.org</a>, JSON is a text format that is completely language-independent but uses conventions that are familiar to programmers of the C-family of languages, including C, C++, C#, Java, JavaScript, Perl, Python, and many others.</p>
+
+</p>
+
+      </div><!-- end gc-pagecontent -->
+    </div><!-- end gooey wrapper -->
+
+    </div> <!-- end codesite content -->
+
+
+<div id="gc-footer" dir="ltr">
+  <div class="text">
+
+  </div>
+</div><!-- end gc-footer -->
+
+</div><!-- end gc-container -->
+
+<script type="text/javascript">CODESITE_CSITimer['load'].tick('ats');</script>
+<script src="/js/codesite_tail.pack.04102009.js" type="text/javascript"></script>
+
+  </body>
+</html>
+
+

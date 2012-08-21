@@ -1,0 +1,34 @@
+<entry xmlns:activity='http://activity.com' 
+		xmlns:t	='http://radarsat.geobliki.com/schemas/tests'
+		gd:etag		='<%= entry.etag %>'
+		>
+
+	<category scheme="http://rip.jit.su/discovery/test.rnc" />
+		
+	<title>Test ID:<%= entry.id %></title>
+	<id>tag:rip.jit.su:test:id:<%= entry.id %></id>
+	
+	<link href='<%= entry.link %>.html' type='html' />
+	<link rel='delete' href='<%= entry.link %>/destroy' />
+	<link rel='details' href='<%= entry.link %>/details' />
+		
+	<updated><%= entry.stats.end %></updated>
+	<author><name>From: RIP</name><email>rip@geobliki.com</email></author>
+
+    <content type="html">
+	  <%= entry.description %>
+	</content>
+
+	<t:id><%= entry.id %> </t:id>
+	<t:url><%= entry.url %> </t:url>
+	<t:level><%= entry.level %> </t:level>
+	<t:version><%= entry.version %> </t:version>
+	<t:options><%= entry.options %> </t:options>
+	<t:start><%= entry.stats.start %> </t:start>
+	<t:end><%= entry.stats.end %> </t:end>
+	<t:passes><%= entry.stats.passes %> </t:passes>
+	<t:failures><%= entry.stats.failures %> </t:failures>
+	<t:total><%= entry.stats.total %> </t:total>
+	<t:duration><%= entry.stats.duration %> </t:duration>
+
+</entry>

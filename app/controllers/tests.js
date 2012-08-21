@@ -4,6 +4,8 @@ var path		= require('path');
 var eyes		= require('eyes');
 var async		= require('async');
 
+var Test		= require('../models/test.js');
+
 var resolve 	= path.resolve;
 var mocha		= require('mocha');
 var Suite 		= mocha.Suite;
@@ -109,69 +111,49 @@ function RipDoc(runner) {
 	
 	runner.on('end', function(){
 		debug("tests url:"+runner.params['url']+" end: %j", stats);
+			
+		var tweet_it = false;
 		
-		app.db.get('services:'+runner.params['url'], function(err, data) {
-			if( !err ) {
-				var json = JSON.parse(data)
-				if( json == null ) {
-					json = { 	'url': runner.params['url'],
-								'passes': 0,
-								'failures':0 };
-				};
-				
-				var tweet_it = false;
-				
-				// no tweeting while local testing
-				// no tweet if results are identical
-				if( runner.params['url'] != "http://localhost") {
-					// make sure there is a significant change
-					if( (json.passes != stats.passes) || (json.failures != stats.failures) ) {
-						tweet_it = true;
-					}
-				}
+		// no tweeting while local testing
+		// no tweet if results are identical
+		if( runner.params['url'] != "http://localhost") {
+			// make sure there is a significant change
+			//if( (json.passes != stats.passes) || (json.failures != stats.failures) ) {
+				tweet_it = true;
+			//}
+		}
 
-				var tmsg = runner.params['url'] + " - Pass:"+stats.passes+" Fail:"+stats.failures + " with:";
-				for( var h in always_files ) { delete runner.params[h]; }
-				delete runner.params['url'];
-				delete runner.params['discovery'];
-				delete runner.params['host'];
-				delete runner.params['sio'];
+		var tmsg = runner.params['url'] + " - Pass:"+stats.passes+" Fail:"+stats.failures + " with:";
+		
+		var url		  = params['url'];
+		var RMM_Level = params['RMM_Level'];
+		var key = 'level'+RMM_Level;
+		for( var h in always_files[key] ) { 
+			delete runner.params[h]; 
+		}
+		
+		delete runner.params['url'];
+		delete runner.params['discovery'];
+		delete runner.params['host'];
+		delete runner.params['sio'];
+		
+		delete runner.params['RMM_Level'];
+		
+		var keys = []
+		for( var key in runner.params ) { keys.push(key); }
+		tmsg += keys.join(", ")
+		
+		if( RMM_Level)
+			tmsg += "@ RMM Level:"+RMM_Level;
 				
-				var RMM_Level = params['RMM_Level'];
-				delete runner.params['RMM_Level'];
-				
-				var keys = []
-				for( var key in runner.params ) { keys.push(key); }
-				tmsg += keys.join(", ")
-				
-				if( RMM_Level)
-					tmsg += "@ RMM Level:"+RMM_Level;
-				
-				//console.log("tweet:"+ tmsg);
-				
-				if(tweet_it ) try {
-					app.twit.updateStatus(tmsg, function (data) {
-							//console.log("twitter:"+util.inspect(data));
-					});
-				} catch(e) { console.error("err:"+e+" connecting to twitter") }
-				
-				// save in the database
-				json.stats 		= stats;
-				json.date   	= new Date;
-				json.with   	= keys.join(", ");
-				json.version	= app.version;
-				
-				if( RMM_Level) 	json.rmm_level 	= RMM_Level;
-				
-				app.db.sadd('services', json.url);
-				app.db.set('services:'+ json.url, JSON.stringify(json));
-				app.db.set('services:output:'+ json.url, output);
-				
-				//console.log("saved:"+util.inspect(json));
-			} else {
-				console.log("error on getting data for:"+url)
-			}
-		})
+		if(tweet_it ) try {
+			app.twit.updateStatus(tmsg, function (data) {});
+		} catch(e) { console.error("err:"+e+" connecting to twitter") }
+		
+		var options = keys.join(",");
+		var test = new Test(params['userid'], url, stats, options, RMM_Level, app.version, output )
+		test.save();
+			
 		var duration 		= (stats.duration).toFixed(2)
 		var statsTemplate 	= '<ul id=\"stats\">'
 		  + '<li class=\"progress\"><canvas width=\"40\" height=\"40\"></canvas></li>'
@@ -183,7 +165,6 @@ function RipDoc(runner) {
 		var report 		= "<ul id='report'>"+results+'</ul>';
 		
 		runner.results = statHtml+report;
-		
 		
 		if( runner.params['sio'] ) app.sio.sockets.emit("rstats", JSON.stringify(stats) );
   	}); 
@@ -197,11 +178,13 @@ RipDoc.prototype.getResults = function(){
 var test_files = [
  "./public/tests/start_test.js"
 , "./public/tests/EndPoint/ValidEndpoint.js"
-, "./public/tests/LandingPage/LandingPage.js"
+, "./public/tests/LandingPage/LandingPage0.js"
+, "./public/tests/LandingPage/LandingPage3.js"
 , "./public/tests/OpenSearch/OpenSearch.js"
 , "./public/tests/Discovery/GoogleDiscoveryAPI.js"
 , "./public/tests/Discovery/AtompubDiscoveryAPI.js"
 , "./public/tests/Discovery/GeoservicesDiscoveryAPI.js"
+, "./public/tests/Discovery/GetCapabilities.js"
 , "./public/tests/Discovery/NoDiscovery.js"
 , "./public/tests/Discovery/ODataDiscoveryAPI.js"
 , "./public/tests/ContentNegotiation/ContentNegotiation.js"
@@ -219,15 +202,35 @@ var test_files = [
 ];
 
 var always_files = {
-	"start_test": 			'on',
-	"ValidEndpoint": 		'on',
-	"LandingPage": 			'on',
-	"ContentNegotiation": 	'on',
-	"UniformInterface": 	'on',
-	"Caching": 			 	'on',
-	"HATEOAS": 				'on',
-	"Compression": 			'on',
-	"end_test": 			'on'
+	"level0": {
+		"start_test": 			'on',
+		"ValidEndpoint": 		'on',
+		"LandingPage0": 		'on',
+		"end_test": 			'on'
+	},
+	"level1": {
+		"start_test": 			'on',
+		"ValidEndpoint": 		'on',
+		"LandingPage0": 		'on',
+		"end_test": 			'on'
+	},
+	"level2": {
+		"start_test": 			'on',
+		"ValidEndpoint": 		'on',
+		"LandingPage0": 		'on',
+		"end_test": 			'on'
+	},
+	"level3": {
+		"start_test": 			'on',
+		"ValidEndpoint": 		'on',
+		"LandingPage3": 		'on',
+		"ContentNegotiation": 	'on',
+		"UniformInterface": 	'on',
+		"Caching": 			 	'on',
+		"HATEOAS": 				'on',
+		"Compression": 			'on',
+		"end_test": 			'on'
+	}
 }
 
 // resolve
@@ -248,6 +251,7 @@ function runTests( params, fn ) {
 						'docs_href', 
 						'explorer_href', 
 						'opensearch_href', 
+						'r',					//TODO global leakage somwhere grrr!
 						'resources_urls',
 						'results',
 						'service_doc', 
@@ -269,9 +273,13 @@ function runTests( params, fn ) {
 	global.results 			= "";
 	global.service_doc 		= undefined;
 
+	var rmm_level 			= params['RMM_Level'] || 0;
+	var key 				= 'level'+rmm_level;
+	debug("rmm_level:"+rmm_level);
+	
 	var startDate = new Date;
-	for( var h in always_files ) {
-		params[h] = always_files[h]
+	for( var h in always_files[key] ) {
+		params[h] = always_files[key][h]
 	}
 
 	debug(util.inspect(params));
@@ -279,6 +287,11 @@ function runTests( params, fn ) {
 	var runner;
 	
 	try {		
+		// Look at security if enabled
+		if( params['security'] ) {
+			console.log("Can we access url:"+params['url'] + " " + params['security'] )
+		} 
+		
 		// fix discovery option
 		var discovery = params['discovery'];
 		params[discovery] = 'on';
@@ -316,20 +329,171 @@ var urls = [
 ]
 
 module.exports = {
-	index: function(req, res) {				
-		res.render("tests/index.jade");					
+	index: function(req, res) {	
+		server_url  = "http://"+req.headers.host;
+		var q   	= req.query['q'];
+		var page	= req.query['page'];
+		var limit	= req.query['limit'];
+	
+		var fmt		= req.fmt();
+
+		if( limit == undefined ) limit = 25;
+		if( page == undefined )  page  = 1;
+
+		var end 	= page*limit -1;
+		var start 	= (page-1)*limit;
+
+		var startIndex = (parseInt(page)-1)*parseInt(limit);
+
+		var if_none_match = req.headers["if-none-match"];
+		var last_modified = req.headers["last-modified"];
+		
+		switch( fmt ) {
+			case 'atom':
+			case 'json':
+				function render_atom_or_json(list, req, res ) {
+					var updated = "";
+					for( el in list ) {
+						if( updated < list[el].stats.end) updated = list[el].stats.end;
+						list[el].options = list[el].options.replace(/,/g, ", ")
+					}
+					var testList = {
+						'kind': "rip#testList",
+						'links': {
+							'self': {
+								'href': "/rtests.json",
+								'type': "application/json",
+								'describedBy': server_url+"/discovery/TestsList.properties"
+							},
+							'create': {
+								'href': "/rtests",
+								'method': 'POST'
+							}
+						},
+						"updated": updated,
+						
+						'items': list
+					}
+					testList['etag'] 	=  JSON.stringify(testList).sha1_hex();
+					
+					if( app.settings.env != 'development' ) {
+						if( if_none_match && if_none_match==testList.etag ) {
+							return res.send("",304);
+						}
+						if( last_modified && last_modified==testList.updated) {
+							return res.send("",304);
+						}
+					}
+					
+					if( fmt == 'json') {
+						var content_type 	= 'application/json; profile=\"'+server_url+"/discovery/TestList.properties\"";
+						res.header('Content-Type', content_type);
+						var date = new Date(Date.parse(testList.updated))
+						res.header('Last-Modified', date);
+						res.header('ETag', testList.etag);
+						return res.send(testList);
+					} else { // atom
+						for( el in list ) {
+							var e = list[el];
+							e.link 			= "http://"+req.headers.host+"/rtests/"+e.id;
+							var score 		= e.stats.passes-e.stats.failures;
+							var description = "<table>"
+							description 	+= "<tr><td>URL:</td><td>"+e.url + "</td></tr>"; 
+							description 	+= "<tr><td>Level:</td><td>"+e.level+"</td></tr>"
+							description 	+= "<tr><td>Options:</td><td>"+e.options+"</td></tr>"
+							description 	+= "<tr><td>Score:</td><td>"+ score +"</td></tr>"
+							description 	+= "<tr><td>Passes:</td><td>"+e.stats.passes+"</td></tr>"
+							description 	+= "<tr><td>Fails:</td><td>"+e.stats.failures+"</td></tr>"
+							description 	+= "<tr><td>More Details:</td><td><a href='"+server_url+"/rtests/"+e.id+"/results'>here</a></td></tr>"
+							description 	+= "</table>"
+							e.description   = description.replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;");	
+						}
+						
+						var totalResults 	= list.length;
+						var link 			= "http://"+req.headers.host + "/rtests";
+						//console.log("atom feed list:"+totalResults);
+						res.header('Content-Type',"application/xml; charset=utf-8");
+						res.header('GData-Version',"2.0");
+						var date = new Date(Date.parse(testList.updated))
+						res.header('Last-Modified', date);
+						res.header('ETag', testList.etag);
+						//eyes.inspect(testList)
+						return res.render("tests/feed.ejs", {
+							tests: 			testList.items,
+							last_updated: 	updated,
+							link: 			link,
+							totalResults: 	totalResults,
+							startIndex: 	start,
+							itemsPerPage: 	end,
+							layout: 		false,
+							etag: 			testList.etag
+						});
+					}					
+				}
+				
+				Test.get_all_tests( function(err, list) {
+					if( q ) {
+						async.filter(list, function(l, cb) {
+							if( l.url.indexOf(q) > 0 ) {
+								cb(true)
+							} else {
+								cb(false)
+							}
+						}, function(results) {
+							render_atom_or_json( results, req, res )
+						})
+					} else {
+						render_atom_or_json( list, req, res )
+					}
+				});
+				return;
+			
+			// HTML output
+			default:
+				function render_html( list, req, res ) {
+					//eyes.inspect(list);					
+					var etag = JSON.stringify(list).sha1_hex();
+					var updated = "";
+					for( el in list ) {
+						if( updated < list[el].latest.stats.end) updated = list[el].latest.stats.end;
+					}
+					
+					if( app.settings.env != 'development' ) {
+						if( if_none_match && if_none_match==etag ) {
+							return res.send("",304);
+						}
+						if( last_modified && last_modified==updated) {
+							return res.send("",304);
+						}
+					}
+					
+					var date = new Date(Date.parse(updated))
+					res.header('Last-Modified', date);
+					res.header('ETag', etag);
+					return res.render("tests/index.jade", {list: list});
+				}
+				
+				Test.get_latest_tests_for_each_service( function(err, list) {
+					if( q ) {
+						async.filter(list, function(l, cb) {
+							if( l.latest.url.indexOf(q) > 0 ) {
+								cb(true)
+							} else {
+								cb(false)
+							}
+						}, function(results) {
+							render_html( results, req, res )
+						})
+					} else {
+						render_html( list, req, res )
+					}
+					
+				});								
+		}
 	},
 	
 	test: function(req,res){
 		res.render("tests/test.ejs", {layout:false});				
-	},
-	
-	// previous form with no html streaming
-	old_form: function(req, res) {
-		app.db.smembers('services', function(err, replies) {	
-			debug("form urls:"+util.inspect(replies))
-			res.render("tests/form.jade", {urls: replies});		
-		})
 	},
 
 	levels: function(req, res) {
@@ -344,10 +508,6 @@ module.exports = {
 	
 	// this is now using socket_io with streaming html
 	form: function(req, res) {
-		//app.db.smembers('services', function(err, replies) {	
-		//	debug("form urls:"+util.inspect(replies))
-		//	res.render("tests/form2.jade", {urls: replies});		
-		//})
 		res.render("tests/form2.jade", {urls: urls});		
 	},
 	
@@ -356,6 +516,7 @@ module.exports = {
 		runTests(params, function( results) {
 		});
 	},
+	
 	// This is going to start the tests and stream results to the page in realtime
 	// using socket_io
 	sio: function(req, res ) {
@@ -368,11 +529,23 @@ module.exports = {
 		// url endpoint to test
 		var test_url	= req.body.params['url'];
 		
-		res.render("tests/results_sio.ejs", {
-			layout: 	false,
-			url: 		test_url,
-			server_url: websocket_url,
-			params: 	params });
+		if( params['security']) {
+			console.log("try to authenticate with submitted endpoint");
+			req.authenticate([params['security']], function(error, authenticated) {
+				if( error ) {
+					return res.send("Authentication error:"+error);
+				} else {
+					console.log("Authenticating...");
+					return;
+				}
+			})
+		} else {
+			res.render("tests/results_sio.ejs", {
+				layout: 		false,
+				url: 			test_url,
+				websocket_url: 	websocket_url,
+				params: 		params });
+		}
 	},
 	
 	// Create a new test and render results on a web page
@@ -383,27 +556,146 @@ module.exports = {
 		if( req.session.user) {
 			var user = User.newInstance(req.session.user);
 			params['userid'] = user.id
+		} else {
+			params['userid'] = -1;
 		}
 		
 		var websocket_url 	= "http://"+req.headers.host;
 		params['host']		= "http://"+req.headers.host+"/ustories";
 
 		// url endpoint to test
-		var test_url	= req.body.params['url'];
+		var test_url		= req.body.params['url'];
 		
-		var results 	= runTests(params, function( results) {
+		var results 		= runTests(params, function( results) {
 			
 		  res.render("tests/results.ejs", {
-			layout: 	false,
-			url: 		test_url,
-			server_url: websocket_url,
-			params: 	params,
-			results: 	results });
+			layout: 		false,
+			url: 			test_url,
+			websocket_url: 	websocket_url,
+			params: 		params,
+			results: 		results });
 		});
 	},
 	
 	show: function(req, res) {
-		var id = req.params['id'];
-		res.render("tests/show.jade");
+		var id 		= req.params['id'];
+		var fmt		= req.fmt();
+
+		var if_none_match = req.headers["if-none-match"];
+		var last_modified = req.headers["last-modified"];
+		
+		if( !fmt ) return res.send(406);
+		
+		server_url = "http://"+req.headers.host;
+				
+		Test.get_by_id(id, function(err, test) {
+			if( !err && test) {
+					var json 			=  test.media_json();
+					var content_type 	= 'application/json; profile=\"'+server_url+"/discovery/Test.properties\"";
+					var updated 		= test.stats.end;
+
+					if( app.settings.env != 'development' ) {
+						if( if_none_match && if_none_match==json.etag ) {
+							return res.send("",304);
+						}
+						if( last_modified && last_modified==updated) {
+							return res.send("",304);
+						}
+					}
+
+					if( fmt == 'json') {
+						var date = new Date(Date.parse(updated))
+						res.header('Last-Modified', date);
+						res.header('Content-Type', content_type);
+						res.header('ETag', json.etag);
+						res.header('GData-Version', '2.0');	
+						return res.send(json);
+					} else {
+						res.redirect("/rtests/"+id+"/results");
+					}
+			} else {
+				res.send(404)
+			}
+		})
+		//res.render("tests/show.jade");
+	},
+	
+	results: function(req, res) {
+		var if_none_match = req.headers["if-none-match"];
+		var last_modified = req.headers["last-modified"];
+
+		var id 		= req.params['id'];
+		Test.get_by_id(id, function(err, test) {
+			if( !err ) {
+				var etag	= JSON.stringify(test).sha1_hex();
+				var updated = test.stats.end;
+				
+				if( app.settings.env != 'development' ) {
+					if( if_none_match && if_none_match==etag ) {
+						return res.send("",304);
+					}
+					if( last_modified && last_modified==updated) {
+						return res.send("",304);
+					}
+				}
+				
+				var date = new Date(Date.parse(updated))
+				res.header('Last-Modified', date);
+				res.header('ETag', etag);
+				
+				res.render("tests/results.jade", { 	url: 		test.url, 
+													results: 	test.output,
+													json: 		test,
+													layout: 	false })
+			} else {
+				res.send(404)
+			}
+		})
+		
+	},
+	
+	history: function(req, res) {
+		var url 			= req.param('url');
+		var if_none_match 	= req.headers["if-none-match"];
+		var last_modified 	= req.headers["last-modified"];
+
+		Test.get_all_tests_for_service(url, function(err, list) {
+			var etag = JSON.stringify(list).sha1_hex();
+			var updated = "";
+			//eyes.inspect(list);
+			for( el in list ) {
+				if( list[el] == null ) {
+					delete list[el]
+				} else if( updated < list[el].stats.end) {
+					updated = list[el].stats.end;
+				}
+			}
+			
+			if( app.settings.env != 'development' ) {				
+				if( if_none_match && if_none_match==etag ) {
+					return res.send("",304);
+				}
+				if( last_modified && last_modified==updated) {
+					return res.send("",304);
+				}
+			}
+			
+			var date = new Date(Date.parse(updated))
+			res.header('Last-Modified', date);
+			res.header('ETag', etag);
+			
+			if( !err ) {
+				res.render("tests/history.jade", { 	url: url, list: list })
+			} else {
+				res.send(404)
+			}
+		})
+	},
+	
+	destroy: function(req, res) {
+		var id 		= req.params['id'];
+		Test.destroy(id, function(err) {
+			res.redirect("/rtests");						
+		})
 	}
 }

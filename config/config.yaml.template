@@ -15,5 +15,8 @@
 	"trackingID":                   "XXXX",
 	"googleAPIKey":                 "XXXXXXXX",
 	"clientID":                     "XXXX",
-	"profileID":                    "XXX"
+	"profileID":                    "XXX",
+	
+	 "OAuth": {
+	}
 }

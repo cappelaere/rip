@@ -1,0 +1,52 @@
+# RELAX NG Compact Syntax Grammar
+# Description: WCPS Process
+
+namespace rip_test 	= "http://rip.jit.su/discovery/test.rnc"
+
+include "core.rnc"
+{
+# Redefine extensionElement of AtomEntry
+	extensionElement = (
+		rip_test_id,
+		rip_test_url,
+		rip_test_version,
+		rip_test_options,
+		rip_test_start,
+		rip_test_end,
+		rip_test_passes,
+		rip_test_failures,
+		rip_test_total,
+		rip_test_duration
+	 )
+}
+
+# 3.3.5 DATE-TIME
+
+pattern-date-time = xsd:string {
+    pattern = "\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ?"
+}
+
+value-date-time = element date-time {
+    pattern-date-time
+}
+
+rip_test_id 	= element rip_test:version { xsd:integer }
+
+rip_test_url	= element rip_test:version { xsd:anyURI }
+
+rip_test_version = element rip_test:version { xsd:integer }
+
+rip_test_options = element rip_test:title { text }
+
+rip_test_start = element rip_test:content { value-date-time }
+
+rip_test_end = element rip_test:content { value-date-time }
+
+rip_test_passes 	= element rip_test:category { xsd:integer }
+
+rip_test_failures 	= element rip_test:category { xsd:integer }
+
+rip_test_total 		= element rip_test:category { xsd:integer }
+
+rip_test_duration	= element rip_test:category { xsd:integer }
+

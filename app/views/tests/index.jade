@@ -1,3 +1,18 @@
 h2 Tests
 
-+ <a href='/tests/levels/3'>Start</a> New Service Test  
++ <a href='/rtests/levels/3'>Start</a> New Service Test  
+
+hr
+table
+	th id
+	th service url
+	th level
+	th score
+	th passes
+	th fails
+	th details
+	th latest date
+	th version 
+	th history 
+	- for(el in list)
+		!=partial('tests/url', { locals: { el: list[el] } })

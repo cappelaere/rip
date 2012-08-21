@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed 	xmlns="http://www.w3.org/2005/Atom"
+      	xmlns:openSearch="http://a9.com/-/spec/opensearch/1.1/" 
+		xmlns:obs="http://rip.jit.su/schemas/tests"
+		xmlns:gd='http://schemas.google.com/g/2005'
+		gd:etag="<%= etag %>"
+		>
+	<category scheme='http://rip.jit.su/schemas/tests.rnc' term='observations' />
+	
+	<title>RIP Tests Feed - <%= last_updated %></title>
+	
+	<link rel='self' href='<%= link %>' type="application/atom+xml" />
+	<link rel='alternate' href='<%= link %>' type="text/html" />
+	<link rel='create' href='<%= link %>/levels/3' type="text/html" />
+	
+	<!-- PubSubHubbub Discovery -->
+	 <link rel="hub" href="http://geobliki.superfeedr.com/" />
+    <!-- End Of PubSubHubbub Discovery -->
+
+	<logo><%= link %>/../images/RIPx32.png'</logo>
+	
+	<id>tag:rip:tests</id>
+	
+	<updated><%= last_updated %></updated>
+	
+	<author><name>RIP</name><email>rip@geobliki.com</email></author>
+	<generator version='1.0'>rip.jit.su</generator>
+	
+	<openSearch:totalResults><%= totalResults %></openSearch:totalResults>
+	<openSearch:startIndex><%= startIndex %></openSearch:startIndex>
+	<openSearch:itemsPerPage><%= itemsPerPage %></openSearch:itemsPerPage>
+	
+	<%- partial('entry', {collection: tests, as: 'entry'}) %>
+	
+</feed>

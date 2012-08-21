@@ -1,0 +1,30 @@
+h2 Scores of RESTful Service 
+	a(href='http://www.crummy.com/writing/speaking/2008-QCon/act3.html') Richardson Maturity 
+	span Level 0
+
+ol(id="toc")
+	li(class='current')
+		a(href='/services/0')
+			span Level 0
+	li
+		a(href="/services/1")
+			span Level 1
+	li
+		a(href="/services/2")
+			span Level 2
+	li
+		a(href="/services/3")
+			span Level 3
+
+div(class="content")
+	table
+		th URL
+		th Score
+		th Passes
+		th Failed
+		th Details
+		th Date	
+		th Version
+		th Actions
+		- for(r in results)
+			!=partial('services/url', { locals: { r: results[r] } })

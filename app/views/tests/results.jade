@@ -1,0 +1,82 @@
+html
+	head
+		title RIP Test Results
+		link(rel="stylesheet", href="/stylesheets/mocha.css")
+		script(src='/javascripts/showhide.js')
+		script(src='/javascripts/jquery-1.5.min.js')
+		script(src='/javascripts/ga_social_tracking.js')
+		script(type="text/javascript")
+			var addthis_config = {"data_track_addressbar":true};
+	
+	body
+		a(href='/') 
+			img(src='/images/RIP.png', width='200')
+	
+		div(id="mocha")
+			ul(id="stats")
+				li(id="stats-passes", class="passes") passes: 
+					em
+						=json.stats.passes
+				li(id="stats-failures", class="failures") failures: 
+					em
+						= json.stats.failures
+				li(id="stats-duration", class="duration") duration: 
+					em
+						= json.stats.duration 
+					ms
+		
+		h2	
+			b Results for: #{url}
+		
+		table
+			tr
+				td 
+					b Test ID
+				td 
+					=json.id
+				
+			tr
+				td 
+					b Date: 
+				td 
+					=json.stats.end
+		
+			tr
+				td 
+					b RMM Level: 
+				td 
+					=json.level
+		
+			tr
+				td 
+					b Options: 
+				td 
+					=json.options
+			
+			tr
+				td 
+					b Version: 
+				td 
+					=json.version
+		
+		br	
+		div(class="addthis_toolbox addthis_default_style ")
+			a(class="addthis_button_facebook_like",fb:like:layout="button_count")
+			a(class="addthis_button_tweet")
+			a(class="addthis_button_pinterest_pinit")
+			a(class="addthis_counter addthis_pill_style")
+			
+		hr	
+		div(id="mocha")
+			ul(id='report')
+				div(id='start-report') 
+					!= results
+		
+		br
+		script(type="text/javascript")
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', '#{trackingID}' ]);
+			_gaq.push(['_trackPageview']);
+			(function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();
+		
+		script(type="text/javascript", src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-501fd00d660ccbd9")

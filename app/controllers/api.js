@@ -7,7 +7,7 @@ var util		= require('util'),
 	var apiConfig = {
 		oauth: false,
 		protocol: "http",
-		publicPath: "/radarsat"
+		publicPath: "/"
 	};
 
 module.exports = {	
@@ -505,7 +505,7 @@ module.exports = {
 		var d 		= discovery.current_schema();
 		var apiName = d.name; 
 		var apiInfo = {
-			name: "Radarsat-2 API Browser",
+			name: "RIP API Browser",
 			version: d.version,
 			protocol: d.protocol,
 			host: req.headers.host,
@@ -525,7 +525,7 @@ module.exports = {
 				method['URI'] 			= resource_methods[rm]['path'];
 				method['MediaType']		= resource_methods[rm]['mediaType'] || "application/json";
 				method['Accept']		= resource_methods[rm]['accept'] || "application/json";
-				console.log(util.inspect(method));
+				//console.log(util.inspect(method));
 				
 				if( resource_methods[rm]['parameters']) {
 					var parameters = [];
@@ -545,7 +545,7 @@ module.exports = {
 					method['parameters']	= parameters;
 				} else {
 					var schema_name = resource_methods[rm]['request']['$ref'];
-					console.log("schema name:"+schema_name);
+					//console.log("schema name:"+schema_name);
 				
 					var schema = d.schemas[schema_name];
 					var dparameters = schema['properties'];
@@ -566,7 +566,7 @@ module.exports = {
 				
 					method['parameters']	= parameters;					
 				}
-				console.log("***Parameters:"+util.inspect(method['parameters']));
+				//console.log("***Parameters:"+util.inspect(method['parameters']));
 				
 				method['read-only']		= false;
 				

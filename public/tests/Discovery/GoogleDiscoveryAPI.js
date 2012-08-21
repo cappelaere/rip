@@ -19,6 +19,26 @@ describe('Discovery Service', function(){
 					done();
 				})
 			})
+			
+			it('should be available from end point url and json extension', function(done){
+				var doc_url = url+ ".json";		
+				request
+				.get( doc_url)
+				.end( function(res) {
+					res.status.should.equal(200);
+					done();
+				})
+			})
+			it('should be available from end point url with proper Accept Headers', function(done){
+				var doc_url = url;
+				request
+				.get( doc_url)
+				.set('Accept', 'application/json')
+				.end( function(res) {
+					res.status.should.equal(200);
+					done();
+				})
+			})
 		})
 		describe('contains API metadata', function() {
 			it('should contain service metadata', function(){

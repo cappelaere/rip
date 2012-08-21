@@ -1,5 +1,5 @@
 var util 			= require('util');
-var request			= require('request');
+var request			= require('superagent');
 var cheerio			= require('cheerio');
 var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
@@ -8,13 +8,15 @@ var debug 			= require('debug')('tests:LandingPage');
 describe('Landing_Page', function(){
 	
 	before( function(done) {
-		request( url, function(err, resp, _body ) {
-			if (err || resp.statusCode != 200) {
+		request
+		.get( url )
+		.end( function(res) {
+			if (res.status != 200) {
 				console.error("failed getting url:"+url)
 				throw new AssertionError({'message':'Error when contacting:'+url});
 			} else {
 				try {
-					$ = cheerio.load(_body)
+					$ = cheerio.load(res.text)
 					done();
 				} catch(e) {
 					console.error("failed parsing landing page:"+url)
@@ -82,6 +84,17 @@ describe('Landing_Page', function(){
 				done();
 			} else {
 				throw new AssertionError({'message':"Docs link not found"});
+			}
+		})
+		
+		it('should contain a link to an atom feed', function(done) {
+			var head = $('head');
+			var link = head.find('link[type=application/atom+xml]')
+			if( link && link.length>0) {
+				debug("atom_feed_href:"+link.attr('href'))
+				done();
+			} else {
+				throw new AssertionError({'message':"atom feed link not found"});
 			}
 		})
 	})

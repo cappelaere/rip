@@ -1,0 +1,100 @@
+
+h2 Test RESTful Service 
+	a(href='http://www.crummy.com/writing/speaking/2008-QCon/act3.html') Richardson Maturity 
+	span Level 3
+
+i(style="color:gray")
+	ul
+		li Resources describe their own capabilities and interconnections
+		li WWW, Atompub, Netflix, Launchpad...
+			
+ol(id="toc")
+
+	li
+		a(href="/rtests/levels/0")
+			span Level 0
+
+	li
+		a(href="/rtests/levels/1")
+			span Level 1
+
+	li
+		a(href="/rtests/levels/2")
+			span Level 2
+	
+	li(class='current')
+		a(href="/rtests/levels/3")
+			span Level 3 
+
+div(class="content")
+
+	form(method='post',action='/rtests/sio')
+		p
+		table
+			tr
+				td
+					label Enter URL: &nbsp;
+					input(type='text', id='inp', name='params[url]', value='http://radarsat.geobliki.com', size="40") &nbsp;
+		
+				td
+					label Options: &nbsp;
+					select(id='select_url', name='select_url' )
+						- for( u in urls )
+							option(value!=urls[u]) #{urls[u]}
+		p
+		<b>With Selected Preferences:</b>
+
+		p 
+		label Service Discovery:&nbsp;
+		select(id='params[discovery]', name='params[discovery]' )
+			option(value="GoogleDiscoveryAPI", selected ) Google Discovery API
+			option(value="AtompubDiscoveryAPI" ) AtomPub Service Document
+			option(value="GeoservicesDiscoveryAPI" ) GeoService Catalog Document
+			option(value="ODataDiscoveryAPI" ) OData Service Document
+			option(value="GetCapabilities" ) OGC Capabilities Document
+			option(value="WSDL" ) WSDL Document
+			option(value="WADL" ) WADL Document
+			option(value="NoDiscovery" ) None
+
+		p
+		input(  type='checkbox', name='params[OpenSearch]', checked)
+		Label Uses OpenSearch
+
+		p
+		input(  type='checkbox', name='params[Atom]', checked)
+		Label Uses Atom Protocol for Data Feeds
+
+		p
+		input(  type='checkbox', name='params[ExtendAtom]', checked)
+		Label Extends Atom Feeds using
+	
+		&nbsp;
+	
+		select(id='params[AtomExtension]', name='params[AtomExtension]' )
+			option(value="GData2", selected ) GData 2.0
+			option(value="GData1" ) GData 1.0
+			option(value="OData1" ) OData 1.0
+		
+		
+		p
+		input(  type='checkbox', name='params[ExtendJSON]', checked)
+		Label Extends JSON using
+		&nbsp;
+
+		select(id='params[JSONExtension]', name='params[JSONExtension]' )
+			option(value="Siren", selected ) Siren
+			option(value="HAL" ) HAL
+		
+		p
+		
+		input(name='params[RMM_Level]', type="hidden", value="3")
+		
+		input(type="submit", value="Submit")
+
+		script(src='/javascripts/jquery-1.5.min.js')
+		script(type='text/javascript')
+			var selectoption = document.getElementById("select_url")
+			selectoption.onchange=function(){
+				var opt = this.options[this.selectedIndex].value
+				$('#inp').val(opt)
+			}

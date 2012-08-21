@@ -39,7 +39,8 @@ describe('End_Point', function(){
 					//this.ok = true;			
 					done();
 				} catch(e) {
-					//this.ok = false;			
+					//this.ok = false;		
+					console.log(url+"-"+e)	
 					throw new Abort("INVALID END POINT")
 				}
 			});

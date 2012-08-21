@@ -1,0 +1,111 @@
+h2 Test RESTful Service 
+	a(href='http://www.crummy.com/writing/speaking/2008-QCon/act3.html') Richardson Maturity 
+	span Level 2
+
+i(style="color:gray")
+	ul
+		li Many URI's, each supporting multiple HTTP methods
+		li The best example is Amazon S3
+		
+p(style="color:red") Gentle WARNING: Not all options are operational yet!!
+
+ol(id="toc")
+	li
+		a(href='/rtests/levels/0')
+			span Level 0
+	li
+		a(href="/rtests/levels/1")
+			span Level 1
+			
+	li(class='current')
+		a(href="/rtests/levels/2")
+			span Level 2
+	li
+		a(href="/rtests/levels/3")
+			span Level 3
+
+div(class="content")
+	form(method='post',action='/rtests/sio')
+		p
+		table
+			tr
+				td
+					label Enter URL: &nbsp;
+					input(type='text', id='inp', name='params[url]', value='http://www.facebook.com', size="40") &nbsp;
+	
+				td
+					label Options: &nbsp;
+					select(id='select_url', name='select_url' )
+						option(value="http://www.facebook.com") Facebook
+						option(value="https://www.googleapis.com/plus/v1") Google+
+						option(value="https://api.github.com") Github
+						option(value="https://api.stackexchange.com") StackExchange
+						option(value="http://api-public.netflix.com") Netflix
+						option(value="https://api.github.com") FourSquare
+
+		p
+		<b>With Selected Preferences:</b>
+
+		p 
+		label Security Strategy:&nbsp;
+		select(id='params[security]', name='params[security]' )
+			option(value="" ) No Security
+			option(value="google2" ) OAUTH 2.0 Google
+			option(value="facebook" ) OAUTH 2.0 Facebook
+			option(value="github" ) OAUTH 2.0 GitHub
+			option(value="foursquare" ) OAUTH 2.0 FourSquare
+
+		p 
+		label Service Discovery:&nbsp;
+		select(id='params[discovery]', name='params[discovery]' )
+			option(value="GoogleDiscoveryAPI" ) Google Discovery API
+			option(value="AtompubDiscoveryAPI" ) AtomPub Service Document
+			option(value="GeoservicesDiscoveryAPI" ) GeoService Catalog Document
+			option(value="ODataDiscoveryAPI" ) OData Service Document
+			option(value="GetCapabilities" ) OGC Capabilities Document
+			option(value="WSDL" ) WSDL Document
+			option(value="WADL" ) WADL Document
+			option(value="NoDiscovery", selected ) None
+
+		p
+		input(  type='checkbox', name='params[OpenSearch]')
+		Label Uses OpenSearch
+
+		p
+		input(  type='checkbox', name='params[Atom]')
+		Label Uses Atom Protocol for Data Feeds
+
+		p
+		input(  type='checkbox', name='params[ExtendAtom]')
+		Label Extends Atom Feeds using
+
+		&nbsp;
+
+		select(id='params[AtomExtension]', name='params[AtomExtension]' )
+			option(value="GData2", selected ) GData 2.0
+			option(value="GData1" ) GData 1.0
+			option(value="OData1" ) OData 1.0
+	
+	
+		p
+		input(  type='checkbox', name='params[ExtendJSON]')
+		Label Extends JSON using
+		&nbsp;
+
+		select(id='params[JSONExtension]', name='params[JSONExtension]' )
+			option(value="Siren", selected ) Siren
+			option(value="HAL" ) HAL
+	
+		p
+	
+		input(name='params[RMM_Level]', type="hidden", value="3")
+	
+		input(type="submit", value="Submit")
+
+		script(src='/javascripts/jquery-1.5.min.js')
+		script(type='text/javascript')
+			var selectoption = document.getElementById("select_url")
+			selectoption.onchange=function(){
+				var opt = this.options[this.selectedIndex].value
+				$('#inp').val(opt)
+			}

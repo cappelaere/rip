@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+<title>Reference - SPS API </title>
+
+<link href="http://code.google.com/css/codesite.pack.04102009.css" type="text/css" rel="stylesheet">
+<script src="http://code.google.com/js/codesite_head.pack.04102009.js" type="text/javascript"></script>
+
+<!--[if IE]><link rel="stylesheet" type="text/css" href="/css/iehacks.css"><![endif]-->
+
+    <link href="http://code.google.com/css/semantic_headers.css" rel="stylesheet" type="text/css" />
+    <link type="text/css" rel="stylesheet" href="http://code.google.com/apis/shared/css/apireference.css" />
+
+    
+  </head>
+
+  <body class="gc-documentation">
+
+
+<div id="codesiteContent">
+
+<a id="gc-topnav-anchor"></a>
+<div id="gc-topnav">
+  <h1>SPS API </h1>
+  <ul id="docs" class="gc-topnav-tabs">
+  </ul>
+</div> <!-- end gc-topnav -->
+
+
+ <%- partial('sidebar') %>
+
+      <div class="g-unit" id="gc-pagecontent">
+        
+          <script type="text/javascript">CODESITE_docEarlyProcessing();</script>
+
+        
+        <h1 class="page_title">Reference</h1>
+
+
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+  var tabs = [];
+
+  function addTabSection(tabId, type) {
+    if (!document.getElementById(tabId)) {
+      return;
+    }
+
+    $('#' + tabId).tabs();
+    tabs.push({
+      id: tabId,
+      type: type,
+    });
+  }
+
+  function showAllTabs(type, value) {
+    for (var i = 0; i < tabs.length; ++i) {
+      var tab = tabs[i];
+      if (type == tab.type) {
+        $('#' + tab.id).tabs("select", tab.id + '_' + value);
+      }
+    }
+  }
+</script>
+
+<script type="text/javascript">
+  $(function(){
+    $('#tab-switcher-method').tabs();
+    addTabSection('tab-switcher-resource', 'datatab');
+
+    addTabSection('alttypes_tasks', 'datatab');
+
+    addTabSection('alttypes_tasks_tasks_list', 'datatab');
+    addTabSection('methodtypes_tasks_tasks_list', 'methodtab');
+    addTabSection('alttypes_tasks_tasks_get', 'datatab');
+    addTabSection('methodtypes_tasks_tasks_get', 'methodtab');
+    addTabSection('alttypes_tasks_tasks_insert', 'datatab');
+    addTabSection('methodtypes_tasks_tasks_insert', 'methodtab');
+    addTabSection('alttypes_tasks_tasks_update', 'datatab');
+    addTabSection('methodtypes_tasks_tasks_update', 'methodtab');
+    addTabSection('alttypes_tasks_tasks_delete', 'datatab');
+    addTabSection('methodtypes_tasks_tasks_delete', 'methodtab');
+    addTabSection('alttypes_tasks_tasks_move', 'datatab');
+    addTabSection('methodtypes_tasks_tasks_move', 'methodtab');
+    addTabSection('alttypes_tasks_tasks_clear', 'datatab');
+    addTabSection('methodtypes_tasks_tasks_clear', 'methodtab');
+
+    addTabSection('alttypes_tasklists', 'datatab');
+
+    addTabSection('alttypes_tasks_tasklists_list', 'datatab');
+    addTabSection('methodtypes_tasks_tasklists_list', 'methodtab');
+    addTabSection('alttypes_tasks_tasklists_get', 'datatab');
+    addTabSection('methodtypes_tasks_tasklists_get', 'methodtab');
+    addTabSection('alttypes_tasks_tasklists_insert', 'datatab');
+    addTabSection('methodtypes_tasks_tasklists_insert', 'methodtab');
+    addTabSection('alttypes_tasks_tasklists_update', 'datatab');
+    addTabSection('methodtypes_tasks_tasklists_update', 'methodtab');
+    addTabSection('alttypes_tasks_tasklists_delete', 'datatab');
+    addTabSection('methodtypes_tasks_tasklists_delete', 'methodtab');
+
+
+  });
+
+  function setTabs() {
+    showAllTabs('datatab', 'json');
+  }
+
+  window.onload = setTabs;
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<p class="labswarning"><strong>Important:</strong> This version of the Google Tasks API is in <a href="/labs/">Labs</a>, and its features might change unexpectedly until it graduates.</p>
+
+
+
+
+
+
+<p>This Reference Guide is a detailed technical reference of the collections, resources, methods, and authentication requirements for the Google Tasks API v1.</p>
+
+<h2>Introduction</h2>
+
+<h3>Contents and Overview</h3>
+<div class="apiindent">
+  <table class="matchpre" id="apitoc">
+    <tr>
+      <th>Data</th>
+      <th>Method</th>
+      <th>REST URI <span style="font-weight: normal;">relative to <code>https://www.googleapis.com/tasks/v1</code></span></th>
+
+      <th>Access</th>
+    </tr>
+
+    <tr>
+      <td rowspan="7">
+          <a href="#collection_tasks">Task Collection</a><br/>&#8627;&nbsp;<a href="#resource_tasks">Task Resource</a>
+      </td>
+
+      <td><a class="apimethod" href="#method_tasks_tasks_list">tasks.list</a></td>
+      <td><code>GET&nbsp; /lists/<span class="apiparam">tasklist</span>/tasks</span></code></td>
+      <td>
+<span class="authrequired">AUTHENTICATED</span>
+      </td>
+    </tr>
+
+    <tr>
+      <td><a class="apimethod" href="#method_tasks_tasks_get">tasks.get</a></td>
+      <td><code>GET&nbsp; /lists/<span class="apiparam">tasklist</span>/tasks/<span class="apiparam">task</span></span></code></td>
+      <td>
+        <span class="authrequired">AUTHENTICATED</span>
+
+      </td>
+    </tr>
+
+    <tr>
+      <td><a class="apimethod" href="#method_tasks_tasks_insert">tasks.insert</a></td>
+      <td><code>POST&nbsp; /lists/<span class="apiparam">tasklist</span>/tasks</span></code></td>
+
+      <td>
+        <span class="authrequired">AUTHENTICATED</span>
+      </td>
+    </tr>
+
+    <tr>
+      <td><a class="apimethod" href="#method_tasks_tasks_update">tasks.update</a></td>
+      <td><code>PUT&nbsp; /lists/<span class="apiparam">tasklist</span>/tasks/<span class="apiparam">task</span></span></code></td>
+
+      <td>
+        <span class="authrequired">AUTHENTICATED</span>
+      </td>
+    </tr>
+
+    <tr>
+      <td><a class="apimethod" href="#method_tasks_tasks_delete">tasks.delete</a></td>
+      <td><code>DELETE&nbsp; /lists/<span class="apiparam">tasklist</span>/tasks/<span class="apiparam">task</span></span></code></td>
+
+      <td>
+        <span class="authrequired">AUTHENTICATED</span>
+      </td>
+    </tr>
+
+    <tr>
+      <td><a class="apimethod" href="#method_tasks_tasks_move">tasks.move</a></td>
+      <td><code>POST&nbsp; /lists/<span class="apiparam">tasklist</span>/tasks/<span class="apiparam">task</span>/move</span></code></td>
+
+      <td>
+        <span class="authrequired">AUTHENTICATED</span>
+      </td>
+    </tr>
+
+    <tr>
+      <td><a class="apimethod" href="#method_tasks_tasks_clear">tasks.clear</a></td>
+      <td><code>POST&nbsp; /lists/<span class="apiparam">tasklist</span>/clear</span></code></td>
+
+      <td>
+        <span class="authrequired">AUTHENTICATED</span>
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="5">
+          <a href="#collection_tasklists">Tasklist Collection</a><br/>&#8627;&nbsp;<a href="#resource_tasklists">Tasklist Resource</a>
+
+      </td>
+
+      <td><a class="apimethod" href="#method_tasks_tasklists_list">tasklists.list</a></td>
+      <td><code>GET&nbsp; /users/@me/lists</span></code></td>
+      <td>
+<span class="authrequired">AUTHENTICATED</span>
+      </td>
+
+    </tr>
+
+    <tr>
+      <td><a class="apimethod" href="#method_tasks_tasklists_get">tasklists.get</a></td>
+      <td><code>GET&nbsp; /users/@me/lists/<span class="apiparam">tasklist</span></span></code></td>
+      <td>
+        <span class="authrequired">AUTHENTICATED</span>
+
+      </td>
+    </tr>
+
+    <tr>
+      <td><a class="apimethod" href="#method_tasks_tasklists_insert">tasklists.insert</a></td>
+      <td><code>POST&nbsp; /users/@me/lists</span></code></td>
+      <td>
+
+        <span class="authrequired">AUTHENTICATED</span>
+      </td>
+    </tr>
+
+    <tr>
+      <td><a class="apimethod" href="#method_tasks_tasklists_update">tasklists.update</a></td>
+      <td><code>PUT&nbsp; /users/@me/lists/<span class="apiparam">tasklist</span></span></code></td>
+
+      <td>
+        <span class="authrequired">AUTHENTICATED</span>
+      </td>
+    </tr>
+
+    <tr>
+      <td><a class="apimethod" href="#method_tasks_tasklists_delete">tasklists.delete</a></td>
+      <td><code>DELETE&nbsp; /users/@me/lists/<span class="apiparam">tasklist</span></span></code></td>
+
+      <td>
+        <span class="authrequired">AUTHENTICATED</span>
+      </td>
+    </tr>
+
+  </table>
+</div>
+
+
+
+
+<h2 id="collection_tasks">Task Collection</h2>
+<h3 id="about_tasks">Task</h3>
+<div class="apiindent">
+  <p><font face="Helvetica, Arial, sans-serif"><span>The <a href="/apis/tasks/v1/reference.html#collection_tasks">Task Collection</a> contains <a href="/apis/tasks/v1/reference.html#resource_tasks">Task Resources</a> belonging to a <a href="/apis/tasks/v1/reference.html#resource_tasklists">Tasklist Resource</a>.</span></font></p>
+  <p><font face="Helvetica, Arial, sans-serif"><div><font face="Helvetica, Arial, sans-serif"><span>The <a href="#method_tasks_tasks_list"><span class="apimethod">tasks.list</span></a>, <a href="#method_tasks_tasks_insert"><span class="apimethod">tasks.insert</span></a>, and <a href="#method_tasks_tasks_clear"><span class="apimethod">tasks.clear</span></a> methods operate on a </span></font><span><a href="/apis/tasks/v1/reference.html#collection_tasks">Task Collection</a>. The <a href="#method_tasks_tasks_get"><span class="apimethod">tasks.get</span></a>, <a href="#method_tasks_tasks_update"><span class="apimethod">tasks.update</span></a>, <a href="#method_tasks_tasks_delete"><span class="apimethod">tasks.delete</span></a>, and <a href="#method_tasks_tasks_move"><span class="apimethod">tasks.move</span></a> methods </span><span>operate on the specified <a href="/apis/tasks/v1/reference.html#resource_tasks">Task Resource</a>.</span></div></font></p>
+
+</div>
+
+<h3 id="resource_tasks">Task Resource</h3>
+<div class="apiindent">
+
+  <p><span>A Task Resource describes a single task.</span></p>
+
+
+
+
+  <div id="alttypes_tasks">
+    <ul>
+
+      <li><a href="#alttypes_tasks_json">JSON</a></li>
+    </ul>
+
+    <div id="alttypes_tasks_json">
+      <pre>
+{<br>  &quot;kind&quot;: &quot;tasks#task&quot;,<br>  &quot;id&quot;: <code class="apiparam">(value)</code>,<br>  &quot;etag&quot;: <code class="apiparam">(value)</code>,<br>  &quot;title&quot;: <code class="apiparam">(value)</code>,<br>  &quot;updated&quot;: <code class="apiparam">(value)</code>,<br>  &quot;selfLink&quot;: <code class="apiparam">(value)</code>,<br>  &quot;parent&quot;: <code class="apiparam">(value)</code>,<br>  &quot;position&quot;: <code class="apiparam">(value)</code>,<br>  &quot;notes&quot;: <code class="apiparam">(value)</code>,<br>  &quot;status&quot;: <code class="apiparam">(value)</code>,<br>  &quot;due&quot;: <code class="apiparam">(value)</code>,<br>  &quot;completed&quot;: <code class="apiparam">(value)</code>,<br>  &quot;deleted&quot;: <code class="apiparam">(value)</code>,<br>  &quot;hidden&quot;: <code class="apiparam">(value)</code><br>}</pre>
+
+      <table class="matchpre">
+        <tr>
+          <th>Property Name</th>
+          <th>Value</th>
+          <th>Description</th>
+          <th>Mutable</th>
+
+        </tr>
+
+        <tr>
+          <td><code>kind</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Type of the resource. This is always <code>tasks#task</code>.</td>
+          <td>
+
+          </td>
+        </tr>
+        <tr>
+          <td><code>id</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Task identifier.</td>
+          <td>
+
+          </td>
+        </tr>
+        <tr>
+          <td><code>etag</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>ETag of the resource.</td>
+          <td>
+
+          </td>
+        </tr>
+        <tr>
+          <td><code>title</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Title of the task.</td>
+          <td>
+
+             yes
+          </td>
+        </tr>
+        <tr>
+          <td><code>updated</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Last modification time of the task (as an RFC 3339 timestamp).</td>
+          <td>
+
+          </td>
+        </tr>
+        <tr>
+          <td><code>selfLink</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>URL pointing to this task. Used to retrieve, update, or delete this task.</td>
+          <td>
+
+          </td>
+        </tr>
+        <tr>
+          <td><code>parent</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Parent task identifier. This field is omitted if it is a top-level task. This field is read-only. Use the <a href="#method_tasks_tasks_move"><span class="apimethod">move</span></a> method to move the task under a different parent or to the top level.</td>
+
+          <td>
+          </td>
+        </tr>
+        <tr>
+          <td><code>position</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>String indicating the position of the task among its sibling tasks under the same parent task or at the top level. If this string is greater than another task&#39;s corresponding position string according to lexicographical ordering, the task is positioned after the other task under the same parent task or at the top level. This field is read-only. Use the <a href="#method_tasks_tasks_move"><span class="apimethod">move</span></a> method to move the task to another position.</td>
+
+          <td>
+          </td>
+        </tr>
+        <tr>
+          <td><code>notes</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Notes describing the task. Optional.</td>
+
+          <td>
+             yes
+          </td>
+        </tr>
+        <tr>
+          <td><code>status</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Status of the task. This is either <code>needsAction</code> or <code>completed</code>.</td>
+
+          <td>
+             yes
+          </td>
+        </tr>
+        <tr>
+          <td><code>due</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Due date of the task (as an RFC 3339 timestamp). Optional.</td>
+
+          <td>
+             yes
+          </td>
+        </tr>
+        <tr>
+          <td><code>completed</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Completion date of the task (as an RFC 3339 timestamp). This field is omitted if the task has not been completed.</td>
+
+          <td>
+             yes
+          </td>
+        </tr>
+        <tr>
+          <td><code>deleted</code></td>
+          <td><code class="apitype">boolean</code></td>
+          <td>Flag indicating whether the task has been deleted. The default is <code>False</code>.</td>
+
+          <td>
+          </td>
+        </tr>
+        <tr>
+          <td><code>hidden</code></td>
+          <td><code class="apitype">boolean</code></td>
+          <td>Flag indicating whether the task is hidden. This is the case if the task had been marked completed when the task list was last cleared. The default is <code>False</code>. This field is read-only.</td>
+
+          <td>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+
+
+
+<h3 id="method_tasks_tasks_list">tasks.list
+
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Returns all <a href="#resource_tasks">Task Resources</a> in the specified task list.
+ Authentication is required.
+  </p>
+
+  <p>To refer to the authenticated user&#39;s default task list, use the special value <code>@default</code>.<div><br></div><div>
+
+
+
+
+
+
+
+<p>This method supports the following optional <a href="using.html#query-params">query parameters</a> that limit or expand the range of results returned: <code>maxResults</code>, <code>completedMax</code>, <code>completedMin</code>, <code>dueMax</code>, <code>dueMin</code>, <code>showCompleted</code>, <code>showDeleted</code>, <code>showHidden</code>, <code>pageToken</code>, <code>updatedMin</code>.</p></div></p>
+
+  <div id="methodtypes_tasks_tasks_list">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasks_list_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasks_list_rest">
+      <pre>
+
+GET https://www.googleapis.com/tasks/v1/lists/<span class="apiparam">tasklist</span>/tasks</pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasks.list"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+
+  <div id="alttypes_tasks_tasks_list">
+    <ul>
+        <li><a href="#alttypes_tasks_tasks_list_json">JSON</a></li>
+
+    </ul>
+
+    <div id="alttypes_tasks_tasks_list_json">
+      <pre>
+{<br>  &quot;kind&quot;: &quot;tasks#tasks&quot;,<br>  &quot;etag&quot;: <code class="apiparam">(value)</code>,<br>  &quot;nextPageToken&quot;: <code class="apiparam">(value)</code>,<br>  &quot;items&quot;: [<br>    <a href="#collection_tasks">tasks Resource</a><br>  ]<br>}</pre>
+
+      <table class="matchpre">
+        <tr>
+          <th>Property Name</th>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+
+        <tr>
+          <td><code>kind</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Type of the resource. This is always <code>tasks#tasks</code>.</td>
+        </tr>
+        <tr>
+
+          <td><code>etag</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>ETag of the resource.</td>
+        </tr>
+        <tr>
+          <td><code>nextPageToken</code></td>
+          <td><code class="apitype">string</code></td>
+
+          <td>Token used to access the next page of this result.</td>
+        </tr>
+        <tr>
+          <td><code>items</code></td>
+          <td><code class="apitype">list</code></td>
+          <td>Collection of tasks.</td>
+        </tr>
+
+      </table>
+    </div>
+  </div>
+
+
+    </div>
+  </div>
+
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks.readonly
+    </code>
+    <br>
+  </p>
+
+</div>
+
+
+<h3 id="method_tasks_tasks_get">tasks.get
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Returns the specified <a href="#resource_tasks">Task Resource</a>.
+ Authentication is required.
+  </p>
+
+  <p>To refer to the authenticated user&#39;s default task list, use the special value <code>@default</code>.</p>
+
+  <div id="methodtypes_tasks_tasks_get">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasks_get_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasks_get_rest">
+      <pre>
+
+GET https://www.googleapis.com/tasks/v1/lists/<span class="apiparam">tasklist</span>/tasks/<span class="apiparam">task</span></pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasks.get"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+
+  <div id="alttypes_tasks_tasks_get">
+    <ul>
+    </ul>
+
+  </div>
+
+
+    </div>
+  </div>
+
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+    <code class="apiscope">
+
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks.readonly
+    </code>
+    <br>
+  </p>
+
+
+</div>
+
+
+<h3 id="method_tasks_tasks_insert">tasks.insert
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Creates a new task on the specified task list. Returns a copy of the created <a href="#resource_tasks">Task Resource</a>.
+ Authentication is required.
+  </p>
+
+  <p>To refer to the authenticated user&#39;s default task list, use the special value <code>@default</code>.<div><br></div><div>
+
+
+
+
+
+
+
+<p>This method supports the following optional <a href="using.html#query-params">query parameters</a>: <code>parent</code>, <code>previous</code>.</p></div></p>
+
+  <div id="methodtypes_tasks_tasks_insert">
+
+    <ul>
+      <li><a href="#methodtypes_tasks_tasks_insert_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasks_insert_rest">
+      <pre>
+POST https://www.googleapis.com/tasks/v1/lists/<span class="apiparam">tasklist</span>/tasks</pre>
+
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasks.insert"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+
+  <div id="alttypes_tasks_tasks_insert">
+    <ul>
+    </ul>
+
+  </div>
+
+    </div>
+  </div>
+
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+
+  </p>
+
+
+</div>
+
+
+<h3 id="method_tasks_tasks_update">tasks.update
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Updates the specified task. Returns a copy of the updated <a href="#resource_tasks">Task Resource</a>.
+ Authentication is required.
+  </p>
+
+  <p>To refer to the authenticated user&#39;s default task list, use the special value <code>@default</code>.</p>
+
+  <div id="methodtypes_tasks_tasks_update">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasks_update_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasks_update_rest">
+      <pre>
+PUT https://www.googleapis.com/tasks/v1/lists/<span class="apiparam">tasklist</span>/tasks/<span class="apiparam">task</span></pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasks.update"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+  <div id="alttypes_tasks_tasks_update">
+    <ul>
+    </ul>
+
+  </div>
+
+
+    </div>
+  </div>
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+  </p>
+
+
+</div>
+
+
+<h3 id="method_tasks_tasks_delete">tasks.delete
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Deletes the specified task from the task list. Returns no data (only a status code).
+ Authentication is required.
+  </p>
+
+  <p>To refer to the authenticated user&#39;s default task list, use the special value <code>@default</code>.</p>
+
+  <div id="methodtypes_tasks_tasks_delete">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasks_delete_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasks_delete_rest">
+      <pre>
+
+DELETE https://www.googleapis.com/tasks/v1/lists/<span class="apiparam">tasklist</span>/tasks/<span class="apiparam">task</span></pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasks.delete"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+
+  <div id="alttypes_tasks_tasks_delete">
+    <ul>
+    </ul>
+
+  </div>
+
+
+    </div>
+  </div>
+
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+    <code class="apiscope">
+
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+  </p>
+
+
+</div>
+
+
+<h3 id="method_tasks_tasks_move">tasks.move
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or moving it to a different position among its sibling tasks. Returns a copy of the updated <a href="#resource_tasks">Task Resource</a>.
+ Authentication is required.
+  </p>
+
+  <p>To refer to the authenticated user&#39;s default task list, use the special value <code>@default</code>.<div><br></div><div><span>This method supports the following optional <a href="using.html#query-params">query parameters</a>: <code>parent</code>, <code>previous</code>.</span></div></p>
+
+  <div id="methodtypes_tasks_tasks_move">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasks_move_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasks_move_rest">
+      <pre>
+
+POST https://www.googleapis.com/tasks/v1/lists/<span class="apiparam">tasklist</span>/tasks/<span class="apiparam">task</span>/move</pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasks.move"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+
+  <div id="alttypes_tasks_tasks_move">
+    <ul>
+
+    </ul>
+
+  </div>
+
+
+    </div>
+  </div>
+
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+  </p>
+
+
+</div>
+
+
+<h3 id="method_tasks_tasks_clear">tasks.clear
+<span class="authrequired">(AUTHENTICATED)</span>
+
+</h3>
+
+<div class="apiindent">
+  <p>Clears all completed tasks from the specified task list. The affected tasks are marked as hidden and are no longer returned by default when retrieving all tasks for a task list. Returns no data (only a status code).
+ Authentication is required.
+  </p>
+
+  <p></p>
+
+  <div id="methodtypes_tasks_tasks_clear">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasks_clear_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasks_clear_rest">
+      <pre>
+POST https://www.googleapis.com/tasks/v1/lists/<span class="apiparam">tasklist</span>/clear</pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasks.clear"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+
+</p><br>
+
+
+  <div id="alttypes_tasks_tasks_clear">
+    <ul>
+    </ul>
+
+  </div>
+
+
+    </div>
+  </div>
+
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+  </p>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<h2 id="collection_tasklists">Tasklist Collection</h2>
+<h3 id="about_tasklists">Tasklist</h3>
+<div class="apiindent">
+  <p><span>The <a href="#collection_tasklists">Tasklist Collection</a> contains <a href="#resource_tasklists">Tasklist Resources</a> belonging to the authenticated user.</span></p>
+
+  <p><font face="Helvetica, Arial, sans-serif"><span><div><font face="Helvetica, Arial, sans-serif"><span>The <a href="#method_tasks_tasklists_list"><span class="apimethod">tasklists.list</span></a> and <a href="#method_tasks_tasklists_insert"><span class="apimethod">tasklists.insert</span></a> methods operate on a </span></font><a href="/apis/tasks/v1/reference.html#collection_tasklists">Tasklist Collection</a>. The <a href="#method_tasks_tasklists_get"><span class="apimethod">tasklists.get</span></a>, <a href="#method_tasks_tasklists_update"><span class="apimethod">tasklists.update</span></a>, and <a href="#method_tasks_tasklists_delete"><span class="apimethod">tasklists.delete</span></a> methods operate on a <a href="/apis/tasks/v1/reference.html#resource_tasklists">Tasklist Resource</a>.</div></span></font></p>
+
+</div>
+
+<h3 id="resource_tasklists">Tasklist Resource</h3>
+<div class="apiindent">
+
+  <p><span>A <a href="#resource_tasklists">Tasklist Resource</a> describes a single task list. Each user has at least one default <a href="#resource_tasklists">Tasklist Resource</a>. For each Tasklist Resource, there is a corresponding <a href="#collection_tasks">Task Collection</a> that contains the tasks in that task list.</span></p>
+
+
+
+  <div id="alttypes_tasklists">
+    <ul>
+      <li><a href="#alttypes_tasklists_json">JSON</a></li>
+    </ul>
+
+    <div id="alttypes_tasklists_json">
+      <pre>
+
+{<br>  &quot;kind&quot;: &quot;tasks#taskList&quot;,<br>  &quot;id&quot;: <code class="apiparam">(value)</code>,<br>  &quot;etag&quot;: <code class="apiparam">(value)</code>,<br>  &quot;title&quot;: <code class="apiparam">(value)</code>,<br>  &quot;selfLink&quot;: <code class="apiparam">(value)</code><br>}</pre>
+
+      <table class="matchpre">
+        <tr>
+          <th>Property Name</th>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+
+        <tr>
+          <td><code>kind</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Type of the resource. This is always <code>tasks#taskList</code>.</td>
+        </tr>
+        <tr>
+
+          <td><code>id</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Task list identifier.</td>
+        </tr>
+        <tr>
+          <td><code>etag</code></td>
+          <td><code class="apitype">string</code></td>
+
+          <td>ETag of the resource.</td>
+        </tr>
+        <tr>
+          <td><code>title</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Title of the task list.</td>
+        </tr>
+
+        <tr>
+          <td><code>selfLink</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>URL pointing to this task list. Used to retrieve, update, or delete this task list.</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+
+
+
+<h3 id="method_tasks_tasklists_list">tasklists.list
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Returns all the authenticated user&#39;s <a href="#resource_tasklists">Tasklist Resources</a>.
+ Authentication is required.
+  </p>
+
+  <p><span>This method supports the following optional <a href="using.html#query-params">query parameters</a>: <code>maxResults</code>, <code>pageToken</code>.</span></p>
+
+  <div id="methodtypes_tasks_tasklists_list">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasklists_list_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasklists_list_rest">
+      <pre>
+GET https://www.googleapis.com/tasks/v1/users/@me/lists</pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasklists.list"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+  <div id="alttypes_tasks_tasklists_list">
+    <ul>
+        <li><a href="#alttypes_tasks_tasklists_list_json">JSON</a></li>
+    </ul>
+
+    <div id="alttypes_tasks_tasklists_list_json">
+      <pre>
+{<br>  &quot;kind&quot;: &quot;tasks#taskLists&quot;,<br>  &quot;etag&quot;: <code class="apiparam">(value)</code>,<br>  &quot;nextPageToken&quot;: <code class="apiparam">(value)</code>,<br>  &quot;items&quot;: [<br>    <a href="#collection_tasklists">tasklists Resource</a><br>  ]<br>}</pre>
+
+      <table class="matchpre">
+        <tr>
+          <th>Property Name</th>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+
+        <tr>
+          <td><code>kind</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>Type of the resource. This is always <code>tasks#taskLists</code>.</td>
+        </tr>
+        <tr>
+
+          <td><code>etag</code></td>
+          <td><code class="apitype">string</code></td>
+          <td>ETag of the resource.</td>
+        </tr>
+        <tr>
+          <td><code>nextPageToken</code></td>
+          <td><code class="apitype">string</code></td>
+
+          <td>Token that can be used to request the next page of this result.</td>
+        </tr>
+        <tr>
+          <td><code>items</code></td>
+          <td><code class="apitype">list</code></td>
+          <td>Collection of task lists.</td>
+        </tr>
+
+      </table>
+    </div>
+  </div>
+
+
+    </div>
+  </div>
+
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks.readonly
+    </code>
+    <br>
+  </p>
+
+</div>
+
+
+<h3 id="method_tasks_tasklists_get">tasklists.get
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Returns the authenticated user&#39;s specified <a href="#resource_tasklists">Tasklist Resource</a>.
+ Authentication is required.
+  </p>
+
+  <p></p>
+
+  <div id="methodtypes_tasks_tasklists_get">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasklists_get_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasklists_get_rest">
+
+      <pre>
+GET https://www.googleapis.com/tasks/v1/users/@me/lists/<span class="apiparam">tasklist</span></pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasklists.get"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+
+  <div id="alttypes_tasks_tasklists_get">
+    <ul>
+    </ul>
+
+  </div>
+
+
+    </div>
+  </div>
+
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+    <code class="apiscope">
+
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks.readonly
+    </code>
+    <br>
+  </p>
+
+
+</div>
+
+
+<h3 id="method_tasks_tasklists_insert">tasklists.insert
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Creates a new task list and adds it to the authenticated user&#39;s task lists. Returns a copy of the created <a href="#resource_tasklists">Tasklist Resource</a>.
+ Authentication is required.
+  </p>
+
+  <p></p>
+
+  <div id="methodtypes_tasks_tasklists_insert">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasklists_insert_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasklists_insert_rest">
+      <pre>
+
+POST https://www.googleapis.com/tasks/v1/users/@me/lists</pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasklists.insert"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+
+  <div id="alttypes_tasks_tasklists_insert">
+    <ul>
+    </ul>
+
+  </div>
+
+
+    </div>
+  </div>
+
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks
+    </code>
+
+    <br>
+  </p>
+
+
+</div>
+
+
+<h3 id="method_tasks_tasklists_update">tasklists.update
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Updates the authenticated user&#39;s specified task list. Returns a copy of the updated <a href="#resource_tasklists">Tasklist Resource</a>.
+ Authentication is required.
+  </p>
+
+  <p></p>
+
+  <div id="methodtypes_tasks_tasklists_update">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasklists_update_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasklists_update_rest">
+
+      <pre>
+PUT https://www.googleapis.com/tasks/v1/users/@me/lists/<span class="apiparam">tasklist</span></pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasklists.update"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+
+  <div id="alttypes_tasks_tasklists_update">
+    <ul>
+    </ul>
+
+  </div>
+
+
+    </div>
+  </div>
+
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+    <code class="apiscope">
+
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+  </p>
+
+
+</div>
+
+
+<h3 id="method_tasks_tasklists_delete">tasklists.delete
+<span class="authrequired">(AUTHENTICATED)</span>
+</h3>
+
+<div class="apiindent">
+  <p>Deletes the authenticated user&#39;s specified task list. Returns no data (only a status code).
+ Authentication is required.
+  </p>
+
+  <p></p>
+
+  <div id="methodtypes_tasks_tasklists_delete">
+    <ul>
+      <li><a href="#methodtypes_tasks_tasklists_delete_rest">REST</a></li>
+
+    </ul>
+
+
+    <div id="methodtypes_tasks_tasklists_delete_rest">
+      <pre>
+DELETE https://www.googleapis.com/tasks/v1/users/@me/lists/<span class="apiparam">tasklist</span></pre>
+<p class="apiexp">
+  <a class="button" target="_blank" href="//code.google.com/apis/explorer/#_s=tasks&amp;_v=v1&amp;_m=tasklists.delete"><img class="apiexp-img" src="/images/popout-204e80-18.png">Try it now in the APIs Explorer!</a>
+</p><br>
+
+  <div id="alttypes_tasks_tasklists_delete">
+    <ul>
+    </ul>
+
+  </div>
+
+
+    </div>
+  </div>
+
+
+  <p class="authnote">Invoking this method requires the use of a token with access to:<br/>
+    <code class="apiscope">
+       https://www.googleapis.com/auth/tasks
+    </code>
+    <br>
+  </p>
+
+
+</div>
+
+
+</div>
+
+
+
+<p><br/></p>
+
+      </div><!-- end gc-pagecontent -->
+    </div><!-- end gooey wrapper -->
+
+    </div> <!-- end codesite content -->
+
+<div id="gc-footer" dir="ltr">
+  <div class="text">
+
+  </div>
+</div><!-- end gc-footer -->
+
+</div><!-- end gc-container -->
+
+<script type="text/javascript">CODESITE_CSITimer['load'].tick('ats');</script>
+<script src="/js/codesite_tail.pack.04102009.js" type="text/javascript"></script>
+
+
+  </body>
+</html>
+
+

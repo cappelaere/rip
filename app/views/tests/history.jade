@@ -1,0 +1,19 @@
+h2 Testing History
+
+h3 Service: 
+	=url
+	
+hr
+table
+	th #
+	th level
+	th score
+	th passes
+	th fails
+	th details
+	th date
+	th version 
+	th actions 
+		
+	- for(el in list)
+		!=partial('tests/history_test', { locals: { el: list[el] } })

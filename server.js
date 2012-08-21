@@ -8,6 +8,7 @@ var express 		= require('express'),
 	sio				= require('socket.io'),
 	path			= require('path'),
 	util			= require('util'),
+	url 			= require('url'),
 	fs				= require('fs'),
     jade			= require('jade'),
 	Encoder			= require('node-html-encoder').Encoder,
@@ -20,8 +21,13 @@ var express 		= require('express'),
 	session			= require('./app/controllers/session'),
 	api				= require('./app/controllers/api'),
 	analytics		= require('./app/controllers/analytics'),
+	opensearch		= require('./app/controllers/opensearch'),
+	
+	auth			= require('connect-auth/lib/index');
+	
 	//tweets			= require('./app/controllers/tweets'),
- 	debug			= require('debug'),
+ 	
+	debug			= require('debug'),
 	cfg				= require('./lib/config'),
 	OAuthVerify		= require('./lib/oauth_verify'),
 	// libxml 		= require("libxml"),
@@ -31,11 +37,10 @@ var express 		= require('express'),
   	RedisStore 		= require('connect-redis')(express),
  	redis			= require('redis');
 
-	var server_url 	= cfg.server_url;
+	var server_url 		= cfg.server_url;
 
-	var app = module.exports = express.createServer();
+	global.app 			= module.exports = express.createServer();
 
-	global.app 			= app;
 	global.server_url 	= server_url;
 	global.trackingID   = cfg.trackingID;
 	global.clientID 	= cfg.clientID;
@@ -44,6 +49,9 @@ var express 		= require('express'),
 	
 	var db, sessionStore;
 	var rtg, passwd;
+	
+	console.log("app.settings.env:"+util.inspect(app.settings.env))
+	console.log("process.env.NODE_ENV:"+util.inspect(process.env.NODE_ENV))
 	
 	// configuring the database access & session store
 	//
@@ -96,8 +104,66 @@ app.sessionStore	= sessionStore;
 // we need to configure environment
 console.log(util.inspect(app.settings));
 
-var mainEnv 	= app.root + '/config/environment'+'.js';
-var supportEnv 	= app.root + '/config/environments/' + app.settings.env+'.js';
+
+var auth_middleware= function() {
+  return function(req, res, next) {
+	console.log("*** auth_middleware");
+	
+    var urlp= url.parse(req.originalUrl, true)
+    if( urlp.query.login_with ) {
+      req.authenticate([urlp.query.login_with], function(error, authenticated) {
+        if( error ) {
+          // Something has gone awry, behave as you wish.
+          console.log( error );
+          res.end();
+      }
+      else {
+          if( authenticated === undefined ) {
+            // The authentication strategy requires some more browser interaction, suggest you do nothing here!
+          }
+          else {
+            // We've either failed to authenticate, or succeeded (req.isAuthenticated() will confirm, as will the value of the received argument)
+            next();
+          }
+      }});
+    }
+    else {
+      next();
+    }
+  }
+};
+
+var base_url = "http://rip.jit.su";
+
+// weave security strategies here
+app.use(auth( {
+		strategies:[ 
+			auth.Facebook({
+				appId : 		cfg.OAuth.Facebook.key, 
+				appSecret: 		cfg.OAuth.Facebook.secret, 
+				scope: 			"email", 
+				callback: 		base_url + cfg.OAuth.Facebook.callback})
+     		, auth.Github({
+				appId : 		cfg.OAuth.Github.key, 
+				appSecret: 		cfg.OAuth.Github.secret, 
+				callback: 		base_url + cfg.OAuth.Github.callback})
+     		, auth.Google2({
+				appId : 		cfg.OAuth.Google.key, 
+				appSecret: 		cfg.OAuth.Google.secret, 
+				callback: 		base_url + cfg.OAuth.Google.callback, requestEmailPermission: true})
+     		, auth.Foursquare({
+				appId: 			cfg.OAuth.Foursquare.key, 
+				appSecret: 		cfg.OAuth.Foursquare.secret, 
+				callback: 		base_url + cfg.OAuth.Foursquare.callback })
+			],
+	 	trace: true, 
+		} )
+	);
+
+//app.use(auth_middleware());
+
+var mainEnv 		= app.root + '/config/environment'+'.js';
+var supportEnv 		= app.root + '/config/environments/' + app.settings.env+'.js';
 require(mainEnv)
 require(supportEnv)
 
@@ -176,6 +242,9 @@ app.get('/docs',										docs.index);
 // Google Discovery API
 app.get('/discovery/v1',								discovery.v1)
 app.get('/discovery',									discovery.index);
+app.get('/rip.json',									discovery.index);
+app.get('/discovery/:resource.properties',				discovery.resource);
+app.get('/discovery/:resource.rnc',						discovery.rnc);
 
 // Play with API
 app.get('/api',											api.index);
@@ -184,23 +253,26 @@ app.get('/analytics',									analytics.index);
 //app.get('/tweets',										tweets.index);
 
 // Features
-app.get('/ustories',									stories.index);
+app.get('/ustories.:format?',							stories.index);
 app.get('/ustories/:cat/:id',							stories.show);
 app.get('/ustories/:cat/:id/:id2',						stories.show);
 
 // Tests
-app.get('/tests',										tests.index);
-app.post('/tests',										tests.create);
-app.post('/tests/sio',									tests.sio);
-app.get('/tests/old_form',								tests.old_form);
-app.get('/tests/form',									tests.form);
-app.get('/tests/levels',								tests.levels);
-app.get('/tests/levels/:id',							tests.levels);
-app.get('/tests/test',									tests.test);
-app.get('/tests/:id',									tests.show);
+app.get('/rtests.:format?',								tests.index);
+app.post('/rtests',										tests.create);
+app.post('/rtests/sio',									tests.sio);
+app.get('/rtests/old_form',								tests.old_form);
+app.get('/rtests/form',									tests.form);
+app.get('/rtests/levels',								tests.levels);
+app.get('/rtests/levels/:id',							tests.levels);
+app.get('/rtests/test',									tests.test);
+app.get('/rtests/history',								tests.history);
+app.get('/rtests/:id/results',							tests.results);
+app.get('/rtests/:id/destroy',							tests.destroy);
+app.get('/rtests/:id.:fmt?',							tests.show);
 
 // Services
-app.get('/services',									services.index);
+app.get('/services.:format?',							services.index);
 app.get('/services/form',								restrict, services.form);
 app.post('/services/create',							services.create);
 app.get('/services/destroy',							services.destroy);
@@ -219,6 +291,8 @@ app.get('/rip/session/logout', 							session.logout);
 app.get('/rip/session/open_id_complete', 				session.open_id_complete);
 app.get('/rip/session', 								session.index);
 
+// Opensearch
+app.get('/opensearch/:id', 							opensearch.index);
 
 // Process the API request
 app.post('/processReq',api.oauth, api.processRequest, function(req, res) {
@@ -331,7 +405,7 @@ if (!module.parent) {
 			app.sio.set('log level', 1);                    // reduce logging
 			app.sio.set('transports', [                     // enable all transports (optional if you want flashsocket)
 			    'websocket'
-			  , 'flashsocket'
+//			  , 'flashsocket'
 			  , 'htmlfile'
 			  , 'xhr-polling'
 			  , 'jsonp-polling'
@@ -348,5 +422,5 @@ if (!module.parent) {
 		// ==========================================
 	
 	
-	console.log("RIP Server ready...")
+	console.log("RIP Server ready...at:"+server_url)
 }
