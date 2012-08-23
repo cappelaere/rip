@@ -6,7 +6,7 @@ var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
 var debug 			= require('debug')('tests:Content_Negotiation');
 
-describe('Content_Negotiation', function() {
+describe('Content Negotiation', function() {
 
 	function add_url( path, m ) {
 		var h = {

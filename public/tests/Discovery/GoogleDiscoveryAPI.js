@@ -5,7 +5,7 @@ var assert 		= require('assert')
 var debug 		= require('debug')('Discovery');
 
 describe('Discovery Service', function(){
-	describe('Using_Google_API_Discovery_Document', function(){
+	describe('Using Google API Discovery Document', function(){
 		describe('is accessible', function() {
 			it('should exists', function(done){
 				var doc_url = url+ discovery_href;

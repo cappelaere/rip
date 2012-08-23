@@ -1,6 +1,7 @@
 var express 	= require('express'),
 	crypto		= require('crypto'),
-	cfg     	= require('../lib/config');
+	cfg     	= require('../lib/config'),
+	markdown	= require("markdown");
 
 app.configure(function(){
 	console.log("configure...");

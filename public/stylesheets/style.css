@@ -9,6 +9,13 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+blockquote {
+	background-color: lightgray;
+	margin: 1em;
+	font-style: italic;	
+}
+
 #messages {
   width: 95%;
   margin-bottom: 15px;

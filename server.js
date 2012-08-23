@@ -30,7 +30,6 @@ var express 		= require('express'),
 	debug			= require('debug'),
 	cfg				= require('./lib/config'),
 	OAuthVerify		= require('./lib/oauth_verify'),
-	// libxml 		= require("libxml"),
 	
 	//form			= require('connect-form'),
 	twitter			= require('twitter'),
@@ -61,7 +60,7 @@ var express 		= require('express'),
 	
 		// jitsu databases create redis rip2
 		// jitsu databases list and update config.yaml
-		//var conn_url 		= 'redis://nodejitsu:ff6691395536b4d5636a81627530830d@drum.redistogo.com:9774/';
+		// var conn_url = 'redis://nodejitsu:ff6691395536b4d5636a81627530830d@drum.redistogo.com:9774/';
 		rtg 				= url.parse(cfg.redis_conn_url);
 		passwd 				= rtg.auth.split(':')[1];
 		
@@ -253,6 +252,7 @@ app.get('/analytics',									analytics.index);
 //app.get('/tweets',										tweets.index);
 
 // Features
+app.get('/ustories',									stories.index);
 app.get('/ustories.:format?',							stories.index);
 app.get('/ustories/:cat/:id',							stories.show);
 app.get('/ustories/:cat/:id/:id2',						stories.show);
@@ -305,6 +305,33 @@ app.post('/processReq',api.oauth, api.processRequest, function(req, res) {
     res.send(result);
 });
 
+// ==============================================================
+// Check incoming headers and sot outgoing headers appropriately
+// mich return a 304 as necessary
+app.check_headers = function( req, res, etag, updated, content_type, fn ) {
+	
+	if( app.settings.env == 'production') {
+		var if_none_match = req.headers["if-none-match"];
+		var last_modified = req.headers["last-modified"];
+
+		if( if_none_match && if_none_match==etag ) {
+			debug("304 due to etag match")
+			return res.send(304);
+		}
+
+		if( last_modified && last_modified==updated) {
+			debug("304 due to date match")
+			return res.send(304);
+		}
+	
+		res.header('Last-Modified',updated);
+		res.header('ETag', etag);
+	}
+	
+	res.header('Content-Type',content_type);
+	
+	fn();
+}
 
 // ==========================================
 // Startup

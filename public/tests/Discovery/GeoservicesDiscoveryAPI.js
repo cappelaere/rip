@@ -8,7 +8,7 @@ var AssertionError	= chai.AssertionError;
 var debug 			= require('debug')('tests:Geoservices');
 
 describe('Discovery Service', function(){
-	describe('Using_GeoServices_Discovery_Catalog', function() {
+	describe('Using GeoServices Discovery Catalog', function() {
 	
 		describe('is accessible', function() {
 			it('should exists', function(done){

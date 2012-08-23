@@ -1,4 +1,4 @@
-describe('Uniform_Interface', function(){
+describe('Uniform Interface', function(){
 	describe('uses limited http verbs', function() {
 		it('should use GET|PUT|POST|HEAD|DELETE|OPTIONS')
 	})

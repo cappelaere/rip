@@ -59,7 +59,7 @@ function bootController(app, file) {
     , prefix = '/' + plural; 
 
   // Special case for "app"
-  if (name == 'app') prefix = '/wcps';
+  //if (name == 'app') prefix = '/wcps';
 
   Object.keys(actions).map(function(action){
     var fn = controllerAction(name, plural, action, actions[action]);

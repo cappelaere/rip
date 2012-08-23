@@ -6,12 +6,12 @@ function Abort (message) {
   this.message = message;
 }
 
-Abort.prototype = Object.create(Error.prototype);
-Abort.prototype.name = 'Abort';
+Abort.prototype 			= Object.create(Error.prototype);
+Abort.prototype.name 		= 'Abort';
 Abort.prototype.constructor = Abort;
 
 
-describe('End_Point', function(){
+describe('End Point', function(){
 	//console.log("Checking myvars describe:"+ util.inspect(this))
 
 	before( function(done) {

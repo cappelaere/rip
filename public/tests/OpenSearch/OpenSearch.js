@@ -5,7 +5,7 @@ var should  = require('chai').should();
 var xml2js	= require('xml2js');
 var debug 	= require('debug')('tests:OpenSearch');
 
-describe('OpenSearch_Document', function(){
+describe('OpenSearch Document', function(){
 	var xmlDoc;
 	var xmlParser;
 	var html_search_url;

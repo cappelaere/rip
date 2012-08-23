@@ -5,7 +5,7 @@ var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
 var debug 			= require('debug')('tests:LandingPage');
 
-describe('Landing_Page', function(){
+describe('Landing Page', function(){
 	var result;
 	
 	it('should exist', function(done) {

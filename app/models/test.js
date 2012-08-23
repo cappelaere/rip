@@ -1,6 +1,8 @@
 var util		= require('util'),
 	async		= require('async'),
-	pubsub		= require('../../lib/pubsub');
+	eyes		= require('eyes'),
+	pubsub		= require('../../lib/pubsub'),
+	debug 		= require('debug')('tests');
 	
 	
 // A test is saved as test_instance
@@ -27,7 +29,7 @@ var Test = exports = module.exports = function Test(
 	this.output			= output;	// actual test results
 };
 
-// create a new process from deserialized JSON Object
+// Create a new process from deserialized JSON Object
 Test.newInstance = function(obj) {
 	
 	var test = new Test();
@@ -37,7 +39,7 @@ Test.newInstance = function(obj) {
 	return test;
 }
 
-// stringify JSON object and return it as a string
+// Stringify JSON object and return it as a string
 Test.prototype.media_json = function() {
 	var test = this;
 	
@@ -63,17 +65,18 @@ Test.prototype.media_json = function() {
 	return test;
 }
 
+// Save Test
 Test.prototype.save = function(fn){
  	var test = this;
 	
 	try {
 		app.db.incr(tests_count, function(err, id) {
 			if( err ) {
-				console.log("Error saving test");
+				console.error("Error saving test");
 				fn(err, null);
 			} else {
 				test.id = id;
-				console.log("storing test id:"+test.id);
+				debug("storing test id:"+test.id);
 				
 				// save test output separately for later retrieval speed... not always needed
 				var output = test.output;
@@ -89,7 +92,7 @@ Test.prototype.save = function(fn){
 				// add service url in service hash set as necessary
 				var service_id;
 				app.db.hget( services_hash, test.url, function(err, service_id) {
-					console.log("Adding to hash "+ err + " "+ service_id);
+					debug("Adding to hash "+ err + " "+ service_id);
 					if( !service_id ) {
 						app.db.hlen(services_hash, function(err, len) {
 							service_id = len+1;
@@ -104,29 +107,35 @@ Test.prototype.save = function(fn){
 				if( fn ) fn(null, test);
 			}
 		})
-	} catch(e) { console.log("Exception saving test:"+e)}
+	} catch(e) { console.error("Exception saving test:"+e)}
 }
 
-// delete all db entries for a test
+// Delete all db entries for a test
 Test.prototype.destroy = function(fn){
-	console.log("destroying:"+this.id);
+	debug("destroying:"+this.id);
 
 	app.db.del(details_instance+this.id);
 	app.db.del(test_instance+this.id);
 
 	app.db.srem( tests_list, this.id);
 
-	app.db.srem( services_tests_list, this.id);
+	// we need to remove from the service url test list
+	var url  = this.url;
+	var tid  = this.id;
+	app.db.hget(services_hash, url, function(err, sid) {
+		debug("removing test id:"+tid+" from:"+services_tests_list+sid);
+		app.db.srem( services_tests_list+sid, tid);
+	});
 
-	fn(null);
+	if(fn) fn(null);
 };
 
-// destroy by test id
+// Destroy by test id
 exports.destroy = function(id, fn) {
   app.db.get(test_instance+id, function(err, data) {
 	if( err ) {
-		console.log("destroy error trying to get test:"+id)
-		fn(err);
+		console.error("destroy error trying to get test:"+id)
+		if(fn) fn(err);
 	} else {
 		var test = Test.newInstance(JSON.parse(data));
 		test.destroy(fn);
@@ -134,11 +143,11 @@ exports.destroy = function(id, fn) {
   })
 };
 
-// return test by test id
+// Return test by test id
 exports.get_by_id = function(id, fn){
   app.db.get(test_instance+id, function(err, data) {
 	if( err || !data ) {
-		console.log("Err:"+err+" trying to get test:"+id);
+		debug("Err:"+err+" trying to get test:"+id+ " data:"+data);
 		fn(err, null);
 	} else {
 		var obj = JSON.parse(data)
@@ -149,7 +158,7 @@ exports.get_by_id = function(id, fn){
   })
 };
 
-// return all services ids
+// Return all services ids
 exports.get_services = function(fn) { 
 	app.db.hgetall(services_hash, function(err, list) {
 		fn(err, list);
@@ -182,30 +191,40 @@ exports.get_latest_tests_for_each_service = function(fn) {
 			exports.get_latest_test_for_service(el.id, function(err, id) {
 				app.db.get(test_instance+id, function(err, t) {
 					var json = JSON.parse(t);
-					delete json["output"];
-					el.latest = json
-					callback(err, el)					
+					if( json ) {
+						delete json["output"];
+						el.latest = json
+						callback(err, el)					
+					} else {
+						debug("null data retrieving test:"+id)
+						callback(err, null)					
+					}
 				})
 			})
 		}, function(err, results) {
-			fn(err, results);
+			// let's filter the nul elements... something bad happened... let's not propagate it
+			async.filter(arr, function(el, cb) {
+				cb(	el.latest );
+			}, function(non_null_results) {
+				fn(err, non_null_results);				
+			})
 		})
 	})
 }
 
 // retrieve all tests for a particular service
 exports.get_all_tests_for_service = function( url, fn) {
-	app.db.hget(services_hash, url, function(err, id) {
-		app.db.smembers(services_tests_list+id, function(err, list) {
-			async.map(list, function(id, callback) {
-				app.db.get( test_instance+id, function(err, test) {
+	app.db.hget(services_hash, url, function(err, sid) {
+		app.db.smembers(services_tests_list+sid, function(err, list) {
+			async.map(list, function(tid, callback) {
+				app.db.get( test_instance+tid, function(err, test) {
 					//console.log(test)
 					var json = JSON.parse(test);
 					if( json ) {
 						delete json["output"];
 						callback(err, json)	
 					} else {
-						console.log("Error getting test:"+id);
+						console.log("Error getting test:"+tid+" from:"+services_tests_list+sid);
 						callback(err,null)
 					}
 				})			
@@ -213,7 +232,6 @@ exports.get_all_tests_for_service = function( url, fn) {
 				fn(err, results);
 			})
 		})
-		
 	})
 }
 

@@ -16,4 +16,4 @@ table
 	th actions 
 		
 	- for(el in list)
-		!=partial('tests/history_test', { locals: { el: list[el] } })
+		!= partial('tests/history_test', { locals: { el: list[el] } })

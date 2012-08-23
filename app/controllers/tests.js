@@ -376,22 +376,13 @@ module.exports = {
 					}
 					testList['etag'] 	=  JSON.stringify(testList).sha1_hex();
 					
-					if( app.settings.env != 'development' ) {
-						if( if_none_match && if_none_match==testList.etag ) {
-							return res.send("",304);
-						}
-						if( last_modified && last_modified==testList.updated) {
-							return res.send("",304);
-						}
-					}
-					
 					if( fmt == 'json') {
 						var content_type 	= 'application/json; profile=\"'+server_url+"/discovery/TestList.properties\"";
-						res.header('Content-Type', content_type);
-						var date = new Date(Date.parse(testList.updated))
-						res.header('Last-Modified', date);
-						res.header('ETag', testList.etag);
-						return res.send(testList);
+				
+						app.check_headers(req, res, testList.etag, testList.updated, content_type, function() {
+							return res.send(testList);
+						});
+						
 					} else { // atom
 						for( el in list ) {
 							var e = list[el];
@@ -411,22 +402,18 @@ module.exports = {
 						
 						var totalResults 	= list.length;
 						var link 			= "http://"+req.headers.host + "/rtests";
-						//console.log("atom feed list:"+totalResults);
-						res.header('Content-Type',"application/xml; charset=utf-8");
-						res.header('GData-Version',"2.0");
-						var date = new Date(Date.parse(testList.updated))
-						res.header('Last-Modified', date);
-						res.header('ETag', testList.etag);
-						//eyes.inspect(testList)
-						return res.render("tests/feed.ejs", {
-							tests: 			testList.items,
-							last_updated: 	updated,
-							link: 			link,
-							totalResults: 	totalResults,
-							startIndex: 	start,
-							itemsPerPage: 	end,
-							layout: 		false,
-							etag: 			testList.etag
+					
+						content_type = "application/atom+xml; charset=utf-8";
+						app.check_headers(req, res, testList.etag, testList.updated, content_type, function() {
+							return res.render("tests/feed.ejs", {
+								tests: 			testList.items,
+								last_updated: 	updated,
+								link: 			link,
+								totalResults: 	totalResults,
+								startIndex: 	start,
+								itemsPerPage: 	end,
+								layout: 		false,
+								etag: 			testList.etag });
 						});
 					}					
 				}
@@ -455,22 +442,12 @@ module.exports = {
 					var etag = JSON.stringify(list).sha1_hex();
 					var updated = "";
 					for( el in list ) {
-						if( updated < list[el].latest.stats.end) updated = list[el].latest.stats.end;
+						if( list[el].latest &&  updated < list[el].latest.stats.end) updated = list[el].latest.stats.end;
 					}
 					
-					if( app.settings.env != 'development' ) {
-						if( if_none_match && if_none_match==etag ) {
-							return res.send("",304);
-						}
-						if( last_modified && last_modified==updated) {
-							return res.send("",304);
-						}
-					}
-					
-					var date = new Date(Date.parse(updated))
-					res.header('Last-Modified', date);
-					res.header('ETag', etag);
-					return res.render("tests/index.jade", {list: list});
+					app.check_headers(req, res, etag, updated, "text/html", function() {
+						return res.render("tests/index.jade", {list: list});
+					})
 				}
 				
 				Test.get_latest_tests_for_each_service( function(err, list) {
@@ -577,6 +554,7 @@ module.exports = {
 		});
 	},
 	
+	// Show a particular test
 	show: function(req, res) {
 		var id 		= req.params['id'];
 		var fmt		= req.fmt();
@@ -594,22 +572,10 @@ module.exports = {
 					var content_type 	= 'application/json; profile=\"'+server_url+"/discovery/Test.properties\"";
 					var updated 		= test.stats.end;
 
-					if( app.settings.env != 'development' ) {
-						if( if_none_match && if_none_match==json.etag ) {
-							return res.send("",304);
-						}
-						if( last_modified && last_modified==updated) {
-							return res.send("",304);
-						}
-					}
-
 					if( fmt == 'json') {
-						var date = new Date(Date.parse(updated))
-						res.header('Last-Modified', date);
-						res.header('Content-Type', content_type);
-						res.header('ETag', json.etag);
-						res.header('GData-Version', '2.0');	
-						return res.send(json);
+						app.check_headers(req, res, etag, updated, content_type, function() {
+							return res.send(json);
+						});
 					} else {
 						res.redirect("/rtests/"+id+"/results");
 					}
@@ -617,9 +583,9 @@ module.exports = {
 				res.send(404)
 			}
 		})
-		//res.render("tests/show.jade");
 	},
 	
+	// Returns a detailed test result
 	results: function(req, res) {
 		var if_none_match = req.headers["if-none-match"];
 		var last_modified = req.headers["last-modified"];
@@ -630,23 +596,16 @@ module.exports = {
 				var etag	= JSON.stringify(test).sha1_hex();
 				var updated = test.stats.end;
 				
-				if( app.settings.env != 'development' ) {
-					if( if_none_match && if_none_match==etag ) {
-						return res.send("",304);
-					}
-					if( last_modified && last_modified==updated) {
-						return res.send("",304);
-					}
-				}
-				
-				var date = new Date(Date.parse(updated))
-				res.header('Last-Modified', date);
-				res.header('ETag', etag);
-				
-				res.render("tests/results.jade", { 	url: 		test.url, 
-													results: 	test.output,
-													json: 		test,
-													layout: 	false })
+				app.check_headers(req, res, etag, updated, "text/html", function() {
+					// we need to get the actual output
+					app.db.get(details_instance+id, function(err, output) {
+						res.render("tests/results.jade", { 	url: 	test.url, 
+														results: 	output,
+														json: 		test,
+														layout: 	false })
+					});					
+				});
+			  	
 			} else {
 				res.send(404)
 			}
@@ -654,6 +613,7 @@ module.exports = {
 		
 	},
 	
+	// Returns a test history of a particular service url
 	history: function(req, res) {
 		var url 			= req.param('url');
 		var if_none_match 	= req.headers["if-none-match"];
@@ -662,7 +622,7 @@ module.exports = {
 		Test.get_all_tests_for_service(url, function(err, list) {
 			var etag = JSON.stringify(list).sha1_hex();
 			var updated = "";
-			//eyes.inspect(list);
+			
 			for( el in list ) {
 				if( list[el] == null ) {
 					delete list[el]
@@ -670,32 +630,27 @@ module.exports = {
 					updated = list[el].stats.end;
 				}
 			}
-			
-			if( app.settings.env != 'development' ) {				
-				if( if_none_match && if_none_match==etag ) {
-					return res.send("",304);
-				}
-				if( last_modified && last_modified==updated) {
-					return res.send("",304);
-				}
-			}
-			
-			var date = new Date(Date.parse(updated))
-			res.header('Last-Modified', date);
-			res.header('ETag', etag);
-			
+			eyes.inspect(list);
 			if( !err ) {
-				res.render("tests/history.jade", { 	url: url, list: list })
+				app.check_headers(req, res, etag, updated, "text/html", function() {
+					res.render("tests/history.jade", { 	url: url, list: list })
+				});
 			} else {
 				res.send(404)
 			}
 		})
 	},
 	
+	// Destroy a particular test run
 	destroy: function(req, res) {
 		var id 		= req.params['id'];
-		Test.destroy(id, function(err) {
-			res.redirect("/rtests");						
+		console.log("tests controller destroy id:"+id)
+		Test.get_by_id(id, function(err, test) {
+			if( err ) return res.send(404);
+			var url = test.url;
+			console.log("tests controller destroy test url:"+url);
+			test.destroy();
+			res.redirect("/rtests/history?url="+url);
 		})
 	}
 }
