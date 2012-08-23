@@ -1,7 +1,7 @@
 {
   "name": "rip",
   "description": "REST Testing Policy for OGC Services",
-  "version": "0.1.0-99",
+  "version": "0.1.0-101",
   "private": false,
   "subdomain": "rip",
   "scripts": {

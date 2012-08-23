@@ -6,7 +6,7 @@ var chai			= require('chai');
 var AssertionError	= chai.AssertionError;
 var debug 			= require('debug')('tests:Headers');
 
-describe('uses Accept and Content-Type headers', function() {
+describe('uses Accept and Content Type headers', function() {
 	var urls = [];
 
 	before( function(done) {
@@ -18,7 +18,7 @@ describe('uses Accept and Content-Type headers', function() {
 		done();
 	})
 
-	describe('should support Accept & Content-type headers', function() {
+	describe('should support Accept & Content Type headers', function() {
 		it( 'should support text/html Accept header and return text/html Content-type', function(done) {
 
 			if( urls.length == 0 ) throw new AssertionError({'message': "No URLs to check"});

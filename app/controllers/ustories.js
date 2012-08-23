@@ -19,36 +19,71 @@ var stories = [];
 
 // Process the markdown table of contents
 // and load a json structure easier to parse
+function process_link( element ) {
+	if( element[0] != 'link') throw "not a link"
+	
+	var href = element[1]['href'].replace(/#/,'/').replace(/_/,"/");
+	
+	var link = {		 
+		'href': href,
+		'key': 	element[2]
+	}
+
+	return link
+}
+
+function process_listitem( element ) {
+	//console.log("process_listitem")
+	//eyes.inspect(element)
+	
+	if( element[0] != 'listitem') throw "not a list item"
+	
+	if( typeof(element[1]) == 'string') {
+		return {
+			'key': element[1]
+		}
+	}
+
+	var link = process_link( element[1] );
+	
+	if( element.length > 2 ) {	// we have sub-bullets
+		var next = element[2];
+		link.list = process_bulletlist( next )
+	}
+	return link;
+}
+
+function process_bulletlist(element) {
+	//console.log("process_bulletlist")
+	//eyes.inspect(element)
+	
+	if( element[0] != 'bulletlist') throw "Not a bullet list"
+	element.shift();	// pop that element
+	
+	var list = [];
+	for( el in element ) {
+		list.push( process_listitem( element[el]))
+	}
+	return list;
+}
+
 function process_toc() {
 	var bulletlist = stories_tree[2];
+
 	// remove first element
 	bulletlist.shift();
+	
 	for( var el in bulletlist ) {
-		var item 		= bulletlist[el];
-		var key1  		= item[1];
+		var element		= bulletlist[el];
 		
-		//console.log(key1);
-		
-		var sub_bullet 	= item[2];
-		sub_bullet.shift();
-		var item_arr = []
-		for( var el2 in sub_bullet ) {
-			var el2_arr = sub_bullet[el2][1]
-						
-			var key2  = el2_arr[2];
-			var value = el2_arr[1]['href']
-			
-			if( value ) {
-				value 	 = String(value).replace(/_/,'/').replace(/#/,'/')
-				var hash = { 'key': key2, 'value': value };
-				
-				item_arr.push(hash);			
-			}
+		var item = {
+			'key': element[1],
+			'list':  process_bulletlist( element[2] )
 		}
-		
-		stories.push( { 'key': key1, 'value': item_arr} )
+		stories.push( item )
 	}
 	//eyes.inspect(stories);
+	
 }
 
 process_toc();
@@ -58,22 +93,21 @@ function find(h, q, fn) {
 	debug("**Find:"+q+" in:"+util.inspect(h));
 
 	for( var k in h ) {
-		var item = h[k];
-		var key  = item['key'];
-		var value = item['value'];
+		var item 	= h[k];
+		var key  	= item['key'];
+		var href 	= item['href'];
+		var list 	= item['list'];
 		
 		debug("key:"+key);
 		if( q && q.indexOf(key)>=0 ) {
 			// remove it from the string
 			nq = q.replace(key,"").trim();
-			//debug("nq length:"+nq.length+" nq:"+nq );
-			if(nq.length>0) {
-				return find(value, nq, fn);
+			// debug("nq length:"+nq.length+" nq:"+nq );
+			if(nq.length > 0) {
+				return find(list, nq, fn);
 			} else {
-				console.log("Value:"+typeof(value))
-				eyes.inspect(value);
-				if( typeof(value) == 'string' ) {
-					return fn(value)
+				if( href ) {
+					return fn(href)
 				} else {
 					debug("return anchor");
 					found = true;
@@ -111,15 +145,17 @@ function htmlize(arr, indent ) {
 	var str = "";
 	for( var el in arr ) {
 		var key 	= arr[el]['key'];
-		var value 	= arr[el]['value'];
-		//console.log(key, typeof(value));
+		var href 	= arr[el]['href'];
+		var list	= arr[el]['list'];
 		
-		if( typeof value != 'object' ) {
-			if( key ) str += "<li><a href='"+ path.join("/ustories", value)+"'>"+key+"</a></li>\n";
+		debug(key, href, list);
+		
+		if( !list ) {
+			str += "<li><a href='"+ path.join("/ustories", href)+"'>"+key+"</a></li>\n";
 		} else {
 			str += "<li><a name='"+key+"'></a> <h"+indent+">"+key+"</h"+indent+">\n<ul>\n";
 			indent++;
-			str += htmlize(value, indent);
+			str += htmlize(list, indent);
 			indent--;
 			str += "</ul></li>\n";
 		}
