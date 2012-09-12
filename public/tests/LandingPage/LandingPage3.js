@@ -70,7 +70,7 @@ describe('Landing Page', function(){
 				debug("explorer_href:"+explorer_href)
 				done();
 			} else {
-				console.log("NO LINK")
+				console.log("NO Explorer Link")
 				throw new AssertionError({'message':'API explorer document link not found'});
 			}
 		})
@@ -82,20 +82,26 @@ describe('Landing Page', function(){
 				docs_href = link.attr('href');
 				debug("docs_href:"+docs_href)
 				done();
-			} else {
+			} else {				
 				throw new AssertionError({'message':"Docs link not found"});
 			}
 		})
 		
 		it('should contain a link to an atom feed', function(done) {
-			var head = $('head');
-			var link = head.find('link[type=application/atom+xml]')
-			if( link && link.length>0) {
-				debug("atom_feed_href:"+link.attr('href'))
-				done();
-			} else {
-				throw new AssertionError({'message':"atom feed link not found"});
-			}
+			var head 	= $('head');
+			var links 	= head.find('link')
+			var found	= false
+			
+			links.each(function(i, elem) {
+				if( elem.attribs.type == 'application/atom+xml') {
+					debug("found atom link to "+elem.attribs.href)
+					found = true
+					done()
+				}
+			})
+			
+			if( !found ) throw new AssertionError({'message':"atom feed link not found"});
+		
 		})
 	})
 })

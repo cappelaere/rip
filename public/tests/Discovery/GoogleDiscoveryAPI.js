@@ -20,15 +20,6 @@ describe('Discovery Service', function(){
 				})
 			})
 			
-			it('should be available from end point url and json extension', function(done){
-				var doc_url = url+ ".json";		
-				request
-				.get( doc_url)
-				.end( function(res) {
-					res.status.should.equal(200);
-					done();
-				})
-			})
 			it('should be available from end point url with proper Accept Headers', function(done){
 				var doc_url = url;
 				request

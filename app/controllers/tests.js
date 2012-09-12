@@ -198,6 +198,7 @@ var test_files = [
 , "./public/tests/HATEOAS/HATEOAS.js"
 , "./public/tests/HATEOAS/HAL.js"
 , "./public/tests/HATEOAS/Siren.js"
+, "./public/tests/Security/https.js"
 , "./public/tests/end_test.js"
 ];
 
@@ -229,6 +230,7 @@ var always_files = {
 		"Caching": 			 	'on',
 		"HATEOAS": 				'on',
 		"Compression": 			'on',
+		"https": 				'on',
 		"end_test": 			'on'
 	}
 }
