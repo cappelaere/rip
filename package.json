@@ -23,7 +23,7 @@
     "cheerio": "0.8.3",
     "connect-auth": "0.5.3",
     "connect-redis": "1.1.0",
-    "connect": "1.8.2",
+    "connect": "3.7.0",
     "cookies": "0.1.6",
     "debug": "0.7.0",
     "ejs": "0.7.1",
